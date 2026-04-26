@@ -1,282 +1,221 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ODC | Analítica de datos y residuos sólidos urbanos</title>
-  <style>
-    :root {
-      --primary: #1f4e79;
-      --secondary: #2e8b57;
-      --accent: #f4b400;
-      --bg: #f6f8fb;
-      --text: #1f2937;
-      --card: #ffffff;
-      --muted: #6b7280;
-      --border: #dbe3ec;
-    }
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
+  <title>ODC | Gestión de Residuos</title>
 
-    header {
-      background: linear-gradient(135deg, var(--primary), #163a59);
-      color: white;
-      padding: 56px 20px;
-      text-align: center;
-    }
+  <link rel="stylesheet" href="css/style.css"/>
 
-    header h1 {
-      margin: 0 0 12px;
-      font-size: 2.2rem;
-    }
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 
-    header p {
-      margin: 8px auto;
-      max-width: 820px;
-      font-size: 1.05rem;
-    }
-
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: white;
-      border-bottom: 1px solid var(--border);
-      box-shadow: 0 2px 8px rgba(0,0,0,.05);
-    }
-
-    .nav-wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 12px 16px;
-      justify-content: center;
-    }
-
-    .nav-wrap a {
-      text-decoration: none;
-      color: var(--primary);
-      font-weight: bold;
-      padding: 8px 12px;
-      border-radius: 999px;
-    }
-
-    .nav-wrap a:hover {
-      background: #eaf2fb;
-    }
-
-    main {
-      max-width: 1100px;
-      margin: 24px auto 48px;
-      padding: 0 16px;
-    }
-
-    section {
-      background: var(--card);
-      margin-bottom: 20px;
-      padding: 28px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 14px rgba(0,0,0,.04);
-    }
-
-    h2 {
-      color: var(--primary);
-      margin-top: 0;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 16px;
-    }
-
-    .card {
-      background: #fbfdff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px;
-    }
-
-    .tag {
-      display: inline-block;
-      background: #e8f4ea;
-      color: #1b5e20;
-      font-size: .85rem;
-      font-weight: bold;
-      padding: 6px 10px;
-      border-radius: 999px;
-      margin-bottom: 10px;
-    }
-
-    .highlight {
-      background: #fff7e0;
-      border-left: 5px solid var(--accent);
-      padding: 16px;
-      border-radius: 10px;
-    }
-
-    .placeholder {
-      border: 2px dashed #b9c7d6;
-      padding: 22px;
-      border-radius: 14px;
-      text-align: center;
-      color: var(--muted);
-      background: #fafcff;
-    }
-
-    details {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      background: #fcfdff;
-      margin-bottom: 12px;
-    }
-
-    summary {
-      font-weight: bold;
-      color: var(--primary);
-      cursor: pointer;
-    }
-
-    ul { padding-left: 20px; }
-
-    .btn {
-      display: inline-block;
-      background: var(--secondary);
-      color: white;
-      text-decoration: none;
-      padding: 12px 18px;
-      border-radius: 10px;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    footer {
-      text-align: center;
-      color: var(--muted);
-      padding: 24px 16px 40px;
-    }
-
-    @media (max-width: 640px) {
-      header h1 { font-size: 1.7rem; }
-      section { padding: 20px; }
-    }
-  </style>
+  <!-- JS -->
+  <script src="js/script.js" defer></script>
 </head>
+
 <body>
-  <header id="inicio">
-    <h1>Impacto de la analítica de datos en la eficiencia de la gestión de residuos sólidos urbanos</h1>
-  </header>
+
+<a class="skip-link" href="#main-content">Saltar al contenido</a>
+
+<!-- ======================
+     MENÚ LATERAL
+====================== -->
+<aside class="drawer" id="drawer">
+
+  <div class="drawer-header">
+    <div class="drawer-title">
+      <h2>ODC UDEC</h2>
+      <p>Gestión de Residuos</p>
+    </div>
+  </div>
 
   <nav>
-    <div class="nav-wrap">
-      <a href="#presentacion">Presentación</a>
-      <a href="#problema">Problema</a>
-      <a href="#objetivos">Objetivos</a>
-      <a href="#modulos">Módulos</a>
-      <a href="#prisma">PRISMA</a>
-      <a href="#evaluacion">Evaluación</a>
-      <a href="#referencias">Referencias</a>
-      <a href="#creditos">Créditos</a>
-    </div>
+    <button class="nav-link active" data-section="portada">Portada</button>
+    <button class="nav-link" data-section="entrada">REA</button>
+    <button class="nav-link" data-section="lineamientos">Lineamientos</button>
+    <button class="nav-link" data-section="modulo-1">Módulo 1</button>
+    <button class="nav-link" data-section="modulo-2">Módulo 2</button>
+    <button class="nav-link" data-section="modulo-3">Módulo 3</button>
+    <button class="nav-link" data-section="modulo-4">Módulo 4</button>
+    <button class="nav-link" data-section="modulo-5">Módulo 5</button>
+    <button class="nav-link" data-section="modulo-6">Módulo 6</button>
+    <button class="nav-link" data-section="simulador">Simulador</button>
+    <button class="nav-link" data-section="evaluacion">Evaluación</button>
+    <button class="nav-link" data-section="conclusion">Conclusión</button>
+    <button class="nav-link" data-section="referencias">Referencias</button>
+    <button class="nav-link" data-section="creditos">Créditos</button>
   </nav>
+</aside>
 
-  <main>
-    <section id="presentacion">
-      <h2>1. Presentación del ODC</h2>
-      <div class="grid">
-        <div class="card">
-          
-        </div>
+<!-- BOTÓN MENU -->
+<button id="drawerToggle" type="button" aria-label="Abrir menú" aria-controls="drawer" aria-expanded="false">&#9776;</button>
+
+<!-- LOGO SUPERIOR DERECHO -->
+<div class="top-logo">
+  <img src="assets/logo-udec.png" alt="Logo Universidad de Cundinamarca">
+</div>
+
+<!-- PROGRESO -->
+<div class="progress-wrapper">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<!-- ======================
+        CONTENIDO
+====================== -->
+<main id="main-content">
+
+<!-- PORTADA -->
+<section id="portada" class="screen active">
+  <h1>Gestión Inteligente de Residuos</h1>
+
+  <p class="hero-text">
+    Transformación digital y analítica de datos para mejorar la eficiencia
+    de la gestión de residuos sólidos urbanos.
+  </p>
+
+  <div class="hero-grid">
+
+    <div class="content-card">
+      <h2>Presentación</h2>
+
+      <p>Universidad de Cundinamarca</p>
+
+      <button class="btn btn-primary" data-section-target="entrada">
+        Iniciar
+      </button>
+    </div>
+
+    <div class="avatar-panel">
+      <div class="avatar-container">
+        <!-- AQUÍ VA VIDEO DEL AVATAR -->
       </div>
-    </section>
 
-    <section id="problema">
-      <h2>2. Problema y pregunta orientadora</h2>
-      <div class="highlight">
-        <p><strong>Problema:</strong> La gestión de residuos sólidos urbanos presenta ineficiencias operativas, económicas y ambientales que pueden ser abordadas con herramientas de analítica de datos y transformación digital.</p>
-        <p><strong>Pregunta:</strong> ¿En qué medida la analítica de datos mejora la eficiencia en la gestión de residuos sólidos urbanos?</p>
+      <audio controls>
+        <source src="assets/audio/intro.mp3">
+      </audio>
+
+      <div class="caption-box">
+        Bienvenido al ODC sobre gestión inteligente de residuos.
       </div>
-    </section>
+    </div>
 
-    <section id="objetivos">
-      <h2>3. Objetivos</h2>
-      <div class="grid">
-        <div class="card">
+  </div>
+</section>
 
-        </div>
-        <div class="card">
-          <h3>Objetivos específicos</h3>
-          
-        </div>
-      </div>
-    </section>
+<!-- REA -->
+<section id="entrada" class="screen">
+  <h2>Resultado de Aprendizaje</h2>
 
-    <section id="modulos">
-      <h2></h2>
+  <p>
+    El estudiante analiza el impacto de la transformación digital en la
+    gestión de residuos usando datos.
+  </p>
+</section>
 
-      <details open>
-        <summary>Módulo 1. Conceptos básicos</summary>
-        
-      </details>
+<!-- LINEAMIENTOS -->
+<section id="lineamientos" class="screen">
+  <h2>Lineamientos del ODC</h2>
 
-      <details>
-        <summary>Módulo 2. Problemáticas actuales</summary>
-     
-        <div class="placeholder">Espacio para gráfico o estadística clave</div>
-      </details>
+  <p>
+    Este ODC incluye módulos, evaluación, referencias, accesibilidad y
+    aprendizaje autogestionado.
+  </p>
+</section>
 
-      <details>
-        <summary>Módulo 3. Analítica de datos y transformación digital</summary>
-        
-      </details>
+<!-- MÓDULO 1 -->
+<section id="modulo-1" class="screen">
+  <h2>Problema urbano</h2>
 
-      <details>
-        <summary>Módulo 4. Aplicaciones y casos</summary>
-       
-      </details>
+  <p>Falta de datos genera ineficiencia.</p>
 
-      <details>
-        <summary>Módulo 5. Hallazgos y eficiencia</summary>
-        
-      </details>
-    </section>
+  <button onclick="checkAnswer(this, true)">Falta de datos</button>
+  <button onclick="checkAnswer(this, false)">Colores</button>
 
-    <section id="prisma">
-      <h2>5. Metodología PRISMA</h2>
-     
-    </section>
+  <div class="feedback"></div>
+</section>
 
-    <section id="evaluacion">
-      <h2>6. Evaluación interactiva</h2>
-      <div class="grid">
-        
-      
-    </section>
+<!-- MÓDULO 2 -->
+<section id="modulo-2" class="screen">
+  <h2>Transformación digital</h2>
+  <p>Optimiza procesos mediante tecnología.</p>
+</section>
 
-    <section id="referencias">
-      <h2>7. Referencias</h2>
-    
-      <div class="placeholder">referencias bibliográficas</div>
-    </section>
+<!-- MÓDULO 3 -->
+<section id="modulo-3" class="screen">
+  <h2>Analítica de datos</h2>
+  <p>Permite decisiones inteligentes.</p>
+</section>
 
-    <section id="creditos">
-      
-    </section>
-  </main>
+<!-- MÓDULO 4 -->
+<section id="modulo-4" class="screen">
+  <h2>Sensores IoT</h2>
+  <p>Monitorean contenedores en tiempo real.</p>
+</section>
 
-  <footer>
-  </footer>
+<!-- MÓDULO 5 -->
+<section id="modulo-5" class="screen">
+  <h2>Impacto ambiental</h2>
+  <p>Reduce emisiones y mejora eficiencia.</p>
+</section>
+
+<!-- MÓDULO 6 -->
+<section id="modulo-6" class="screen">
+  <h2>Toma de decisiones</h2>
+  <p>Basada en evidencia y datos.</p>
+</section>
+
+<!-- SIMULADOR -->
+<section id="simulador" class="screen">
+  <h2>Simulador IoT</h2>
+
+  <button id="simulateBtn">Simular</button>
+
+  <canvas id="impactChart"></canvas>
+</section>
+
+<!-- EVALUACIÓN -->
+<section id="evaluacion" class="screen">
+  <h2>Evaluación</h2>
+
+  <button onclick="checkAnswer(this, true)">IoT</button>
+  <button onclick="checkAnswer(this, false)">Carteles</button>
+
+  <div class="feedback"></div>
+</section>
+
+<!-- CONCLUSIÓN -->
+<section id="conclusion" class="screen">
+  <h2>Conclusión</h2>
+
+  <p>
+    La digitalización mejora la sostenibilidad urbana.
+  </p>
+</section>
+
+<!-- REFERENCIAS -->
+<section id="referencias" class="screen">
+  <h2>Referencias</h2>
+
+  <p>Agregar mínimo 20 fuentes en formato APA 7.</p>
+</section>
+
+<!-- CRÉDITOS -->
+<section id="creditos" class="screen">
+  <h2>Créditos</h2>
+
+  <p>Universidad de Cundinamarca</p>
+</section>
+
+<!-- CONTROLES -->
+<div class="screen-controls">
+  <button id="prevBtn" class="btn btn-ghost" type="button" aria-label="Anterior">&larr;</button>
+  <button id="nextBtn" class="btn btn-primary" type="button" aria-label="Siguiente">&rarr;</button>
+</div>
+
+</main>
+
 </body>
 </html>
