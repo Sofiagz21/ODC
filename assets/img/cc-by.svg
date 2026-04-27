@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="140" viewBox="0 0 560 140" role="img" aria-label="Creative Commons CC BY 4.0">
+  <rect x="8" y="8" width="544" height="124" rx="26" fill="rgba(5,8,7,0.95)" stroke="rgba(57,255,136,0.35)" stroke-width="4"/>
+  <g transform="translate(30 28)">
+    <circle cx="42" cy="42" r="42" fill="rgba(255,255,255,0.04)" stroke="rgba(238,251,245,0.75)" stroke-width="4"/>
+    <text x="42" y="54" text-anchor="middle" font-family="system-ui,Segoe UI,Arial" font-size="34" font-weight="900" fill="#eefbf5">CC</text>
+  </g>
+  <g transform="translate(130 28)">
+    <circle cx="42" cy="42" r="42" fill="rgba(57,255,136,0.12)" stroke="rgba(57,255,136,0.55)" stroke-width="4"/>
+    <text x="42" y="54" text-anchor="middle" font-family="system-ui,Segoe UI,Arial" font-size="34" font-weight="900" fill="#39ff88">BY</text>
+  </g>
+  <text x="250" y="70" font-family="system-ui,Segoe UI,Arial" font-size="30" font-weight="900" fill="#eefbf5">Creative Commons</text>
+  <text x="250" y="102" font-family="system-ui,Segoe UI,Arial" font-size="20" font-weight="800" fill="#9fb8ad">Atribución 4.0 Internacional (CC BY 4.0)</text>
+</svg>

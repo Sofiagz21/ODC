@@ -1,401 +1,644 @@
-/* =========================================================
-   ODC | Gestión Inteligente de Residuos
-   Navegación SPA + Drawer + Progreso + Simulador + Actividades
-========================================================= */
-
-const drawer = document.getElementById("drawer");
-const drawerToggle = document.getElementById("drawerToggle");
-const navLinks = document.querySelectorAll(".nav-link");
-const screens = document.querySelectorAll(".screen");
-const sectionButtons = document.querySelectorAll("[data-section-target]");
+const sections = Array.from(document.querySelectorAll(".screen"));
+const navLinks = Array.from(document.querySelectorAll(".nav-link"));
+const sectionButtons = Array.from(document.querySelectorAll("[data-section-target]"));
 
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
+const drawerToggle = document.getElementById("drawerToggle");
+const drawer = document.getElementById("drawer");
 const progressBar = document.getElementById("progressBar");
 
-const simulateBtn = document.getElementById("simulateBtn");
-const feedback = document.getElementById("simulatorFeedback");
-const chartCanvas = document.getElementById("impactChart");
+let currentSectionIndex = sections.findIndex((section) =>
+  section.classList.contains("active")
+);
 
-let impactChart = null;
+if (currentSectionIndex === -1) currentSectionIndex = 0;
 
-function syncDrawerToggleA11y() {
-  if (!drawerToggle || !drawer) return;
+let speechSynthesisUtterance = null;
+let chartInstance = null;
 
-  const isDesktop = window.innerWidth > 980;
-  const expanded = isDesktop
-    ? !drawer.classList.contains("collapsed")
-    : drawer.classList.contains("open");
+/* =========================
+   NAVEGACIÓN
+========================= */
 
-  drawerToggle.setAttribute("aria-expanded", String(expanded));
-  drawerToggle.setAttribute("aria-label", expanded ? "Cerrar menu" : "Abrir menu");
-}
+function showSection(index) {
+  if (index < 0 || index >= sections.length) return;
 
-/* -----------------------------
-   Drawer lateral
------------------------------ */
-if (drawerToggle && drawer) {
-  drawerToggle.addEventListener("click", () => {
-    const isDesktop = window.innerWidth > 980;
+  pauseAllVideos();
+  stopSpeech();
 
-    if (isDesktop) {
-      drawer.classList.toggle("collapsed");
-      const expanded = !drawer.classList.contains("collapsed");
-      drawerToggle.setAttribute("aria-expanded", String(expanded));
-    } else {
-      drawer.classList.toggle("open");
-      const expanded = drawer.classList.contains("open");
-      drawerToggle.setAttribute("aria-expanded", String(expanded));
-    }
-
-    syncDrawerToggleA11y();
+  sections.forEach((section, sectionIndex) => {
+    section.classList.toggle("active", sectionIndex === index);
   });
-}
 
-/* -----------------------------
-   Utilidades de navegación
------------------------------ */
-function getActiveIndex() {
-  return [...screens].findIndex((screen) =>
-    screen.classList.contains("active")
-  );
+  navLinks.forEach((link) => {
+    link.classList.toggle("active", link.dataset.section === sections[index].id);
+  });
+
+  currentSectionIndex = index;
+  updateProgress();
+
+  window.location.hash = sections[index].id;
+
+  if (window.matchMedia("(max-width: 1120px)").matches) {
+    closeDrawer();
+  }
 }
 
 function updateProgress() {
-  const index = getActiveIndex();
-  const total = screens.length;
-  const progress = ((index + 1) / total) * 100;
+  if (!progressBar || sections.length === 0) return;
 
-  if (progressBar) {
-    progressBar.style.width = `${progress}%`;
-  }
+  const progress = ((currentSectionIndex + 1) / sections.length) * 100;
+  progressBar.style.width = `${progress}%`;
+}
 
-  if (prevBtn) {
-    prevBtn.disabled = index === 0;
-  }
+function handleNavClick(event) {
+  const target = event.currentTarget.dataset.section;
+  const index = sections.findIndex((section) => section.id === target);
 
-  if (nextBtn) {
-    nextBtn.disabled = index === total - 1;
+  if (index !== -1) showSection(index);
+}
+
+function handleSectionButton(event) {
+  const target = event.currentTarget.dataset.sectionTarget;
+  const index = sections.findIndex((section) => section.id === target);
+
+  if (index !== -1) showSection(index);
+}
+
+/* =========================
+   MENÚ
+========================= */
+
+function toggleDrawer() {
+  if (!drawer || !drawerToggle) return;
+
+  const isMobile = window.matchMedia("(max-width: 1120px)").matches;
+
+  if (isMobile) {
+    const isOpen = drawer.classList.contains("open");
+    drawer.classList.toggle("open", !isOpen);
+    drawerToggle.setAttribute("aria-expanded", String(!isOpen));
+  } else {
+    const isClosed = drawer.classList.contains("closed");
+    drawer.classList.toggle("closed", !isClosed);
+    drawerToggle.setAttribute("aria-expanded", String(isClosed));
   }
 }
 
-/* -----------------------------
-   Navegación SPA
------------------------------ */
-function showSection(sectionId) {
-  const currentScreen = document.querySelector(".screen.active");
-  const targetScreen = document.getElementById(sectionId);
+function closeDrawer() {
+  if (!drawer || !drawerToggle) return;
 
-  if (!targetScreen || currentScreen === targetScreen) return;
+  const isMobile = window.matchMedia("(max-width: 1120px)").matches;
 
-  if (currentScreen) {
-    currentScreen.classList.add("leaving");
-
-    setTimeout(() => {
-      currentScreen.classList.remove("active", "leaving");
-      targetScreen.classList.add("active");
-      targetScreen.setAttribute("tabindex", "-1");
-      targetScreen.focus({ preventScroll: true });
-      updateProgress();
-    }, 250);
-  } else {
-    targetScreen.classList.add("active");
-    updateProgress();
-  }
-
-  navLinks.forEach((link) => {
-    link.classList.toggle("active", link.dataset.section === sectionId);
-  });
-
-  if (window.innerWidth <= 980 && drawer) {
+  if (isMobile) {
     drawer.classList.remove("open");
-    syncDrawerToggleA11y();
+    drawerToggle.setAttribute("aria-expanded", "false");
   }
+}
 
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
+/* =========================
+   AUDIO / NARRACIÓN
+========================= */
+
+function speakText(text) {
+  if (!window.speechSynthesis || !text) return;
+
+  stopSpeech();
+
+  speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
+  speechSynthesisUtterance.lang = "es-ES";
+  speechSynthesisUtterance.rate = 1;
+
+  speechSynthesis.speak(speechSynthesisUtterance);
+}
+
+function stopSpeech() {
+  if (!window.speechSynthesis) return;
+
+  speechSynthesis.cancel();
+  speechSynthesisUtterance = null;
+}
+
+function setupAudioControls() {
+  const narrationPlays = Array.from(document.querySelectorAll(".narration-play"));
+  const narrationStops = Array.from(document.querySelectorAll(".narration-stop"));
+
+  narrationPlays.forEach((button) => {
+    button.addEventListener("click", () => {
+      const narrationText = button.dataset.narration;
+      speakText(narrationText);
+    });
+  });
+
+  narrationStops.forEach((button) => {
+    button.addEventListener("click", stopSpeech);
   });
 }
 
-navLinks.forEach((link) => {
-  link.addEventListener("click", () => {
-    showSection(link.dataset.section);
+/* =========================
+   VIDEOS
+========================= */
+
+function setupVideoPlayer(videoId, playBtnId, muteBtnId) {
+  const video = document.getElementById(videoId);
+  const playBtn = document.getElementById(playBtnId);
+  const muteBtn = document.getElementById(muteBtnId);
+
+  if (!video || !playBtn || !muteBtn) return;
+
+  function syncButtons() {
+    playBtn.textContent = video.paused ? "▶" : "⏸";
+    muteBtn.textContent = video.muted ? "🔇" : "🔊";
+  }
+
+  playBtn.addEventListener("click", async () => {
+    try {
+      if (video.paused) {
+        await video.play();
+      } else {
+        video.pause();
+      }
+
+      syncButtons();
+    } catch (error) {
+      console.warn(`No se pudo reproducir el video ${videoId}:`, error);
+    }
   });
-});
 
-sectionButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    showSection(button.dataset.sectionTarget);
+  muteBtn.addEventListener("click", () => {
+    video.muted = !video.muted;
+    syncButtons();
   });
-});
 
-/* -----------------------------
-   Botones Anterior / Siguiente
------------------------------ */
-if (prevBtn) {
-  prevBtn.addEventListener("click", () => {
-    const index = getActiveIndex();
-    const previousScreen = screens[index - 1];
+  video.addEventListener("play", syncButtons);
+  video.addEventListener("pause", syncButtons);
+  video.addEventListener("ended", syncButtons);
+  video.addEventListener("volumechange", syncButtons);
 
-    if (previousScreen) {
-      showSection(previousScreen.id);
+  syncButtons();
+}
+
+function pauseAllVideos() {
+  const videos = Array.from(document.querySelectorAll("video"));
+
+  videos.forEach((video) => {
+    if (!video.paused) video.pause();
+  });
+}
+
+function setupVideoControls() {
+  setupVideoPlayer("portadaVideo", "playVideoBtn", "muteVideoBtn");
+  setupVideoPlayer("entradaVideo", "playEntradaBtn", "muteEntradaBtn");
+}
+
+/* =========================
+   INFO CHIPS
+========================= */
+
+function setupInfoChips() {
+  const chips = Array.from(document.querySelectorAll("[data-info]"));
+
+  chips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const message = chip.dataset.info;
+      if (message) alert(message);
+    });
+  });
+}
+
+/* =========================
+   ACTIVIDADES
+========================= */
+
+function setupActivities() {
+  setupMultipleChoiceActivities();
+  setupChecklistActivities();
+  setupDragDropActivities();
+  setupOrderActivities();
+}
+
+function setupMultipleChoiceActivities() {
+  const activities = Array.from(
+    document.querySelectorAll('.activity[data-activity-type="mcq"]')
+  );
+
+  activities.forEach((activity) => {
+    const buttons = Array.from(activity.querySelectorAll("button[data-correct]"));
+    const feedback = activity.querySelector(".feedback");
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        buttons.forEach((btn) => btn.classList.remove("selected"));
+        button.classList.add("selected");
+
+        if (feedback) {
+          feedback.textContent = button.dataset.feedback || "";
+        }
+      });
+    });
+  });
+}
+
+function setupChecklistActivities() {
+  const activities = Array.from(
+    document.querySelectorAll(
+      '.activity[data-activity-type="checklist"], .activity[data-activity-type="multi"]'
+    )
+  );
+
+  activities.forEach((activity) => {
+    const checkBtn = activity.querySelector(".activity-check");
+    const resetBtn = activity.querySelector(".activity-reset");
+    const feedback = activity.querySelector(".feedback");
+
+    if (checkBtn) {
+      checkBtn.addEventListener("click", () => {
+        const checkboxes = Array.from(activity.querySelectorAll('input[type="checkbox"]'));
+
+        let isCorrect = true;
+
+        checkboxes.forEach((checkbox) => {
+          const required = checkbox.dataset.required === "true";
+          const correct = checkbox.dataset.correct;
+
+          if (required && !checkbox.checked) isCorrect = false;
+
+          if (correct === "true" && !checkbox.checked) isCorrect = false;
+          if (correct === "false" && checkbox.checked) isCorrect = false;
+        });
+
+        if (feedback) {
+          feedback.textContent = isCorrect
+            ? "Correcto. Tus respuestas están alineadas con el objetivo."
+            : "Revisa tus selecciones e inténtalo nuevamente.";
+        }
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        const checkboxes = Array.from(activity.querySelectorAll('input[type="checkbox"]'));
+        checkboxes.forEach((checkbox) => {
+          checkbox.checked = false;
+        });
+
+        if (feedback) feedback.textContent = "";
+      });
     }
   });
 }
 
-if (nextBtn) {
-  nextBtn.addEventListener("click", () => {
-    const index = getActiveIndex();
-    const nextScreen = screens[index + 1];
+function setupDragDropActivities() {
+  const activities = Array.from(
+    document.querySelectorAll('.activity[data-activity-type="dragdrop"]')
+  );
 
-    if (nextScreen) {
-      showSection(nextScreen.id);
+  activities.forEach((activity) => {
+    const items = Array.from(activity.querySelectorAll(".drag-item"));
+    const zones = Array.from(activity.querySelectorAll(".drop-zone"));
+    const checkBtn = activity.querySelector(".activity-check");
+    const resetBtn = activity.querySelector(".activity-reset");
+    const feedback = activity.querySelector(".feedback");
+
+    let selectedItem = null;
+
+    items.forEach((item) => {
+      item.addEventListener("dragstart", (event) => {
+        event.dataTransfer.setData("text/plain", item.dataset.item);
+      });
+
+      item.addEventListener("click", () => {
+        selectedItem = item;
+        items.forEach((i) => i.classList.remove("selected"));
+        item.classList.add("selected");
+      });
+    });
+
+    zones.forEach((zone) => {
+      const slot = zone.querySelector(".drop-slot");
+
+      zone.addEventListener("dragover", (event) => {
+        event.preventDefault();
+      });
+
+      zone.addEventListener("drop", (event) => {
+        event.preventDefault();
+
+        const itemValue = event.dataTransfer.getData("text/plain");
+        const item = items.find((i) => i.dataset.item === itemValue);
+
+        if (item && slot) slot.appendChild(item);
+      });
+
+      zone.addEventListener("click", () => {
+        if (selectedItem && slot) {
+          slot.appendChild(selectedItem);
+          selectedItem.classList.remove("selected");
+          selectedItem = null;
+        }
+      });
+    });
+
+    if (checkBtn) {
+      checkBtn.addEventListener("click", () => {
+        const correct = zones.every((zone) => {
+          const slotItem = zone.querySelector(".drop-slot .drag-item");
+          return slotItem && slotItem.dataset.item === zone.dataset.accept;
+        });
+
+        if (feedback) {
+          feedback.textContent = correct
+            ? "Correcto. Cada tecnología está asociada con su función."
+            : "Aún hay asociaciones por revisar.";
+        }
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        const dragItemsContainer = activity.querySelector(".drag-items");
+
+        items.forEach((item) => {
+          dragItemsContainer.appendChild(item);
+          item.classList.remove("selected");
+        });
+
+        selectedItem = null;
+        if (feedback) feedback.textContent = "";
+      });
     }
   });
 }
 
-/* -----------------------------
-   Pop-ups +info
------------------------------ */
-const infoButtons = document.querySelectorAll(".info-chip");
+function setupOrderActivities() {
+  const activities = Array.from(
+    document.querySelectorAll('.activity[data-activity-type="order"]')
+  );
 
-const infoMessages = [
-  "La falta de datos en tiempo real impide saber cuándo, dónde y cuánto recolectar, generando rutas ineficientes.",
-  "La transformación digital no consiste solo en usar tecnología, sino en rediseñar procesos con información medible.",
-  "La analítica de datos convierte registros en patrones, indicadores y evidencia para tomar mejores decisiones.",
-  "Los sensores IoT permiten monitorear contenedores y activar rutas dinámicas según el nivel de llenado.",
-  "Optimizar rutas reduce consumo de combustible, emisiones y costos operativos del sistema.",
-  "Una decisión basada en datos se justifica con evidencia, indicadores y comparación de escenarios."
-];
+  activities.forEach((activity) => {
+    const list = activity.querySelector(".order-list");
+    const checkBtn = activity.querySelector(".activity-check");
+    const resetBtn = activity.querySelector(".activity-reset");
+    const feedback = activity.querySelector(".feedback");
 
-infoButtons.forEach((button, index) => {
-  button.addEventListener("click", () => {
-    showToast(infoMessages[index] || "Información adicional del módulo.");
-  });
-});
+    const correctOrder = ["Identificación", "Cribado", "Elegibilidad", "Inclusión"];
 
-function showToast(message) {
-  const existingToast = document.querySelector(".toast-message");
+    if (!list) return;
 
-  if (existingToast) {
-    existingToast.remove();
-  }
+    list.addEventListener("click", (event) => {
+      const upBtn = event.target.closest(".order-up");
+      const downBtn = event.target.closest(".order-down");
 
-  const toast = document.createElement("div");
-  toast.className = "toast-message";
-  toast.textContent = message;
-  toast.setAttribute("role", "status");
-  toast.setAttribute("aria-live", "polite");
+      if (!upBtn && !downBtn) return;
 
-  document.body.appendChild(toast);
+      const item = event.target.closest(".order-item");
+      if (!item) return;
 
-  setTimeout(() => {
-    toast.classList.add("visible");
-  }, 50);
+      if (upBtn && item.previousElementSibling) {
+        list.insertBefore(item, item.previousElementSibling);
+      }
 
-  setTimeout(() => {
-    toast.classList.remove("visible");
+      if (downBtn && item.nextElementSibling) {
+        list.insertBefore(item.nextElementSibling, item);
+      }
+    });
 
-    setTimeout(() => {
-      toast.remove();
-    }, 300);
-  }, 4500);
-}
+    if (checkBtn) {
+      checkBtn.addEventListener("click", () => {
+        const currentOrder = Array.from(list.querySelectorAll(".order-item")).map(
+          (item) => item.dataset.step
+        );
 
-/* -----------------------------
-   Actividades con retroalimentación
------------------------------ */
-function checkAnswer(button, correct) {
-  const activity = button.closest(".activity");
-  const feedbackBox = activity.querySelector(".feedback");
+        const correct = currentOrder.every((step, index) => step === correctOrder[index]);
 
-  if (!activity || !feedbackBox) return;
-
-  const buttons = activity.querySelectorAll("button");
-
-  buttons.forEach((btn) => {
-    btn.disabled = true;
-    btn.classList.remove("answer-correct", "answer-wrong");
-  });
-
-  if (correct) {
-    button.classList.add("answer-correct");
-    feedbackBox.textContent =
-      "✅ Correcto. Esta respuesta se relaciona con el uso de datos para mejorar la gestión de residuos.";
-    feedbackBox.style.color = "#39ff88";
-  } else {
-    button.classList.add("answer-wrong");
-    feedbackBox.textContent =
-      "❌ Incorrecto. Revisa el contenido del módulo y piensa en cómo los datos apoyan la toma de decisiones.";
-    feedbackBox.style.color = "#ff6b6b";
-  }
-}
-
-window.checkAnswer = checkAnswer;
-
-/* -----------------------------
-   Simulador de decisión IoT
------------------------------ */
-function runIoTSimulation() {
-  if (!window.Chart || !chartCanvas) {
-    if (feedback) {
-      feedback.textContent =
-        "No se pudo cargar Chart.js. Verifica la conexión o el enlace CDN.";
+        if (feedback) {
+          feedback.textContent = correct
+            ? "Correcto. El orden PRISMA es adecuado."
+            : "Revisa el orden: identificación, cribado, elegibilidad e inclusión.";
+        }
+      });
     }
-    return;
+
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        const items = Array.from(list.querySelectorAll(".order-item"));
+
+        items
+          .sort((a, b) => a.dataset.step.localeCompare(b.dataset.step))
+          .forEach((item) => list.appendChild(item));
+
+        if (feedback) feedback.textContent = "";
+      });
+    }
+  });
+}
+
+/* =========================
+   QUIZ FINAL
+========================= */
+
+function setupQuiz() {
+  const finalQuiz = document.getElementById("finalQuiz");
+  const resetQuizBtn = document.getElementById("resetQuizBtn");
+
+  if (!finalQuiz) return;
+
+  finalQuiz.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(finalQuiz);
+    let score = 0;
+
+    for (let i = 1; i <= 8; i += 1) {
+      if (formData.get(`q${i}`) === "a") score += 1;
+    }
+
+    const quizResult = document.getElementById("quizResult");
+    const quizReview = document.getElementById("quizReview");
+
+    if (quizResult) {
+      quizResult.textContent = `Obtuviste ${score} de 8 respuestas correctas.`;
+    }
+
+    if (quizReview) {
+      quizReview.textContent =
+        score === 8
+          ? "Muy bien: todas las respuestas son correctas."
+          : "Revisa los módulos sugeridos para mejorar tu puntaje.";
+    }
+  });
+
+  if (resetQuizBtn) {
+    resetQuizBtn.addEventListener("click", () => {
+      finalQuiz.reset();
+
+      const quizResult = document.getElementById("quizResult");
+      const quizReview = document.getElementById("quizReview");
+
+      if (quizResult) quizResult.textContent = "";
+      if (quizReview) quizReview.textContent = "";
+    });
   }
+}
 
-  const beforeIoT = {
-    rutas: 100,
-    combustible: 100,
-    tiempo: 100,
-    emisiones: 100,
-    aprovechamiento: 42,
-  };
+/* =========================
+   SIMULADOR / CHART
+========================= */
 
-  const afterIoT = {
-    rutas: 72,
-    combustible: 68,
-    tiempo: 64,
-    emisiones: 70,
-    aprovechamiento: 78,
-  };
+function createChart() {
+  const impactChartEl = document.getElementById("impactChart");
 
-  const labels = [
-    "Rutas",
-    "Combustible",
-    "Tiempo",
-    "Emisiones",
-    "Aprovechamiento",
-  ];
+  if (!impactChartEl || typeof Chart === "undefined") return;
 
-  if (impactChart) {
-    impactChart.destroy();
-  }
+  const ctx = impactChartEl.getContext("2d");
 
-  impactChart = new Chart(chartCanvas, {
+  chartInstance = new Chart(ctx, {
     type: "bar",
     data: {
-      labels,
+      labels: ["Ruta fija", "Umbral 80%", "Ruta dinámica"],
       datasets: [
         {
-          label: "Sin sensores IoT",
-          data: Object.values(beforeIoT),
+          label: "Kilómetros",
+          data: [120, 95, 80],
+          backgroundColor: "rgba(57, 255, 136, 0.5)",
+          borderColor: "rgba(57, 255, 136, 1)",
           borderWidth: 1,
-          borderRadius: 10,
         },
         {
-          label: "Con sensores IoT",
-          data: Object.values(afterIoT),
+          label: "Combustible",
+          data: [85, 70, 60],
+          backgroundColor: "rgba(255, 255, 255, 0.15)",
+          borderColor: "rgba(255, 255, 255, 0.65)",
           borderWidth: 1,
-          borderRadius: 10,
         },
       ],
     },
     options: {
       responsive: true,
-      animation: {
-        duration: 1200,
-        easing: "easeOutQuart",
-      },
       plugins: {
         legend: {
           labels: {
             color: "#eefbf5",
-            font: {
-              weight: "bold",
-            },
-          },
-        },
-        tooltip: {
-          callbacks: {
-            label(context) {
-              return `${context.dataset.label}: ${context.raw}%`;
-            },
           },
         },
       },
       scales: {
         x: {
-          ticks: {
-            color: "#9fb8ad",
-            font: {
-              weight: "bold",
-            },
-          },
-          grid: {
-            color: "rgba(255,255,255,0.08)",
-          },
+          ticks: { color: "#eefbf5" },
+          grid: { color: "rgba(255,255,255,0.08)" },
         },
         y: {
-          beginAtZero: true,
-          max: 110,
-          ticks: {
-            color: "#9fb8ad",
-            callback(value) {
-              return `${value}%`;
-            },
-          },
-          grid: {
-            color: "rgba(255,255,255,0.08)",
-          },
+          ticks: { color: "#eefbf5" },
+          grid: { color: "rgba(255,255,255,0.08)" },
         },
       },
     },
   });
+}
 
-  if (feedback) {
-    feedback.innerHTML = `
-      <strong>Resultado de la simulación:</strong>
-      con sensores IoT se reducen rutas, consumo de combustible, tiempo operativo
-      y emisiones. Además, aumenta el aprovechamiento gracias a decisiones basadas
-      en datos.
-    `;
+function setupSimulator() {
+  const simulateBtn = document.getElementById("simulateBtn");
+  const resetSimBtn = document.getElementById("resetSimBtn");
+
+  if (simulateBtn) {
+    simulateBtn.addEventListener("click", () => {
+      const selected = document.querySelector('input[name="simStrategy"]:checked');
+
+      if (!selected) return;
+      if (!chartInstance) createChart();
+
+      const feedback = document.getElementById("simulatorFeedback");
+
+      if (feedback) {
+        feedback.textContent = `Estrategia seleccionada: ${selected.value}. Observa el gráfico y compara la eficiencia.`;
+      }
+    });
+  }
+
+  if (resetSimBtn) {
+    resetSimBtn.addEventListener("click", () => {
+      if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+      }
+
+      const feedback = document.getElementById("simulatorFeedback");
+
+      if (feedback) {
+        feedback.textContent =
+          "Simulación reiniciada. Selecciona una estrategia y presiona Simular.";
+      }
+    });
   }
 }
 
-if (simulateBtn) {
-  simulateBtn.addEventListener("click", runIoTSimulation);
+/* =========================
+   MODALES
+========================= */
+
+function setupModals() {
+  const helpDialog = document.getElementById("helpDialog");
+  const audioDialog = document.getElementById("audioDialog");
+
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+
+    if (target.matches("#helpBtn") && helpDialog) {
+      helpDialog.showModal();
+    }
+
+    if (target.matches("#audioCtrlBtn") && audioDialog) {
+      audioDialog.showModal();
+    }
+  });
 }
 
-/* -----------------------------
-   Navegación con teclado
------------------------------ */
-document.addEventListener("keydown", (event) => {
-  const index = getActiveIndex();
+/* =========================
+   INICIALIZACIÓN
+========================= */
 
-  if (event.key === "Escape") {
-    if (drawer) {
-      drawer.classList.remove("open");
-    }
+function init() {
+  navLinks.forEach((link) => link.addEventListener("click", handleNavClick));
+  sectionButtons.forEach((button) =>
+    button.addEventListener("click", handleSectionButton)
+  );
 
-    syncDrawerToggleA11y();
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => showSection(currentSectionIndex - 1));
   }
 
-  if (event.key === "ArrowRight") {
-    const nextScreen = screens[index + 1];
-
-    if (nextScreen) {
-      showSection(nextScreen.id);
-    }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => showSection(currentSectionIndex + 1));
   }
 
-  if (event.key === "ArrowLeft") {
-    const previousScreen = screens[index - 1];
-
-    if (previousScreen) {
-      showSection(previousScreen.id);
-    }
+  if (drawerToggle) {
+    drawerToggle.addEventListener("click", toggleDrawer);
   }
-});
 
-/* -----------------------------
-   Estado inicial
------------------------------ */
-window.addEventListener("load", () => {
+  setupAudioControls();
+  setupVideoControls();
+  setupInfoChips();
+  setupActivities();
+  setupQuiz();
+  setupSimulator();
+  setupModals();
+
+  if (window.location.hash) {
+    const hashIndex = sections.findIndex(
+      (section) => `#${section.id}` === window.location.hash
+    );
+
+    if (hashIndex !== -1) {
+      showSection(hashIndex);
+    } else {
+      showSection(currentSectionIndex);
+    }
+  } else {
+    showSection(currentSectionIndex);
+  }
+
   updateProgress();
-  syncDrawerToggleA11y();
-});
+}
 
-window.addEventListener("resize", syncDrawerToggleA11y);
+document.addEventListener("DOMContentLoaded", init);
