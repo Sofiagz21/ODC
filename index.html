@@ -6,6 +6,20 @@
 
     <title>ODC | Gestión Inteligente de Residuos</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="icon"
+      href="assets/img/favicon-recycle.svg?v=1"
+      type="image/svg+xml"
+    />
+    <link rel="shortcut icon" href="assets/img/favicon-recycle.svg?v=1" />
+
     <link rel="stylesheet" href="css/style.css" />
 
     <!-- Chart.js (Pantalla 07: Simulador) -->
@@ -18,41 +32,64 @@
     <a class="skip-link" href="#main-content">Saltar al contenido</a>
 
     <!-- ======================
-       MENÚ LATERAL
+       MENÚ (OVERLAY)
   ====================== -->
-    <aside class="drawer" id="drawer">
-      <div class="drawer-header">
-        <div class="drawer-title">
-          <h2>ODC UDEC</h2>
-          <p>Gestión Inteligente de Residuos</p>
-        </div>
-      </div>
+    <aside class="drawer closed" id="drawer" aria-label="Menú de navegación">
+      <div class="drawer-panel" role="dialog" aria-modal="true">
+        <div class="drawer-header">
+          <div class="drawer-title">
+            <h2>ODC UDEC</h2>
+            <p>Gestión Inteligente de Residuos</p>
+          </div>
 
-      <nav>
-        <button class="nav-link active" data-section="portada">
-          01 · Portada
-        </button>
-        <button class="nav-link" data-section="entrada">
-          02 · Presentación del Recurso
-        </button>
-        <button class="nav-link" data-section="indice">03 · Índice</button>
-        <button class="nav-link" data-section="modulo-1">04 · Módulo 1</button>
-        <button class="nav-link" data-section="modulo-2">05 · Módulo 2</button>
-        <button class="nav-link" data-section="modulo-3">06 · Módulo 3</button>
-        <button class="nav-link" data-section="modulo-4">07 · Módulo 4</button>
-        <button class="nav-link" data-section="modulo-5">08 · Módulo 5</button>
-        <button class="nav-link" data-section="modulo-6">09 · Módulo 6</button>
-        <button class="nav-link" data-section="evaluacion">
-          10 · Evaluación
-        </button>
-        <button class="nav-link" data-section="conclusion">
-          11 · Conclusión
-        </button>
-        <button class="nav-link" data-section="referencias">
-          12 · Referencias
-        </button>
-        <button class="nav-link" data-section="creditos">13 · Créditos</button>
-      </nav>
+          <button
+            id="drawerClose"
+            class="drawer-close"
+            type="button"
+            aria-label="Cerrar menú"
+            title="Cerrar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <nav class="menu-grid" aria-label="Secciones">
+          <button class="nav-link active" data-section="portada">
+            01 · Portada · Inicio del ODC
+          </button>
+          <button class="nav-link" data-section="entrada">
+            02 · REA y población objetivo
+          </button>
+          <button class="nav-link" data-section="modulo-1">
+            03 · Módulo 1 · Problema ambiental
+          </button>
+          <button class="nav-link" data-section="modulo-2">
+            04 · Módulo 2 · Conceptos clave
+          </button>
+          <button class="nav-link" data-section="modulo-3">
+            05 · Módulo 3 · Tecnologías digitales
+          </button>
+          <button class="nav-link" data-section="modulo-4">
+            06 · Módulo 4 · Esquema comparativo
+          </button>
+          <button class="nav-link" data-section="modulo-5">
+            07 · Módulo 5 · Indicadores clave
+          </button>
+          <button class="nav-link" data-section="modulo-6">
+            08 · Módulo 6 · Evidencia PRISMA
+          </button>
+          <button class="nav-link" data-section="evaluacion">
+            09 · Módulo 8 · Evaluación final
+          </button>
+          <button class="nav-link" data-section="conclusion">
+            10 · Módulo 9 · Conclusiones
+          </button>
+          <button class="nav-link" data-section="referencias">
+            11 · Módulo 10 · Referencias y créditos
+          </button>
+          <button class="nav-link" data-section="creditos">12 · Créditos</button>
+        </nav>
+      </div>
     </aside>
 
     <!-- BOTÓN MENU -->
@@ -61,9 +98,9 @@
       type="button"
       aria-label="Abrir menú"
       aria-controls="drawer"
-      aria-expanded="true"
+      aria-expanded="false"
     >
-      &#9776;
+      ♻️ Menú
     </button>
 
     <!-- LOGO SUPERIOR DERECHO -->
@@ -85,79 +122,106 @@
     <main id="main-content">
       <!-- 01: PORTADA -->
       <section id="portada" class="screen active">
-        <p class="eyebrow">Objeto Digital de Conocimiento (ODC)</p>
-        <h1>
-          Analítica de Datos: Eficiencia en la Gestión de Residuos Urbanos
-        </h1>
+        <div class="cover-wrap" role="region" aria-label="Portada del ODC">
+          <div class="hero-grid cover-grid">
+            <div class="content-card cover-card">
+              <div class="cover-badge">ODC · UNIVERSIDAD DE CUNDINAMARCA</div>
 
-        <p class="hero-text">
-          (IA, IoT y Big Data) aplicada al análisis y a la toma de decisiones
-          para mejorar la eficiencia operativa y la sostenibilidad urbana.
-        </p>
+              <h1>
+                Analítica de Datos para RSU en
+                <span class="cover-highlight"
+                  >Universidad de Cundinamarca · Extensión Chía</span
+                >
+              </h1>
 
-        <div class="hero-grid">
-          <div class="content-card">
-            <ul class="meta-list" aria-label="Datos de la portada">
-              <li>Presentado Por: Sofia Gonzalez , Luis Carlos Beltran</li>
-              <li>Programa: Especialización en Ciencia y Analítica de Datos</li>
-              <li>Universidad de Cundinamarca</li>
-              <li>2026</li>
-            </ul>
+              <p class="hero-text">
+                Objeto Digital de Conocimiento sobre analítica de datos, IA, IoT
+                y Big Data aplicados a la gestión sostenible de residuos sólidos
+                urbanos.
+              </p>
 
-            <div
-              class="hero-actions"
-              role="group"
-              aria-label="Acciones principales"
-            >
-              <button
-                class="btn btn-primary"
-                data-section-target="entrada"
-                style="font-size: 1.2em; padding: 1rem 3rem"
-              >
-                Iniciar
-              </button>
+              <ul class="cover-chips" aria-label="Información rápida">
+                <li class="cover-chip">
+                  Posgrado en Analítica y Ciencia de Datos
+                </li>
+                <li class="cover-chip">12 pantallas interactivas</li>
+                <li class="cover-chip">versión 1.0 · 2026</li>
+              </ul>
+
+              <p class="cover-author">
+                Sofía González Zubieta · Luis Carlos Beltrán Orozco
+              </p>
             </div>
 
-            <div class="caption-box">
-              Navegación: usa el menú lateral, el índice o <strong>←</strong> /
-              <strong>→</strong>.
+            <div class="avatar-panel cover-media">
+              <div class="avatar-container" aria-label="Video de portada">
+                <div class="cover-video-card" aria-label="Video de portada">
+                  <div class="cover-video-wrapper">
+                    <video
+                      id="portadaVideo"
+                      class="cover-video"
+                      autoplay
+                      loop
+                      muted
+                      playsinline
+                      preload="metadata"
+                    >
+                      <source src="assets/video/portada.mp4" type="video/mp4" />
+                      Tu navegador no soporta video.
+                    </video>
+                  </div>
+
+                  <div
+                    class="video-overlay video-controls-below"
+                    aria-label="Controles de video"
+                  >
+                    <button
+                      id="playVideoBtn"
+                      type="button"
+                      class="btn video-button"
+                      aria-label="Reproducir o pausar"
+                      title="Reproducir / Pausar"
+                    >
+                      ▶
+                    </button>
+                    <div class="volume-control" aria-label="Volumen">
+                      <span id="volumeIconPortada" class="volume-icon" aria-hidden="true"
+                        >🔊</span
+                      >
+                      <input
+                        id="volumeRangePortada"
+                        class="volume-range"
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value="1"
+                        aria-label="Ajustar volumen"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <p class="cover-video-note">
+                  Conoce el propósito del ODC y cómo navegar por sus módulos.
+                </p>
+
+              </div>
             </div>
           </div>
 
-          <div class="avatar-panel">
-            <div class="avatar-container" aria-label="Video de portada">
-              <div class="cover-video-wrapper">
-                <video
-                  id="portadaVideo"
-                  class="cover-video"
-                  muted
-                  playsinline
-                  preload="metadata"
-                >
-                  <source src="assets/video/portada.mp4" type="video/mp4" />
-                  Tu navegador no soporta video.
-                </video>
-                <div class="video-overlay" aria-label="Controles de video">
-                  <button
-                    id="playVideoBtn"
-                    type="button"
-                    class="btn video-button"
-                    aria-label="Reproducir o pausar"
-                    title="Reproducir / Pausar"
-                  >
-                    ▶
-                  </button>
-                  <button
-                    id="muteVideoBtn"
-                    type="button"
-                    class="btn video-button"
-                    aria-label="Silenciar o activar audio"
-                    title="Silenciar / Activar audio"
-                  >
-                    🔇
-                  </button>
-                </div>
-              </div>
+          <div class="cover-actions" role="group" aria-label="Acciones principales">
+            <button class="btn btn-primary cover-start" data-section-target="entrada">
+              ▶ Iniciar recorrido
+            </button>
+          </div>
+
+          <div class="assistant-card" aria-label="Guía del recurso">
+            <div class="assistant-avatar" aria-hidden="true">ODC</div>
+            <div class="assistant-text">
+              <strong>Hola</strong>, este recurso te guiará por el uso de analítica
+              de datos para optimizar la gestión de residuos urbanos. Cuando estés
+              listo, inicia el recorrido.
             </div>
           </div>
         </div>
@@ -166,157 +230,129 @@
       <!-- 02: ENTRADA -->
       <!-- 02: ENTRADA -->
       <section id="entrada" class="screen">
-        <header>
-          <h2>Fundamentos y Alcance del ODC</h2>
+        <header class="entry-header">
+          <h2> REA y Población objetivo</h2>
+          <p class="caption-box">
+            Una vista rápida, aplicada y ambiental del propósito del ODC.
+          </p>
         </header>
 
-        <div class="hero-grid">
-          <!-- TEXTO -->
-          <div class="content-card">
-            <span class="eyebrow">REA</span>
-            <h3>Resultado Esperado de Aprendizaje</h3>
-            <p>
-              Al finalizar, el estudiante analizara el impacto de la analítica
-              de datos en la gestión de los residuos sólidos urbanos en
-              contextos locales. A través de un esquema comparativo que evaluara
-              la eficiencia operática, la sostenibilidad ambiental por medio de
-              herramientas tecnológicas (IA, IoT, Big Data).
-            </p>
-          </div>
-          <div class="content-card">
-            <span class="eyebrow">¿A quién va dirigido?</span>
-            <h3>Población objetivo</h3>
-            <p>
-              El Objeto Digital de Conocimiento está dirigida a estudiantes y
-              docentes de educación superior en programas de ingeniería
-              ambiental, sistemas, tecnología e innovación, así como a gestores
-              ambientales municipales y población de la comunidad local
-              interesados en sostenibilidad urbana.
-            </p>
+        <div class="entry-shell" role="region" aria-label="Entrada 1">
+          <div class="entry-dashboard" aria-label="Tarjetas principales">
+            <article class="entry-card entry-card-1">
+              <div class="entry-icon" aria-hidden="true">☁️♻️</div>
+              <h3>¿De qué trata este ODC?</h3>
+              <p>
+                Este ODC aborda la analítica de datos y la transformación
+                digital como herramientas para mejorar la eficiencia en la
+                gestión de residuos sólidos urbanos en la Universidad de
+                Cundinamarca, Extensión Chía. Integra inteligencia artificial,
+                IoT y Big Data para apoyar la recolección, procesamiento y
+                análisis de información orientada a la sostenibilidad, la
+                economía circular y la toma de decisiones.
+              </p>
+            </article>
+
+            <article class="entry-card entry-card-2">
+              <div class="entry-icon" aria-hidden="true">🎯📈</div>
+              <h3>Resultado Esperado de Aprendizaje</h3>
+              <p>
+                Al finalizar el ODC, el estudiante analizará el impacto de la
+                analítica de datos en la gestión de residuos sólidos urbanos en
+                la Universidad de Cundinamarca, Extensión Chía, mediante un
+                esquema comparativo que permitirá evaluar la eficiencia
+                operativa, la sostenibilidad ambiental y la viabilidad de
+                herramientas tecnológicas como la IA, el IoT y el Big Data.
+              </p>
+            </article>
+
+            <article class="entry-card entry-card-3">
+              <div class="entry-icon" aria-hidden="true">🎓👩‍🏫🏢🌿</div>
+              <h3>¿Para quién está diseñado?</h3>
+              <p>
+                El ODC está dirigido a estudiantes, docentes, administrativos y
+                comunidad académica interesada en sostenibilidad, gestión
+                ambiental, analítica de datos y transformación digital. También
+                puede ser útil para gestores ambientales municipales y actores
+                comunitarios vinculados con la mejora de la gestión urbana de
+                residuos.
+              </p>
+            </article>
+
+            <div
+              class="entry-activity activity"
+            >
+              <h3>Mini actividad · Rompecabezas</h3>
+              <p>
+                Arma la secuencia del ODC en un rompecabezas interactivo.
+              </p>
+              <button id="entryPuzzleBtn" class="btn btn-primary" type="button">
+                🧩 Abrir rompecabezas
+              </button>
+            </div>
+
+            <div class="entry-quote" role="note">
+              Este recorrido transforma los datos en decisiones para una gestión
+              de residuos más sostenible.
+            </div>
           </div>
 
-          <!-- VIDEO (FIX PRINCIPAL) -->
-          <div class="avatar-panel">
-            <div class="avatar-container">
+          <aside class="entry-side" aria-label="Guía y recurso multimedia">
+            <div class="entry-video-card" aria-label="Video de entrada">
               <div class="cover-video-wrapper">
                 <video
                   id="entradaVideo"
                   class="cover-video"
+                  autoplay
+                  loop
+                  muted
                   playsinline
                   preload="metadata"
                 >
                   <source src="assets/video/entrada.mp4" type="video/mp4" />
                 </video>
-
-                <div class="video-overlay">
-                  <button id="playEntradaBtn" class="btn video-button">
-                    ▶
-                  </button>
-                  <button id="muteEntradaBtn" class="btn video-button">
-                    🔊
-                  </button>
+              </div>
+              <div
+                class="video-overlay video-controls-below"
+                aria-label="Controles de video"
+              >
+                <button id="playEntradaBtn" type="button" class="btn video-button">
+                  ▶
+                </button>
+                <div class="volume-control" aria-label="Volumen">
+                  <span id="volumeIconEntrada" class="volume-icon" aria-hidden="true"
+                    >🔊</span
+                  >
+                  <input
+                    id="volumeRangeEntrada"
+                    class="volume-range"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value="1"
+                    aria-label="Ajustar volumen"
+                  />
                 </div>
               </div>
             </div>
-          </div>
+
+            <div class="data-guide" aria-label="Avatar Data">
+              <div class="data-avatar" aria-hidden="true">Data</div>
+              <div class="data-bubble">
+                En esta entrada conocerás qué aprenderás, por qué es importante
+                y cómo este ODC se conecta con la sostenibilidad de la Extensión
+                Chía.
+              </div>
+            </div>
+          </aside>
         </div>
       </section>
 
-      <!-- 03: ÍNDICE -->
-      <section id="indice" class="screen">
-        <h2>Índice / Menú</h2>
-        <p>
-          Mapa navegable (acceso no rígido) a módulos, evaluación, cierre,
-          referencias y créditos.
-        </p>
-
-        <div class="index-grid" role="list" aria-label="Índice de secciones">
-          <button
-            class="index-card"
-            role="listitem"
-            data-section-target="modulo-1"
-          >
-            <span class="index-title">Módulo 1 · Problema</span>
-            <span class="index-desc">Infografía: crisis de los residuos</span>
-          </button>
-          <button
-            class="index-card"
-            role="listitem"
-            data-section-target="modulo-2"
-          >
-            <span class="index-title">Módulo 2 · CTI</span>
-            <span class="index-desc">IA, IoT y Big Data</span>
-          </button>
-          <button
-            class="index-card"
-            role="listitem"
-            data-section-target="modulo-3"
-          >
-            <span class="index-title">Módulo 3 · Ciencia</span>
-            <span class="index-desc">Metodología PRISMA</span>
-          </button>
-          <button
-            class="index-card"
-            role="listitem"
-            data-section-target="modulo-4"
-          >
-            <span class="index-title">Módulo 4 · Análisis</span>
-            <span class="index-desc">Simulador con datos (Chart.js)</span>
-          </button>
-          <button
-            class="index-card"
-            role="listitem"
-            data-section-target="modulo-5"
-          >
-            <span class="index-title">Módulo 5 · Casos</span>
-            <span class="index-desc">Economía circular en práctica</span>
-          </button>
-          <button
-            class="index-card"
-            role="listitem"
-            data-section-target="modulo-6"
-          >
-            <span class="index-title">Módulo 6 · Sostenibilidad</span>
-            <span class="index-desc">3R y ODS</span>
-          </button>
-          <button
-            class="index-card"
-            role="listitem"
-            data-section-target="evaluacion"
-          >
-            <span class="index-title">Evaluación final</span>
-            <span class="index-desc">Sumativa + repaso por tema</span>
-          </button>
-          <button
-            class="index-card"
-            role="listitem"
-            data-section-target="conclusion"
-          >
-            <span class="index-title">Conclusión</span>
-            <span class="index-desc">Síntesis + acciones prácticas</span>
-          </button>
-          <button
-            class="index-card"
-            role="listitem"
-            data-section-target="referencias"
-          >
-            <span class="index-title">Referencias</span>
-            <span class="index-desc">≥20 APA 7 (sangría francesa)</span>
-          </button>
-          <button
-            class="index-card"
-            role="listitem"
-            data-section-target="creditos"
-          >
-            <span class="index-title">Créditos y licencia</span>
-            <span class="index-desc">TASL + CC BY 4.0</span>
-          </button>
-        </div>
-      </section>
 
       <!-- 04: MÓDULO 1 -->
       <section id="modulo-1" class="screen">
-        <h2>Módulo 1: Problema</h2>
+        <h2>Módulo 1 · Problema ambiental</h2>
 
         <div class="module-layout">
           <div class="content-card">
@@ -437,7 +473,7 @@
 
       <!-- 05: MÓDULO 2 -->
       <section id="modulo-2" class="screen">
-        <h2>Módulo 2: CTI</h2>
+        <h2>Módulo 2 · Conceptos clave</h2>
 
         <div class="module-layout">
           <div class="content-card">
@@ -590,7 +626,7 @@
 
       <!-- 06: MÓDULO 3 -->
       <section id="modulo-3" class="screen">
-        <h2>Módulo 3: Ciencia</h2>
+        <h2>Módulo 3 · Tecnologías digitales</h2>
 
         <div class="module-layout">
           <div class="content-card">
@@ -768,7 +804,7 @@
 
       <!-- 07: MÓDULO 4 -->
       <section id="modulo-4" class="screen">
-        <h2>Módulo 4: Análisis</h2>
+        <h2>Módulo 4 · Esquema comparativo</h2>
 
         <div class="module-layout">
           <div class="content-card">
@@ -905,7 +941,7 @@
 
       <!-- 08: MÓDULO 5 -->
       <section id="modulo-5" class="screen">
-        <h2>Módulo 5: Casos</h2>
+        <h2>Módulo 5 · Indicadores clave</h2>
 
         <div class="module-layout">
           <div class="content-card">
@@ -1020,7 +1056,7 @@
 
       <!-- 09: MÓDULO 6 -->
       <section id="modulo-6" class="screen">
-        <h2>Módulo 6: Sostenibilidad</h2>
+        <h2>Módulo 6 · Evidencia PRISMA</h2>
 
         <div class="module-layout">
           <div class="content-card">
@@ -1134,7 +1170,7 @@
 
       <!-- 10: EVALUACIÓN FINAL -->
       <section id="evaluacion" class="screen">
-        <h2>Evaluación final</h2>
+        <h2>Módulo 8 · Evaluación final</h2>
         <p>
           Evaluación sumativa (8 ítems) alineada al REA. Retroalimentación
           inmediata y sugerencias de repaso por tema.
@@ -1317,7 +1353,7 @@
 
       <!-- 11: CONCLUSIÓN -->
       <section id="conclusion" class="screen">
-        <h2>Conclusión</h2>
+        <h2>Módulo 9 · Conclusiones</h2>
 
         <div class="two-columns">
           <div class="content-card">
@@ -1384,7 +1420,7 @@
 
       <!-- 12: REFERENCIAS -->
       <section id="referencias" class="screen">
-        <h2>Referencias (APA 7)</h2>
+        <h2>Módulo 10 · Referencias y créditos</h2>
         <p class="caption-box">
           Incluye mínimo 20 fuentes. Formato APA 7 con sangría francesa.
         </p>
@@ -1429,8 +1465,8 @@
         <h3>Ayuda</h3>
         <ul class="meta-list">
           <li>
-            <strong>Navegación:</strong> usa el menú lateral o el índice;
-            también puedes usar ← / →.
+            <strong>Navegación:</strong> usa el menú lateral; también puedes
+            usar ← / →.
           </li>
           <li>
             <strong>Avatar:</strong> guía pantallas 02, 04–09 y 11 (más del 70%
@@ -1491,5 +1527,95 @@
         </div>
       </form>
     </dialog>
+
+    <!-- AVISO (CONSTRUCCIÓN) -->
+    <dialog id="constructionDialog" class="modal">
+      <form method="dialog" class="modal-card construction-card">
+        <div class="construction-head">
+          <div class="construction-icon" aria-hidden="true">🚧</div>
+          <div>
+            <h3>Sección en construcción</h3>
+            <p class="caption-box construction-sub">
+              Estamos terminando este contenido.
+            </p>
+          </div>
+        </div>
+        <div id="constructionMessage" class="construction-message">
+          Los módulos 1 al 12 se encuentran en construcción. Lo podrás ver pronto.
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" value="close">Entendido</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- ENTRADA: ROMPECABEZAS (MODAL) -->
+    <dialog id="entryPuzzleDialog" class="modal">
+      <form method="dialog" class="modal-card entry-puzzle-card">
+        <h3>Rompecabezas · Secuencia del ODC</h3>
+        <p class="caption-box">
+          Arma la secuencia correcta: datos → tecnología → sostenibilidad →
+          decisiones.
+        </p>
+
+        <div
+          class="activity"
+          data-activity-type="dragdrop"
+          data-activity-id="entrada-rompecabezas"
+        >
+          <div class="dragdrop entry-puzzle" aria-label="Rompecabezas de secuencia">
+            <div class="drag-items" aria-label="Piezas">
+              <div class="drag-item" draggable="true" data-item="datos">
+                📊 Datos
+              </div>
+              <div class="drag-item" draggable="true" data-item="tecnologia">
+                🤖 IA · IoT · Big Data
+              </div>
+              <div class="drag-item" draggable="true" data-item="sostenibilidad">
+                ♻️ Sostenibilidad
+              </div>
+              <div class="drag-item" draggable="true" data-item="decisiones">
+                ✅ Decisiones
+              </div>
+            </div>
+
+            <div class="drop-zones" aria-label="Espacios">
+              <div class="drop-zone" data-accept="datos">
+                <div class="drop-title">1) Inicio</div>
+                <div class="drop-slot" aria-label="Espacio 1"></div>
+              </div>
+              <div class="drop-zone" data-accept="tecnologia">
+                <div class="drop-title">2) Herramientas</div>
+                <div class="drop-slot" aria-label="Espacio 2"></div>
+              </div>
+              <div class="drop-zone" data-accept="sostenibilidad">
+                <div class="drop-title">3) Impacto</div>
+                <div class="drop-slot" aria-label="Espacio 3"></div>
+              </div>
+              <div class="drop-zone" data-accept="decisiones">
+                <div class="drop-title">4) Resultado</div>
+                <div class="drop-slot" aria-label="Espacio 4"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="quiz-actions">
+            <button class="btn btn-primary activity-check" type="button">
+              Validar
+            </button>
+            <button class="btn btn-ghost activity-reset" type="button">
+              Reiniciar
+            </button>
+          </div>
+
+          <div class="feedback" aria-live="polite"></div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-primary" value="close">Cerrar</button>
+        </div>
+      </form>
+    </dialog>
+
   </body>
 </html>

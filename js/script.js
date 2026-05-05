@@ -6,6 +6,7 @@ const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 const drawerToggle = document.getElementById("drawerToggle");
 const drawer = document.getElementById("drawer");
+const drawerClose = document.getElementById("drawerClose");
 const progressBar = document.getElementById("progressBar");
 
 let currentSectionIndex = sections.findIndex((section) =>
@@ -16,6 +17,138 @@ if (currentSectionIndex === -1) currentSectionIndex = 0;
 
 let speechSynthesisUtterance = null;
 let chartInstance = null;
+let audioUnlocked = false;
+
+/* =========================
+   PROGRESO (DESBLOQUEO SECUENCIAL)
+========================= */
+
+const PROGRESS_STORAGE_KEY = "odc:completedUpTo:v2";
+const orderedSectionIds = [
+  "portada",
+  "entrada",
+  "modulo-1",
+  "modulo-2",
+  "modulo-3",
+  "modulo-4",
+  "modulo-5",
+  "modulo-6",
+  "evaluacion",
+  "conclusion",
+  "referencias",
+  "creditos",
+].filter((id) => sections.some((section) => section.id === id));
+
+const indexById = new Map(orderedSectionIds.map((id, index) => [id, index]));
+
+let hasShownLockMessage = false;
+let activeEnterTimeMs = null;
+let activeSectionId = null;
+
+const UNDER_CONSTRUCTION_MESSAGE =
+  "Los módulos 1 al 12 se encuentran en construcción. Lo podrás ver pronto.";
+
+function isUnderConstructionSectionId(id) {
+  return (
+    /^modulo-\d+$/i.test(id) ||
+    ["evaluacion", "conclusion", "referencias", "creditos"].includes(id)
+  );
+}
+
+function showConstructionNotice(message) {
+  const dialog = document.getElementById("constructionDialog");
+  const messageEl = document.getElementById("constructionMessage");
+
+  if (messageEl && message) messageEl.textContent = message;
+
+  if (dialog && typeof dialog.showModal === "function") {
+    dialog.showModal();
+    return;
+  }
+
+  alert(message || UNDER_CONSTRUCTION_MESSAGE);
+}
+
+function getCompletedUpTo() {
+  try {
+    const value = Number(window.localStorage.getItem(PROGRESS_STORAGE_KEY));
+    if (Number.isFinite(value) && value >= 0) return Math.floor(value);
+  } catch {
+    // ignore
+  }
+
+  return 0; // permite Portada (0) y abre Entrada (1) como siguiente
+}
+
+function setCompletedUpTo(value) {
+  try {
+    window.localStorage.setItem(PROGRESS_STORAGE_KEY, String(value));
+  } catch {
+    // ignore
+  }
+}
+
+function canAccessSectionId(id) {
+  const targetIndex = indexById.get(id);
+  if (targetIndex === undefined) return true;
+
+  const completedUpTo = getCompletedUpTo();
+  return targetIndex <= completedUpTo + 1;
+}
+
+function applyModuleLockState() {
+  navLinks.forEach((link) => {
+    const targetId = link.dataset.section;
+    const isLocked = !canAccessSectionId(targetId);
+
+    link.disabled = isLocked;
+    link.setAttribute("aria-disabled", String(isLocked));
+    link.title = isLocked
+      ? "Debes revisar el módulo anterior para desbloquear este contenido."
+      : "";
+  });
+
+  updateNextButtonLock();
+}
+
+function updateNextButtonLock() {
+  if (!nextBtn) return;
+
+  const nextSection = sections[currentSectionIndex + 1];
+
+  if (!nextSection) {
+    nextBtn.disabled = true;
+    return;
+  }
+
+  nextBtn.disabled = !canAccessSectionId(nextSection.id);
+}
+
+function maybeCompleteActiveSection() {
+  const active = sections[currentSectionIndex];
+  if (!active) return;
+
+  const activeIndex = indexById.get(active.id);
+  if (activeIndex === undefined) return;
+
+  if (activeSectionId !== active.id) {
+    activeSectionId = active.id;
+    activeEnterTimeMs = Date.now();
+  }
+
+  if (!activeEnterTimeMs || Date.now() - activeEnterTimeMs < 6000) return;
+
+  const bottomInView =
+    active.getBoundingClientRect().bottom <= window.innerHeight + 8;
+
+  if (!bottomInView) return;
+
+  const completedUpTo = getCompletedUpTo();
+  if (activeIndex > completedUpTo) {
+    setCompletedUpTo(activeIndex);
+    applyModuleLockState();
+  }
+}
 
 /* =========================
    NAVEGACIÓN
@@ -23,6 +156,31 @@ let chartInstance = null;
 
 function showSection(index) {
   if (index < 0 || index >= sections.length) return;
+
+  const targetId = sections[index].id;
+  if (isUnderConstructionSectionId(targetId)) {
+    showConstructionNotice(UNDER_CONSTRUCTION_MESSAGE);
+    return;
+  }
+
+  if (!canAccessSectionId(targetId)) {
+    const completedUpTo = getCompletedUpTo();
+    const requiredId = orderedSectionIds[completedUpTo + 1] || "entrada";
+    const requiredIndex = sections.findIndex((section) => section.id === requiredId);
+
+    if (!hasShownLockMessage) {
+      hasShownLockMessage = true;
+      alert(
+        "Este contenido está bloqueado. Para desbloquearlo, revisa el módulo anterior y llega hasta el final."
+      );
+    }
+
+    if (requiredIndex !== -1) {
+      index = requiredIndex;
+    } else {
+      return;
+    }
+  }
 
   pauseAllVideos();
   stopSpeech();
@@ -37,12 +195,18 @@ function showSection(index) {
 
   currentSectionIndex = index;
   updateProgress();
+  updateNextButtonLock();
+  maybeCompleteActiveSection();
+  window.setTimeout(maybeCompleteActiveSection, 6200);
+  autoplaySectionVideos(sections[index]);
+
+  if (audioUnlocked) {
+    enableAudioEverywhere();
+  }
 
   window.location.hash = sections[index].id;
 
-  if (window.matchMedia("(max-width: 1120px)").matches) {
-    closeDrawer();
-  }
+  closeDrawer();
 }
 
 function updateProgress() {
@@ -73,28 +237,18 @@ function handleSectionButton(event) {
 function toggleDrawer() {
   if (!drawer || !drawerToggle) return;
 
-  const isMobile = window.matchMedia("(max-width: 1120px)").matches;
-
-  if (isMobile) {
-    const isOpen = drawer.classList.contains("open");
-    drawer.classList.toggle("open", !isOpen);
-    drawerToggle.setAttribute("aria-expanded", String(!isOpen));
-  } else {
-    const isClosed = drawer.classList.contains("closed");
-    drawer.classList.toggle("closed", !isClosed);
-    drawerToggle.setAttribute("aria-expanded", String(isClosed));
-  }
+  const isOpen = drawer.classList.contains("open");
+  drawer.classList.toggle("open", !isOpen);
+  drawer.classList.toggle("closed", isOpen);
+  drawerToggle.setAttribute("aria-expanded", String(!isOpen));
 }
 
 function closeDrawer() {
   if (!drawer || !drawerToggle) return;
 
-  const isMobile = window.matchMedia("(max-width: 1120px)").matches;
-
-  if (isMobile) {
-    drawer.classList.remove("open");
-    drawerToggle.setAttribute("aria-expanded", "false");
-  }
+  drawer.classList.remove("open");
+  drawer.classList.add("closed");
+  drawerToggle.setAttribute("aria-expanded", "false");
 }
 
 /* =========================
@@ -140,16 +294,23 @@ function setupAudioControls() {
    VIDEOS
 ========================= */
 
-function setupVideoPlayer(videoId, playBtnId, muteBtnId) {
+function setupVideoPlayer(videoId, playBtnId, volumeRangeId, volumeIconId) {
   const video = document.getElementById(videoId);
   const playBtn = document.getElementById(playBtnId);
-  const muteBtn = document.getElementById(muteBtnId);
+  const volumeRange = document.getElementById(volumeRangeId);
+  const volumeIcon = document.getElementById(volumeIconId);
 
-  if (!video || !playBtn || !muteBtn) return;
+  if (!video || !playBtn || !volumeRange) return;
 
   function syncButtons() {
     playBtn.textContent = video.paused ? "▶" : "⏸";
-    muteBtn.textContent = video.muted ? "🔇" : "🔊";
+
+    const currentVolume = Number.isFinite(video.volume) ? video.volume : 1;
+    volumeRange.value = String(video.muted ? 0 : currentVolume);
+
+    if (volumeIcon) {
+      volumeIcon.textContent = video.muted || currentVolume === 0 ? "🔇" : "🔊";
+    }
   }
 
   playBtn.addEventListener("click", async () => {
@@ -166,8 +327,10 @@ function setupVideoPlayer(videoId, playBtnId, muteBtnId) {
     }
   });
 
-  muteBtn.addEventListener("click", () => {
-    video.muted = !video.muted;
+  volumeRange.addEventListener("input", () => {
+    const value = Math.max(0, Math.min(1, Number(volumeRange.value)));
+    video.volume = value;
+    video.muted = value === 0;
     syncButtons();
   });
 
@@ -179,6 +342,31 @@ function setupVideoPlayer(videoId, playBtnId, muteBtnId) {
   syncButtons();
 }
 
+function enableAudioEverywhere() {
+  audioUnlocked = true;
+  const videos = Array.from(document.querySelectorAll("video"));
+  videos.forEach((video) => {
+    video.muted = false;
+    video.volume = 1;
+  });
+
+  const portadaPlay = document.getElementById("playVideoBtn");
+  const portadaVol = document.getElementById("volumeRangePortada");
+  const portadaIcon = document.getElementById("volumeIconPortada");
+  const portadaVideo = document.getElementById("portadaVideo");
+  if (portadaPlay && portadaVideo) portadaPlay.textContent = portadaVideo.paused ? "▶" : "⏸";
+  if (portadaVol) portadaVol.value = "1";
+  if (portadaIcon) portadaIcon.textContent = "🔊";
+
+  const entradaPlay = document.getElementById("playEntradaBtn");
+  const entradaVol = document.getElementById("volumeRangeEntrada");
+  const entradaIcon = document.getElementById("volumeIconEntrada");
+  const entradaVideo = document.getElementById("entradaVideo");
+  if (entradaPlay && entradaVideo) entradaPlay.textContent = entradaVideo.paused ? "▶" : "⏸";
+  if (entradaVol) entradaVol.value = "1";
+  if (entradaIcon) entradaIcon.textContent = "🔊";
+}
+
 function pauseAllVideos() {
   const videos = Array.from(document.querySelectorAll("video"));
 
@@ -187,9 +375,34 @@ function pauseAllVideos() {
   });
 }
 
+async function autoplaySectionVideos(section) {
+  if (!section) return;
+  const videos = Array.from(section.querySelectorAll("video"));
+
+  for (const video of videos) {
+    try {
+      video.volume = 1;
+      video.muted = !audioUnlocked;
+      await video.play();
+    } catch {
+      // ignore
+    }
+  }
+}
+
 function setupVideoControls() {
-  setupVideoPlayer("portadaVideo", "playVideoBtn", "muteVideoBtn");
-  setupVideoPlayer("entradaVideo", "playEntradaBtn", "muteEntradaBtn");
+  setupVideoPlayer(
+    "portadaVideo",
+    "playVideoBtn",
+    "volumeRangePortada",
+    "volumeIconPortada"
+  );
+  setupVideoPlayer(
+    "entradaVideo",
+    "playEntradaBtn",
+    "volumeRangeEntrada",
+    "volumeIconEntrada"
+  );
 }
 
 /* =========================
@@ -349,8 +562,8 @@ function setupDragDropActivities() {
 
         if (feedback) {
           feedback.textContent = correct
-            ? "Correcto. Cada tecnología está asociada con su función."
-            : "Aún hay asociaciones por revisar.";
+            ? "Correcto. Secuencia completa: datos → tecnología → sostenibilidad → decisiones."
+            : "Aún falta ordenar la secuencia. Revisa qué va primero y valida de nuevo.";
         }
       });
     }
@@ -580,6 +793,7 @@ function setupSimulator() {
 function setupModals() {
   const helpDialog = document.getElementById("helpDialog");
   const audioDialog = document.getElementById("audioDialog");
+  const entryPuzzleDialog = document.getElementById("entryPuzzleDialog");
 
   document.addEventListener("click", (event) => {
     const target = event.target;
@@ -590,6 +804,10 @@ function setupModals() {
 
     if (target.matches("#audioCtrlBtn") && audioDialog) {
       audioDialog.showModal();
+    }
+
+    if (target.matches("#entryPuzzleBtn") && entryPuzzleDialog) {
+      entryPuzzleDialog.showModal();
     }
   });
 }
@@ -616,6 +834,18 @@ function init() {
     drawerToggle.addEventListener("click", toggleDrawer);
   }
 
+  if (drawerClose) {
+    drawerClose.addEventListener("click", closeDrawer);
+  }
+
+  if (drawer) {
+    drawer.addEventListener("click", (event) => {
+      if (event.target === drawer && drawer.classList.contains("open")) {
+        closeDrawer();
+      }
+    });
+  }
+
   setupAudioControls();
   setupVideoControls();
   setupInfoChips();
@@ -623,6 +853,16 @@ function init() {
   setupQuiz();
   setupSimulator();
   setupModals();
+
+  // Intenta autoplay en la sección activa (normalmente Portada)
+  autoplaySectionVideos(sections[currentSectionIndex]);
+
+  // En el primer gesto del usuario, fuerza audio activo (los navegadores suelen bloquear autoplay con sonido).
+  document.addEventListener("pointerdown", enableAudioEverywhere, { once: true });
+  document.addEventListener("keydown", enableAudioEverywhere, { once: true });
+
+  applyModuleLockState();
+  window.addEventListener("scroll", maybeCompleteActiveSection, { passive: true });
 
   if (window.location.hash) {
     const hashIndex = sections.findIndex(
