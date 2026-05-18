@@ -6390,3 +6390,155 @@ button:disabled,
     max-height: 600px;
   }
 }
+
+/* =========================
+   WORD SEARCH ACTIVITY (MÓDULO 6)
+========================= */
+
+.ws-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  align-items: start;
+}
+
+.ws-grid-container {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(16, 35, 28, 0.5);
+  border: 1px solid rgba(57, 255, 136, 0.2);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.ws-grid {
+  border-collapse: collapse;
+  font-family: "Courier New", monospace;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.ws-grid td {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(57, 255, 136, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.ws-grid td:hover {
+  background: rgba(57, 255, 136, 0.15);
+  border-color: rgba(57, 255, 136, 0.6);
+  box-shadow: 0 0 8px rgba(57, 255, 136, 0.3);
+}
+
+.ws-grid td.selected {
+  background: rgba(57, 255, 136, 0.3);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 900;
+  box-shadow: 0 0 12px rgba(57, 255, 136, 0.5);
+}
+
+.ws-grid td.found {
+  background: rgba(57, 255, 136, 0.25);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 900;
+}
+
+.ws-words {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.ws-word {
+  padding: 0.85rem 1rem;
+  background: rgba(57, 255, 136, 0.08);
+  border: 1px solid rgba(57, 255, 136, 0.3);
+  color: var(--text);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+  text-align: left;
+}
+
+.ws-word:hover {
+  background: rgba(57, 255, 136, 0.15);
+  border-color: rgba(57, 255, 136, 0.6);
+  transform: translateX(4px);
+}
+
+.ws-word.found {
+  background: rgba(57, 255, 136, 0.25);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.ws-word::after {
+  content: attr(data-hint);
+  display: none;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 400;
+  margin-top: 0.3rem;
+}
+
+.feedback {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 10px;
+  background: rgba(57, 255, 136, 0.1);
+  border: 1px solid rgba(57, 255, 136, 0.2);
+  color: var(--muted);
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.feedback.success {
+  background: rgba(57, 255, 136, 0.2);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.quiz-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .ws-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .ws-grid td {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+    border-width: 1px;
+  }
+
+  .ws-words {
+    grid-column: 1;
+  }
+}

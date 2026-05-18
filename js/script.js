@@ -2253,6 +2253,250 @@ function setupPairsActivities() {
 }
 
 /* =========================
+   WORD SEARCH ACTIVITY (MÓDULO 6)
+========================= */
+
+function initializeWordSearch() {
+  // Find all word search activities
+  const wordSearchActivities = Array.from(
+    document.querySelectorAll('[data-activity-type="wordsearch"]')
+  );
+
+  wordSearchActivities.forEach((activity) => {
+    const grid = activity.querySelector(".ws-grid");
+    const wordButtons = activity.querySelectorAll(".ws-word");
+    const feedbackEl = activity.querySelector(".feedback");
+    const resetBtn = activity.querySelector("[data-ws-reset]");
+
+    if (!grid || wordButtons.length === 0) return;
+
+    // Get cells from table
+    const cells = Array.from(grid.querySelectorAll("td"));
+    const rows = grid.querySelectorAll("tr").length;
+    const cols = grid.querySelector("tr").querySelectorAll("td").length;
+
+    // Track found words
+    const foundWords = new Set();
+    let selectedCells = [];
+    let selectionStartCell = null;
+
+    // Word list with positions (horizontal, vertical, diagonal directions)
+    const wordPositions = findWords(cells, rows, cols);
+
+    function findWords(cells, rows, cols) {
+      const positions = {};
+      const words = Array.from(wordButtons).map((btn) => btn.dataset.word);
+
+      words.forEach((word) => {
+        // Check all directions: right, down, diagonal-right, diagonal-left
+        const directions = [
+          { dx: 1, dy: 0 }, // right
+          { dx: 0, dy: 1 }, // down
+          { dx: 1, dy: 1 }, // diagonal-right
+          { dx: 1, dy: -1 }, // diagonal-left
+          { dx: -1, dy: 0 }, // left
+          { dx: 0, dy: -1 }, // up
+          { dx: -1, dy: -1 }, // diagonal-left-up
+          { dx: -1, dy: 1 }, // diagonal-right-up
+        ];
+
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            for (const dir of directions) {
+              const path = [];
+              let match = true;
+
+              for (let i = 0; i < word.length; i++) {
+                const r = row + dir.dy * i;
+                const c = col + dir.dx * i;
+
+                if (r < 0 || r >= rows || c < 0 || c >= cols) {
+                  match = false;
+                  break;
+                }
+
+                const cellIndex = r * cols + c;
+                const cellContent = cells[cellIndex]?.textContent?.trim() || "";
+
+                if (cellContent !== word[i]) {
+                  match = false;
+                  break;
+                }
+
+                path.push(cellIndex);
+              }
+
+              if (match) {
+                positions[word] = path;
+              }
+            }
+          }
+        }
+      });
+
+      return positions;
+    }
+
+    // Mouse events for grid selection
+    cells.forEach((cell, index) => {
+      cell.addEventListener("mousedown", () => {
+        selectionStartCell = index;
+        selectedCells = [index];
+        updateSelection();
+      });
+
+      cell.addEventListener("mouseenter", () => {
+        if (selectionStartCell === null) return;
+
+        // Get line between start and current cell
+        selectedCells = getLineCells(selectionStartCell, index, rows, cols);
+        updateSelection();
+      });
+
+      cell.addEventListener("mouseup", () => {
+        checkSelection();
+        selectionStartCell = null;
+        selectedCells = [];
+        updateSelection();
+      });
+    });
+
+    // Helper to get cells in a line
+    function getLineCells(start, end, rows, cols) {
+      const startRow = Math.floor(start / cols);
+      const startCol = start % cols;
+      const endRow = Math.floor(end / cols);
+      const endCol = end % cols;
+
+      const path = [];
+      const dx = endCol === startCol ? 0 : endCol > startCol ? 1 : -1;
+      const dy = endRow === startRow ? 0 : endRow > startRow ? 1 : -1;
+
+      let row = startRow;
+      let col = startCol;
+
+      while (true) {
+        path.push(row * cols + col);
+        if (row === endRow && col === endCol) break;
+        if (row !== endRow) row += dy;
+        if (col !== endCol) col += dx;
+      }
+
+      return path;
+    }
+
+    function updateSelection() {
+      cells.forEach((cell, index) => {
+        cell.classList.toggle("selected", selectedCells.includes(index));
+      });
+    }
+
+    function checkSelection() {
+      if (selectedCells.length === 0) return;
+
+      const selectedText = selectedCells
+        .map((i) => cells[i].textContent?.trim() || "")
+        .join("");
+
+      const selectedTextReverse = selectedCells
+        .reverse()
+        .map((i) => cells[i].textContent?.trim() || "")
+        .join("");
+
+      let foundWord = null;
+
+      for (const word of Array.from(wordButtons).map((btn) => btn.dataset.word)) {
+        if (
+          selectedText === word ||
+          selectedTextReverse === word ||
+          selectedText === word.split("").reverse().join("")
+        ) {
+          foundWord = word;
+          break;
+        }
+      }
+
+      if (foundWord && !foundWords.has(foundWord)) {
+        foundWords.add(foundWord);
+        markWordAsFound(foundWord);
+        updateFeedback();
+
+        if (foundWords.size === wordButtons.length) {
+          showCompletionMessage();
+        }
+      }
+    }
+
+    function markWordAsFound(word) {
+      // Mark cells
+      const cellIndices = wordPositions[word] || [];
+      cellIndices.forEach((index) => {
+        cells[index].classList.add("found");
+      });
+
+      // Mark button
+      const btn = Array.from(wordButtons).find(
+        (b) => b.dataset.word === word
+      );
+      if (btn) {
+        btn.classList.add("found");
+        btn.disabled = true;
+      }
+    }
+
+    function updateFeedback() {
+      const remaining = wordButtons.length - foundWords.size;
+      if (remaining === 0) return;
+
+      feedbackEl.textContent = `¡Bien! Te quedan ${remaining} palabr${remaining === 1 ? "a" : "as"}.`;
+      feedbackEl.classList.add("success");
+      setTimeout(() => feedbackEl.classList.remove("success"), 2000);
+    }
+
+    function showCompletionMessage() {
+      feedbackEl.textContent =
+        "¡Excelente! Has encontrado todas las palabras del módulo 6.";
+      feedbackEl.classList.add("success");
+    }
+
+    function reset() {
+      foundWords.clear();
+      selectedCells = [];
+      selectionStartCell = null;
+
+      cells.forEach((cell) => {
+        cell.classList.remove("selected", "found");
+      });
+
+      wordButtons.forEach((btn) => {
+        btn.classList.remove("found");
+        btn.disabled = false;
+      });
+
+      feedbackEl.textContent = "Busca las palabras relacionadas con el módulo.";
+      feedbackEl.classList.remove("success");
+    }
+
+    // Attach reset handler
+    if (resetBtn) {
+      resetBtn.addEventListener("click", reset);
+    }
+
+    activity.__odcReset = reset;
+
+    // Initialize
+    reset();
+  });
+}
+
+// Initialize word search when DOM is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeWordSearch);
+} else {
+  initializeWordSearch();
+}
+
+/* =========================
    QUIZ FINAL
 ========================= */
 
