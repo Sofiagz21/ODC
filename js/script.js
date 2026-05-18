@@ -15,7 +15,6 @@ let currentSectionIndex = sections.findIndex((section) =>
 
 if (currentSectionIndex === -1) currentSectionIndex = 0;
 
-let speechSynthesisUtterance = null;
 let chartInstance = null;
 let audioUnlocked = false;
 
@@ -101,6 +100,129 @@ function showConstructionNotice(message) {
   }
 
   showInfoDialog(message || UNDER_CONSTRUCTION_MESSAGE, "Aviso");
+}
+
+/* =========================
+   ACTIVIDAD COMPLETADA (MODAL)
+========================= */
+
+let completionNextSectionId = null;
+
+function getNextSectionId(currentId) {
+  const idx = indexById.get(currentId);
+  if (!Number.isFinite(idx)) return null;
+  const nextId = orderedSectionIds[idx + 1];
+  return typeof nextId === "string" ? nextId : null;
+}
+
+function goToSectionId(sectionId) {
+  const index = sections.findIndex((section) => section.id === sectionId);
+  if (index !== -1) showSection(index);
+}
+
+function inferActivitySectionId(activityEl) {
+  const explicit = activityEl?.dataset?.activitySection;
+  if (explicit) return explicit;
+
+  const screen = activityEl?.closest?.("section.screen");
+  if (screen?.id) return screen.id;
+
+  const dialog = activityEl?.closest?.("dialog");
+  if (dialog?.id === "m2CircularDialog") return "modulo-2";
+  if (dialog?.id === "m3PairsDialog") return "modulo-3";
+
+  return null;
+}
+
+function showCompletionDialog({ title, message, nextSectionId }) {
+  const dialog = document.getElementById("completionDialog");
+  const titleEl = document.getElementById("completionTitle");
+  const messageEl = document.getElementById("completionMessage");
+  const continueBtn = document.getElementById("completionContinue");
+
+  completionNextSectionId = nextSectionId || null;
+
+  if (titleEl) titleEl.textContent = title || "¡Excelente!";
+  if (messageEl) messageEl.textContent = message || "Actividad completada.";
+
+  if (continueBtn) {
+    continueBtn.style.display = completionNextSectionId ? "" : "none";
+  }
+
+  if (dialog && typeof dialog.showModal === "function") {
+    if (dialog.open) dialog.close();
+    dialog.showModal();
+  }
+}
+
+function setupCompletionDialog() {
+  const dialog = document.getElementById("completionDialog");
+  const continueBtn = document.getElementById("completionContinue");
+
+  if (!dialog) return;
+
+  if (continueBtn) {
+    continueBtn.addEventListener("click", () => {
+      const nextId = completionNextSectionId;
+      if (dialog.open) dialog.close();
+      if (nextId) goToSectionId(nextId);
+    });
+  }
+
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog && dialog.open) dialog.close();
+  });
+}
+
+function completeActivity(activityEl, customMessage) {
+  if (!activityEl || activityEl.dataset?.odcCompleted === "true") return;
+
+  activityEl.dataset.odcCompleted = "true";
+
+  const sectionId = inferActivitySectionId(activityEl);
+  const nextId = sectionId ? getNextSectionId(sectionId) : null;
+
+  if (sectionId) {
+    const sectionIndex = indexById.get(sectionId);
+    if (Number.isFinite(sectionIndex)) {
+      const completedUpTo = getCompletedUpTo();
+      if (sectionIndex > completedUpTo) {
+        setCompletedUpTo(sectionIndex);
+        applyModuleLockState();
+      }
+    }
+  }
+
+  const nextTitle =
+    nextId && document.getElementById(nextId)
+      ? document.getElementById(nextId).querySelector("h2")?.textContent?.trim()
+      : "";
+
+  const message =
+    customMessage ||
+    (nextTitle
+      ? `¡Excelente! Actividad completada.\nContinúa a: ${nextTitle}`
+      : "¡Excelente! Actividad completada.\nContinúa al siguiente módulo.");
+
+  const resetFn = activityEl.__odcReset;
+  if (typeof resetFn === "function") {
+    try {
+      resetFn();
+    } catch (error) {
+      console.warn("No se pudo reiniciar la actividad:", error);
+    }
+  }
+
+  const parentDialog = activityEl.closest?.("dialog");
+  if (parentDialog && parentDialog.open && parentDialog.id !== "completionDialog") {
+    parentDialog.close();
+  }
+
+  window.setTimeout(() => {
+    if (activityEl?.dataset) activityEl.dataset.odcCompleted = "false";
+  }, 80);
+
+  showCompletionDialog({ title: "¡Excelente!", message, nextSectionId: nextId });
 }
 
 function getCompletedUpTo() {
@@ -191,6 +313,8 @@ function maybeCompleteActiveSection() {
 function showSection(index) {
   if (index < 0 || index >= sections.length) return;
 
+  const previousSection = sections[currentSectionIndex];
+
   const targetId = sections[index].id;
   if (isUnderConstructionSectionId(targetId)) {
     showConstructionNotice(UNDER_CONSTRUCTION_MESSAGE);
@@ -218,7 +342,7 @@ function showSection(index) {
   }
 
   pauseAllVideos();
-  stopSpeech();
+  resetSectionVideos(previousSection);
 
   sections.forEach((section, sectionIndex) => {
     section.classList.toggle("active", sectionIndex === index);
@@ -233,7 +357,8 @@ function showSection(index) {
   updateNextButtonLock();
   maybeCompleteActiveSection();
   window.setTimeout(maybeCompleteActiveSection, 6200);
-  autoplaySectionVideos(sections[index]);
+  autoplayPrimaryVideo(sections[index]);
+  animateSectionEntrance(sections[index]);
 
   if (audioUnlocked) {
     enableAudioEverywhere();
@@ -242,6 +367,54 @@ function showSection(index) {
   window.location.hash = sections[index].id;
 
   closeDrawer();
+}
+
+function animateSectionEntrance(section) {
+  if (!section) return;
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  section.classList.remove("is-entering");
+  void section.offsetWidth;
+  section.classList.add("is-entering");
+
+  const animated = Array.from(
+    section.querySelectorAll(
+      [
+        ".content-card",
+        ".avatar-panel",
+        ".microcontent",
+        ".module-purpose",
+        ".simulator",
+        ".media-card",
+        ".activity",
+        ".m1-zone",
+        ".m2-col",
+        ".m3-col",
+        ".m3-guide-card",
+        ".m4-compare-col",
+        ".m4-aspects",
+        ".m4-close",
+        ".m4-question",
+        ".m4-purpose",
+      ].join(",")
+    )
+  );
+
+  const seen = new Set();
+  const unique = animated.filter((el) => {
+    if (!el || seen.has(el)) return false;
+    seen.add(el);
+    return true;
+  });
+
+  unique.forEach((el, i) => {
+    el.classList.remove("odc-animate");
+    void el.offsetWidth;
+    el.style.animationDelay = `${Math.min(i * 60, 420)}ms`;
+    el.classList.add("odc-animate");
+  });
 }
 
 function updateProgress() {
@@ -290,50 +463,18 @@ function closeDrawer() {
    AUDIO / NARRACIÓN
 ========================= */
 
-function speakText(text) {
-  if (!window.speechSynthesis || !text) return;
-
-  stopSpeech();
-
-  speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
-  speechSynthesisUtterance.lang = "es-ES";
-  speechSynthesisUtterance.rate = 1;
-
-  speechSynthesis.speak(speechSynthesisUtterance);
-}
-
-function stopSpeech() {
-  if (!window.speechSynthesis) return;
-
-  speechSynthesis.cancel();
-  speechSynthesisUtterance = null;
-}
-
-function setupAudioControls() {
-  const narrationPlays = Array.from(document.querySelectorAll(".narration-play"));
-  const narrationStops = Array.from(document.querySelectorAll(".narration-stop"));
-
-  narrationPlays.forEach((button) => {
-    button.addEventListener("click", () => {
-      const narrationText = button.dataset.narration;
-      speakText(narrationText);
-    });
-  });
-
-  narrationStops.forEach((button) => {
-    button.addEventListener("click", stopSpeech);
-  });
-}
+// Narración por voz eliminada para evitar redundancia de UI/texto.
 
 /* =========================
    VIDEOS
 ========================= */
 
-function setupVideoPlayer(videoId, playBtnId, volumeRangeId, volumeIconId) {
+function setupVideoPlayer(videoId, playBtnId, volumeRangeId, volumeIconId, replayBtnId) {
   const video = document.getElementById(videoId);
   const playBtn = document.getElementById(playBtnId);
   const volumeRange = document.getElementById(volumeRangeId);
   const volumeIcon = document.getElementById(volumeIconId);
+  const replayBtn = replayBtnId ? document.getElementById(replayBtnId) : null;
 
   if (!video || !playBtn || !volumeRange) return;
 
@@ -362,6 +503,18 @@ function setupVideoPlayer(videoId, playBtnId, volumeRangeId, volumeIconId) {
     }
   });
 
+  if (replayBtn) {
+    replayBtn.addEventListener("click", async () => {
+      try {
+        video.currentTime = 0;
+        await video.play();
+        syncButtons();
+      } catch (error) {
+        console.warn(`No se pudo reiniciar el video ${videoId}:`, error);
+      }
+    });
+  }
+
   volumeRange.addEventListener("input", () => {
     const value = Math.max(0, Math.min(1, Number(volumeRange.value)));
     video.volume = value;
@@ -377,6 +530,83 @@ function setupVideoPlayer(videoId, playBtnId, volumeRangeId, volumeIconId) {
   syncButtons();
 }
 
+function getVideoControlsParts(overlay) {
+  const playBtn = overlay.querySelector('[data-video-action="toggle"]');
+  const replayBtn = overlay.querySelector('[data-video-action="replay"]');
+  const volumeRange = overlay.querySelector('[data-video-action="volume"]');
+  const volumeIcon = overlay.querySelector('[data-video-action="icon"]');
+  return { playBtn, replayBtn, volumeRange, volumeIcon };
+}
+
+function resolveTargetVideo(overlay) {
+  const targetId = overlay?.dataset?.videoTarget;
+  if (targetId) return document.getElementById(targetId);
+
+  const container = overlay.closest(".cover-video-card, .entry-video-card, figure, .m3-guide-video");
+  return (
+    container?.querySelector?.("video") ||
+    overlay.parentElement?.querySelector?.("video") ||
+    null
+  );
+}
+
+function setupVideoOverlayControls(overlay) {
+  const video = resolveTargetVideo(overlay);
+  const { playBtn, replayBtn, volumeRange, volumeIcon } = getVideoControlsParts(overlay);
+
+  if (!video || !playBtn || !volumeRange) return;
+
+  function sync() {
+    playBtn.textContent = video.paused ? "▶" : "⏸";
+
+    const currentVolume = Number.isFinite(video.volume) ? video.volume : 1;
+    volumeRange.value = String(video.muted ? 0 : currentVolume);
+
+    if (volumeIcon) {
+      volumeIcon.textContent = video.muted || currentVolume === 0 ? "🔇" : "🔊";
+    }
+  }
+
+  playBtn.addEventListener("click", async () => {
+    try {
+      if (video.paused) {
+        await video.play();
+      } else {
+        video.pause();
+      }
+      sync();
+    } catch (error) {
+      console.warn("No se pudo reproducir el video:", error);
+    }
+  });
+
+  if (replayBtn) {
+    replayBtn.addEventListener("click", async () => {
+      try {
+        video.currentTime = 0;
+        await video.play();
+        sync();
+      } catch (error) {
+        console.warn("No se pudo reiniciar el video:", error);
+      }
+    });
+  }
+
+  volumeRange.addEventListener("input", () => {
+    const value = Math.max(0, Math.min(1, Number(volumeRange.value)));
+    video.volume = value;
+    video.muted = value === 0;
+    sync();
+  });
+
+  video.addEventListener("play", sync);
+  video.addEventListener("pause", sync);
+  video.addEventListener("ended", sync);
+  video.addEventListener("volumechange", sync);
+
+  sync();
+}
+
 function enableAudioEverywhere() {
   audioUnlocked = true;
   const videos = Array.from(document.querySelectorAll("video"));
@@ -384,6 +614,9 @@ function enableAudioEverywhere() {
     video.muted = false;
     video.volume = 1;
   });
+
+  // Controles sincronizados por eventos de `volumechange` en cada overlay.
+  return;
 
   const portadaPlay = document.getElementById("playVideoBtn");
   const portadaVol = document.getElementById("volumeRangePortada");
@@ -410,39 +643,89 @@ function pauseAllVideos() {
   });
 }
 
-async function autoplaySectionVideos(section) {
-  if (!section) return;
-  const videos = Array.from(section.querySelectorAll("video"));
+function pauseOtherVideos(activeVideo) {
+  const videos = Array.from(document.querySelectorAll("video"));
 
-  for (const video of videos) {
+  videos.forEach((video) => {
+    if (video !== activeVideo && !video.paused) {
+      video.pause();
+    }
+  });
+}
+
+function resetVideo(video) {
+  if (!video) return;
+
+  const applyReset = () => {
     try {
-      video.volume = 1;
-      video.muted = !audioUnlocked;
-      await video.play();
+      video.currentTime = 0;
     } catch {
       // ignore
     }
+  };
+
+  try {
+    video.pause();
+  } catch {
+    // ignore
+  }
+
+  if (video.readyState >= 1) {
+    applyReset();
+  } else {
+    video.addEventListener("loadedmetadata", applyReset, { once: true });
+  }
+}
+
+function resetSectionVideos(section) {
+  if (!section) return;
+  const videos = Array.from(section.querySelectorAll("video"));
+  videos.forEach(resetVideo);
+}
+
+function setupSingleVideoPlayback() {
+  document.addEventListener(
+    "play",
+    (event) => {
+      const target = event.target;
+      if (target && target.tagName === "VIDEO") {
+        pauseOtherVideos(target);
+      }
+    },
+    true
+  );
+}
+
+async function autoplayPrimaryVideo(section) {
+  if (!section) return;
+
+  const primary =
+    section.querySelector("video[data-primary-video]") ||
+    section.querySelector("video");
+
+  if (!primary) return;
+
+  // Asegura que solo un video esté activo
+  pauseOtherVideos(primary);
+  resetVideo(primary);
+
+  try {
+    primary.volume = 1;
+    primary.muted = !audioUnlocked;
+    await primary.play();
+  } catch {
+    // ignore
   }
 }
 
 function setupVideoControls() {
-  setupVideoPlayer(
-    "portadaVideo",
-    "playVideoBtn",
-    "volumeRangePortada",
-    "volumeIconPortada"
-  );
-  setupVideoPlayer(
-    "entradaVideo",
-    "playEntradaBtn",
-    "volumeRangeEntrada",
-    "volumeIconEntrada"
-  );
+  const overlays = Array.from(document.querySelectorAll("[data-video-controls]"));
+  overlays.forEach(setupVideoOverlayControls);
 }
 
 /* =========================
    INFO CHIPS
-========================= */
+ ========================= */
 
 function setupInfoChips() {
   const chips = Array.from(document.querySelectorAll("[data-info]"));
@@ -468,6 +751,580 @@ function setupInfoDialog() {
   });
 }
 
+function setupM3TermDialog() {
+  const dialog = document.getElementById("m3TermDialog");
+  const titleEl = document.getElementById("m3TermTitle");
+  const bodyEl = document.getElementById("m3TermBody");
+
+  if (!dialog || !titleEl || !bodyEl) return;
+
+  document.addEventListener("click", (event) => {
+    const button = event.target?.closest?.("[data-term-button]");
+    if (!button) return;
+
+    const title = button.querySelector(".m3-term-title")?.textContent?.trim() || "Término";
+    const template = button.parentElement?.querySelector?.("[data-term-template]");
+
+    titleEl.textContent = title;
+    bodyEl.textContent = "";
+
+    if (template && template.content) {
+      bodyEl.appendChild(template.content.cloneNode(true));
+    }
+
+    if (typeof dialog.showModal === "function") {
+      if (dialog.open) dialog.close();
+      dialog.showModal();
+      return;
+    }
+
+    alert(title);
+  });
+
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog && dialog.open) dialog.close();
+  });
+}
+
+function setupM4AspectComparator() {
+  const panel = document.querySelector("[data-m4-aspect-panel]");
+  if (!panel) return;
+
+  const tabs = Array.from(document.querySelectorAll("[data-m4-aspect]"));
+  const titleEl = panel.querySelector("[data-m4-aspect-title]");
+  const leftTextEl = panel.querySelector("[data-m4-aspect-left] p");
+  const rightTextEl = panel.querySelector("[data-m4-aspect-right] p");
+  const valueEl = panel.querySelector("[data-m4-aspect-value] span");
+
+  if (!titleEl || !leftTextEl || !rightTextEl || !valueEl) return;
+
+  const aspects = {
+    registro: {
+      title: "Registro de residuos",
+      traditional:
+        "Manual, incompleta o inexistente. Puede depender de formatos físicos, observaciones aisladas o registros no estandarizados.",
+      smart:
+        "Digital, sistemática y trazable. Permite registrar fecha, punto de generación, tipo de residuo, peso, responsable y destino.",
+      value:
+        "Construye una línea base institucional para analizar tendencias, comparar periodos y evaluar mejoras.",
+    },
+    clasificacion: {
+      title: "Clasificación",
+      traditional:
+        "Depende únicamente del usuario. Puede presentar errores por falta de cultura ambiental, señalización insuficiente o mezcla de residuos.",
+      smart:
+        "Puede apoyarse en inteligencia artificial, sensores, registros fotográficos, códigos QR y campañas dirigidas según los datos recolectados.",
+      value:
+        "Permite medir tasa de separación correcta, tasa de rechazo y kilogramos de material aprovechable.",
+    },
+    recoleccion: {
+      title: "Recolección",
+      traditional: "Frecuencia fija, sin análisis del nivel de llenado ni de la generación real de residuos.",
+      smart: "Frecuencia ajustada según datos, indicadores, sensores de llenado o reportes digitales.",
+      value:
+        "Reduce recorridos innecesarios, tiempos de recolección y viajes en vacío; permite ajustar rutas según evidencia.",
+    },
+    seguimiento: {
+      title: "Seguimiento",
+      traditional:
+        "Limitado y poco verificable. Puede no existir evidencia suficiente sobre qué ocurre después de la recolección.",
+      smart: "Mediante tableros, métricas, mapas, reportes y alertas.",
+      value:
+        "Permite monitorear puntos críticos, desbordamientos, cumplimiento de recolección y desempeño operativo.",
+    },
+    decisiones: {
+      title: "Toma de decisiones",
+      traditional:
+        "Reactiva. Las acciones se realizan cuando aparece un problema visible, como acumulación, desbordamiento, quejas o bajo reciclaje.",
+      smart:
+        "Basada en evidencia. Las decisiones se toman con datos históricos, indicadores, alertas y análisis descriptivo, predictivo o prescriptivo.",
+      value:
+        "Permite anticipar necesidades, priorizar acciones ambientales y justificar decisiones institucionales.",
+    },
+    costos: {
+      title: "Costos operativos",
+      traditional:
+        "Difíciles de estimar, porque no siempre se conoce tiempo, ruta, frecuencia, peso gestionado o recursos utilizados.",
+      smart:
+        "Medibles mediante indicadores como costo por kilogramo gestionado, tiempo de recolección, número de recorridos, recursos utilizados y porcentaje de viajes en vacío.",
+      value:
+        "Facilita evaluar eficiencia operativa, identificar desperdicios y justificar mejoras en el sistema de gestión.",
+    },
+    impacto: {
+      title: "Impacto ambiental",
+      traditional:
+        "Poco cuantificado. Puede desconocerse cuánto se recicla, cuánto se aprovecha, cuánto se envía a disposición final o qué emisiones podrían evitarse.",
+      smart:
+        "Medible mediante tasa de reciclaje, tasa de aprovechamiento, kilogramos recuperados, emisiones evitadas, reducción de residuos y reducción de recorridos.",
+      value:
+        "Permite demostrar avances en sostenibilidad institucional, economía circular y cumplimiento de metas ambientales.",
+    },
+    trazabilidad: {
+      title: "Trazabilidad",
+      traditional:
+        "Parcial o inexistente. No siempre se conoce el recorrido del residuo desde su generación hasta su destino.",
+      smart:
+        "Seguimiento desde el punto de generación hasta almacenamiento, aprovechamiento o disposición final, mediante registros digitales, QR/RFID, formularios móviles o bases de datos.",
+      value:
+        "Permite auditar el proceso, mejorar transparencia y fortalecer la responsabilidad ambiental institucional.",
+    },
+  };
+
+  function render(key) {
+    const aspect = aspects[key] || aspects.registro;
+    titleEl.textContent = aspect.title;
+    leftTextEl.textContent = aspect.traditional;
+    rightTextEl.textContent = aspect.smart;
+    valueEl.textContent = aspect.value;
+  }
+
+  function setActive(key) {
+    tabs.forEach((tab) => {
+      const active = tab.dataset.m4Aspect === key;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-selected", active ? "true" : "false");
+    });
+    panel.dataset.m4AspectCurrent = key;
+    render(key);
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const key = tab.dataset.m4Aspect;
+      if (!key) return;
+      setActive(key);
+    });
+  });
+
+  const initial =
+    tabs.find((tab) => tab.classList.contains("is-active"))?.dataset?.m4Aspect ||
+    tabs[0]?.dataset?.m4Aspect ||
+    "registro";
+  setActive(initial);
+}
+
+function setupCaseSeriesActivities() {
+  const activities = Array.from(
+    document.querySelectorAll('.activity[data-activity-type="case-series"]')
+  );
+
+  activities.forEach((activity) => {
+    const progressEl = activity.querySelector("[data-case-progress]");
+    const scoreEl = activity.querySelector("[data-case-score]");
+    const textEl = activity.querySelector("[data-case-text]");
+    const feedbackEl = activity.querySelector("[data-case-feedback]");
+    const nextBtn = activity.querySelector("[data-case-next]");
+    const resetBtn = activity.querySelector("[data-case-reset]");
+    const choiceBtns = Array.from(activity.querySelectorAll("[data-case-choice]"));
+
+    if (!textEl || choiceBtns.length === 0) return;
+
+    const cases = [
+      {
+        text: "Se recoge la basura todos los días a la misma hora, aunque los contenedores estén medio vacíos.",
+        correct: "tradicional",
+        feedback:
+          "La frecuencia fija no considera datos reales de llenado ni demanda de recolección.",
+      },
+      {
+        text: "Un dashboard muestra que la cafetería genera más residuos orgánicos los lunes.",
+        correct: "inteligente",
+        feedback:
+          "El tablero permite observar patrones y tomar decisiones basadas en evidencia.",
+      },
+      {
+        text: "No se conoce cuánto material reciclable se recupera cada semana.",
+        correct: "tradicional",
+        feedback:
+          "Sin registro ni indicadores no se puede medir el aprovechamiento.",
+      },
+      {
+        text: "Los códigos QR permiten registrar el peso y destino de los residuos por punto ecológico.",
+        correct: "inteligente",
+        feedback:
+          "El registro digital fortalece la trazabilidad del residuo.",
+      },
+      {
+        text: "Las campañas ambientales se diseñan según los errores frecuentes de separación.",
+        correct: "inteligente",
+        feedback:
+          "Los datos permiten focalizar campañas según problemas reales de clasificación.",
+      },
+      {
+        text: "Las decisiones se toman solo cuando hay quejas por desbordamiento.",
+        correct: "tradicional",
+        feedback:
+          "Es una decisión reactiva: se actúa después de que el problema aparece.",
+      },
+      {
+        text: "El sistema estima que durante la semana de parciales aumentará la generación de residuos.",
+        correct: "inteligente",
+        feedback:
+          "La predicción permite anticipar necesidades operativas.",
+      },
+      {
+        text: "No existe registro del destino final de los residuos recolectados.",
+        correct: "tradicional",
+        feedback:
+          "La falta de trazabilidad impide conocer el recorrido del residuo.",
+      },
+    ];
+
+    let index = 0;
+    let score = 0;
+    let locked = false;
+
+    function updateMeta() {
+      if (progressEl) progressEl.textContent = `Caso ${index + 1} de ${cases.length}`;
+      if (scoreEl) scoreEl.textContent = `Aciertos: ${score}`;
+    }
+
+    function setFeedback(message, isCorrect) {
+      if (!feedbackEl) return;
+      setFeedbackTone(feedbackEl, isCorrect);
+      feedbackEl.textContent = message || "";
+    }
+
+    function render() {
+      const current = cases[index];
+      textEl.textContent = current?.text || "";
+      updateMeta();
+      locked = false;
+      if (nextBtn) nextBtn.disabled = true;
+      setFeedback("", null);
+    }
+
+    function finish() {
+      const total = cases.length;
+      if (nextBtn) nextBtn.disabled = true;
+
+      if (score >= 7) {
+        setFeedback(
+          "Excelente. Reconoces con claridad la diferencia entre una gestión reactiva y una gestión basada en datos.",
+          true
+        );
+      } else if (score >= 4) {
+        setFeedback(
+          "Buen avance. Recuerda: la gestión tradicional reacciona cuando el problema aparece; la gestión inteligente registra, analiza y decide con evidencia.",
+          null
+        );
+      } else {
+        setFeedback(
+          "Repasa el comparador. Una gestión con analítica de datos se caracteriza por registros digitales, indicadores, trazabilidad, tableros y decisiones basadas en evidencia.",
+          false
+        );
+      }
+
+      if (score >= 7) completeActivity(activity, `¡Excelente! Actividad completada.\nPuntaje: ${score}/${total}`);
+    }
+
+    choiceBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (locked) return;
+        const choice = btn.dataset.caseChoice;
+        const current = cases[index];
+        if (!choice || !current) return;
+
+        locked = true;
+        const correct = choice === current.correct;
+        if (correct) score += 1;
+
+        setFeedback(correct ? `Correcto. ${current.feedback}` : `Incorrecto. ${current.feedback}`, correct);
+        updateMeta();
+        if (nextBtn) nextBtn.disabled = false;
+      });
+    });
+
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        if (index >= cases.length - 1) {
+          finish();
+          return;
+        }
+        index += 1;
+        render();
+      });
+    }
+
+    function reset() {
+      index = 0;
+      score = 0;
+      render();
+    }
+
+    if (resetBtn) resetBtn.addEventListener("click", reset);
+    activity.__odcReset = reset;
+
+    render();
+  });
+}
+
+function setupM5IndicatorsPanel() {
+  const panel = document.querySelector("[data-m5-dim-panel]");
+  if (!panel) return;
+
+  const tabs = Array.from(document.querySelectorAll("[data-m5-dim]"));
+  const titleEl = panel.querySelector("[data-m5-dim-title]");
+  const bodyEl = panel.querySelector("[data-m5-dim-body]");
+  const noteEl = panel.querySelector("[data-m5-dim-note]");
+
+  if (!titleEl || !bodyEl || !noteEl) return;
+
+  const dims = {
+    ambiental: {
+      title: "Dimensión ambiental",
+      note:
+        "Estos indicadores permiten evaluar si la institución reduce la cantidad de residuos enviados a disposición final y aumenta el aprovechamiento de materiales. UNEP e ISWA (2024) destacan beneficios ambientales y económicos de modelos de economía circular.",
+      rows: [
+        ["Tasa de aprovechamiento", "kg aprovechados / kg totales × 100", "Porcentaje de residuos reciclados, reutilizados o compostados."],
+        ["Tasa de reciclaje", "kg reciclados / kg totales × 100", "Nivel de recuperación de materiales reciclables."],
+        ["Reducción de residuos", "kg iniciales - kg finales", "Disminución de residuos enviados a disposición final."],
+        ["Emisiones evitadas", "km reducidos × factor de emisión", "Beneficio ambiental asociado a rutas optimizadas."],
+      ],
+    },
+    operativa: {
+      title: "Dimensión operativa",
+      note:
+        "Estos indicadores permiten identificar eficiencia operativa: recorridos innecesarios, acumulación o puntos críticos. El documento base sugiere programar recolecciones según demanda y medir tiempos y recorridos.",
+      rows: [
+        ["Eficiencia de recolección", "kg recolectados / tiempo empleado", "Productividad del proceso de recolección."],
+        ["Cumplimiento de recolección", "recolecciones realizadas / recolecciones programadas × 100", "Nivel de cumplimiento de rutas internas."],
+        ["Puntos críticos activos", "número de puntos con acumulación o desbordamiento", "Zonas que requieren atención prioritaria."],
+        ["Tiempo promedio de recolección", "suma de tiempos / número de recorridos", "Duración media del proceso operativo."],
+      ],
+    },
+    economica: {
+      title: "Dimensión económica",
+      note:
+        "Medir costos permite comparar escenarios antes y después de implementar mejoras. La EPA (2025) recomienda enfoques de ciclo de vida para identificar oportunidades de reducción de impactos y costos.",
+      rows: [
+        ["Costo por kg gestionado", "costo total / kg gestionados", "Eficiencia económica de la gestión."],
+        ["Costos evitados", "costo base - costo posterior", "Ahorro logrado por mejoras operativas."],
+        ["Costo por ruta", "costo total de recolección / número de rutas", "Costo promedio de cada recorrido."],
+      ],
+    },
+    comunitaria: {
+      title: "Dimensión institucional y comunitaria",
+      note:
+        "Estos indicadores ayudan a evaluar apropiación de campañas y calidad de separación en la fuente, e identificar puntos donde se requiere educación o señalización.",
+      rows: [
+        ["Participación comunitaria", "participantes / población total × 100", "Apropiación institucional de acciones ambientales."],
+        ["Tasa de separación correcta", "residuos correctamente separados / residuos evaluados × 100", "Calidad de separación en la fuente."],
+        ["Tasa de rechazo", "kg rechazados / kg aprovechables recolectados × 100", "Material no aprovechable por contaminación o mala clasificación."],
+      ],
+    },
+    datos: {
+      title: "Dimensión de trazabilidad y datos",
+      note:
+        "La trazabilidad permite saber qué ocurre con el residuo desde su generación hasta su destino. Se puede fortalecer con formularios digitales, QR/RFID y bases de datos estructuradas.",
+      rows: [
+        ["Trazabilidad del residuo", "registros completos / registros totales × 100", "Seguimiento del residuo desde su origen hasta su destino."],
+        ["Incidencias registradas", "número de registros con novedades", "Fallas, errores o eventos críticos."],
+        ["Tiempo entre generación y retiro", "hora de retiro - hora de generación", "Tiempo que permanece el residuo en el punto de generación."],
+      ],
+    },
+  };
+
+  function render(key) {
+    const dim = dims[key] || dims.ambiental;
+    titleEl.textContent = dim.title;
+    noteEl.textContent = dim.note;
+    bodyEl.textContent = "";
+
+    dim.rows.forEach(([name, formula, measures]) => {
+      const tr = document.createElement("tr");
+      const td1 = document.createElement("td");
+      const td2 = document.createElement("td");
+      const td3 = document.createElement("td");
+      td1.textContent = name;
+      td2.textContent = formula;
+      td3.textContent = measures;
+      tr.appendChild(td1);
+      tr.appendChild(td2);
+      tr.appendChild(td3);
+      bodyEl.appendChild(tr);
+    });
+  }
+
+  function setActive(key) {
+    tabs.forEach((tab) => {
+      const active = tab.dataset.m5Dim === key;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-selected", active ? "true" : "false");
+    });
+    panel.dataset.m5DimCurrent = key;
+    render(key);
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const key = tab.dataset.m5Dim;
+      if (!key) return;
+      setActive(key);
+    });
+  });
+
+  const initial =
+    tabs.find((tab) => tab.classList.contains("is-active"))?.dataset?.m5Dim ||
+    tabs[0]?.dataset?.m5Dim ||
+    "ambiental";
+  setActive(initial);
+}
+
+function setupCalcActivities() {
+  const activities = Array.from(document.querySelectorAll('.activity[data-activity-type="calc"]'));
+
+  activities.forEach((activity) => {
+    const cards = Array.from(activity.querySelectorAll("[data-calc-case]"));
+    const resetBtn = activity.querySelector("[data-calc-reset]");
+
+    if (cards.length === 0) return;
+
+    const completed = new Set();
+
+    function markDone(card) {
+      const key = card.dataset.calcCase || "";
+      if (key) completed.add(key);
+      card.dataset.calcDone = "true";
+
+      if (completed.size >= cards.length) {
+        completeActivity(activity, "¡Excelente! Completaste los cálculos clave del módulo 5.");
+      }
+    }
+
+    function reset() {
+      completed.clear();
+      cards.forEach((card) => {
+        card.dataset.calcDone = "false";
+        const feedback = card.querySelector("[data-calc-feedback]");
+        if (feedback) {
+          setFeedbackTone(feedback, null);
+          feedback.textContent = "";
+        }
+      });
+    }
+
+    cards.forEach((card) => {
+      const runBtn = card.querySelector("[data-calc-run]");
+      const aEl = card.querySelector("[data-calc-a]");
+      const bEl = card.querySelector("[data-calc-b]");
+      const feedbackEl = card.querySelector("[data-calc-feedback]");
+
+      if (!runBtn || !aEl || !bEl || !feedbackEl) return;
+
+      runBtn.addEventListener("click", () => {
+        const a = Number(aEl.value);
+        const b = Number(bEl.value);
+
+        if (!Number.isFinite(a) || !Number.isFinite(b) || b === 0) {
+          setFeedbackTone(feedbackEl, false);
+          feedbackEl.textContent = "Revisa los valores: deben ser números y el denominador no puede ser 0.";
+          return;
+        }
+
+        const type = card.dataset.calcCase;
+
+        if (type === "reciclaje" || type === "trazabilidad") {
+          const value = (a / b) * 100;
+          const rounded = Math.round(value * 10) / 10;
+          setFeedbackTone(feedbackEl, true);
+          feedbackEl.textContent =
+            type === "reciclaje"
+              ? `Resultado: ${rounded} %. Esto indica qué porcentaje de residuos generados fue recuperado mediante reciclaje.`
+              : `Resultado: ${rounded} %. Esto indica qué porcentaje de registros está completo (origen, peso, tipo y destino).`;
+          markDone(card);
+          return;
+        }
+
+        if (type === "costo") {
+          const value = a / b;
+          const rounded = Math.round(value * 10) / 10;
+          setFeedbackTone(feedbackEl, true);
+          feedbackEl.textContent =
+            `Resultado: ${rounded} COP/kg. Este indicador ayuda a evaluar eficiencia económica y comparar estrategias.`;
+          markDone(card);
+          return;
+        }
+
+        setFeedbackTone(feedbackEl, null);
+        feedbackEl.textContent = "";
+      });
+    });
+
+    if (resetBtn) resetBtn.addEventListener("click", reset);
+    activity.__odcReset = reset;
+    reset();
+  });
+}
+
+function setupWordSearchActivities() {
+  const activities = Array.from(document.querySelectorAll('.activity[data-activity-type="wordsearch"]'));
+
+  activities.forEach((activity) => {
+    const words = Array.from(activity.querySelectorAll("[data-word]"));
+    const feedbackEl = activity.querySelector("[data-ws-feedback]");
+    const resetBtn = activity.querySelector("[data-ws-reset]");
+
+    if (words.length === 0 || !feedbackEl) return;
+
+    const messages = {
+      PRISMA: "PRISMA: organiza identificación, selección, elegibilidad e inclusión de estudios.",
+      SCOPUS: "SCOPUS: base de datos utilizada para recuperar artículos científicos.",
+      ANALITICA: "ANALÍTICA: permite interpretar datos y convertirlos en evidencia.",
+      BIGDATA: "BIG DATA: integra grandes volúmenes de datos de sensores, registros y reportes.",
+      IOT: "IoT: captura datos mediante sensores en contenedores o puntos críticos.",
+      IA: "IA: apoya clasificación, predicción y detección de patrones.",
+      RECICLAJE: "RECICLAJE: reincorpora materiales aprovechables a nuevos procesos.",
+      TRAZABILIDAD: "TRAZABILIDAD: sigue el residuo desde su generación hasta su destino.",
+      SOSTENIBILIDAD: "SOSTENIBILIDAD: orienta la reducción de impactos ambientales.",
+      ECONOMIA: "ECONOMÍA: se relaciona con economía circular y aprovechamiento de materiales.",
+      DASHBOARD: "DASHBOARD: visualiza indicadores para apoyar decisiones institucionales.",
+      RESIDUOS: "RESIDUOS: tema central de la propuesta del ODC.",
+    };
+
+    const found = new Set();
+
+    function setMsg(ok, text) {
+      setFeedbackTone(feedbackEl, ok);
+      feedbackEl.textContent = text;
+    }
+
+    function finishIfDone() {
+      if (found.size >= words.length) {
+        completeActivity(activity, "¡Excelente! Reconociste los términos clave que conectan PRISMA con la evidencia del ODC.");
+      }
+    }
+
+    function reset() {
+      found.clear();
+      words.forEach((btn) => btn.classList.remove("is-found"));
+      setFeedbackTone(feedbackEl, null);
+      feedbackEl.textContent = "";
+    }
+
+    words.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const key = String(btn.dataset.word || "").toUpperCase();
+        if (!key) return;
+
+        if (found.has(key)) {
+          setMsg(true, messages[key] || "¡Ya encontrada!");
+          return;
+        }
+
+        found.add(key);
+        btn.classList.add("is-found");
+        setMsg(true, messages[key] || "¡Encontrada!");
+        finishIfDone();
+      });
+    });
+
+    if (resetBtn) resetBtn.addEventListener("click", reset);
+    activity.__odcReset = reset;
+    reset();
+  });
+}
+
 /* =========================
    ACTIVIDADES
 ========================= */
@@ -477,6 +1334,375 @@ function setupActivities() {
   setupChecklistActivities();
   setupDragDropActivities();
   setupOrderActivities();
+  setupPairsActivities();
+  setupCaseSeriesActivities();
+  setupCalcActivities();
+  setupWordSearchActivities();
+}
+
+function setupFlipCards() {
+  const cards = Array.from(document.querySelectorAll("[data-flip-card]"));
+
+  cards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const isFlipped = card.classList.toggle("is-flipped");
+      card.setAttribute("aria-pressed", String(isFlipped));
+    });
+  });
+}
+
+function setupFlowGraphics() {
+  const graphics = Array.from(document.querySelectorAll("[data-flow-graphic]"));
+
+  graphics.forEach((graphic) => {
+    const nodes = Array.from(graphic.querySelectorAll("[data-flow-node]"));
+    const detailEl =
+      graphic.parentElement?.querySelector?.("[data-flow-detail]") || null;
+
+    if (nodes.length === 0 || !detailEl) return;
+
+    function render(node) {
+      const title = node.dataset.title || node.textContent?.trim?.() || "Paso";
+      const detail = node.dataset.detail || "";
+
+      detailEl.textContent = "";
+
+      const strong = document.createElement("strong");
+      strong.textContent = `${title}:`;
+
+      const text = document.createTextNode(` ${detail}`);
+
+      detailEl.appendChild(strong);
+      detailEl.appendChild(text);
+
+      detailEl.classList.remove("is-pop");
+      void detailEl.offsetWidth;
+      detailEl.classList.add("is-pop");
+    }
+
+    function setActive(node) {
+      nodes.forEach((n) => n.classList.toggle("is-active", n === node));
+      render(node);
+    }
+
+    nodes.forEach((node) => {
+      node.addEventListener("click", () => setActive(node));
+    });
+
+    const initial = nodes.find((n) => n.classList.contains("is-active")) || nodes[0];
+    if (initial) setActive(initial);
+  });
+}
+
+function setupCircularRouteActivity() {
+  const root = document.getElementById("m2-circular");
+  if (!root) return;
+
+  const caseEl = document.getElementById("m2CircularCase");
+  const progressEl = document.getElementById("m2CircularProgress");
+  const scoreEl = document.getElementById("m2CircularScore");
+  const feedbackEl = document.getElementById("m2CircularFeedback");
+  const feedbackTextEl = document.getElementById("m2CircularFeedbackText");
+  const nextBtn = document.getElementById("m2CircularNext");
+  const resetBtn = document.getElementById("m2CircularReset");
+  const actionButtons = Array.from(root.querySelectorAll("[data-action]"));
+  const cardEl = root.querySelector(".m2-circular-card");
+
+  if (
+    !caseEl ||
+    !progressEl ||
+    !scoreEl ||
+    !feedbackEl ||
+    !feedbackTextEl ||
+    !nextBtn ||
+    !resetBtn ||
+    actionButtons.length === 0
+  ) {
+    return;
+  }
+
+  const cases = [
+    {
+      text: "En la cafetería quedan cáscaras de fruta y residuos vegetales después del consumo diario.",
+      correct: "Compostar",
+      correctFeedback:
+        "Correcto. Los residuos orgánicos pueden aprovecharse mediante compostaje, evitando que lleguen a disposición final.",
+    },
+    {
+      text: "En una oficina quedan hojas impresas por una sola cara y aún se pueden usar para borradores.",
+      correct: "Reutilizar",
+      correctFeedback:
+        "Correcto. Antes de reciclar, es preferible reutilizar el material si todavía tiene vida útil.",
+    },
+    {
+      text: "Después de una jornada académica se recogen botellas plásticas limpias y separadas correctamente.",
+      correct: "Reciclar",
+      correctFeedback: "Correcto. Si el plástico está limpio y separado, puede enviarse a reciclaje.",
+    },
+    {
+      text: "En la zona de comidas se encuentran empaques contaminados con grasa y restos de alimentos.",
+      correct: "Disponer",
+      correctFeedback:
+        "Correcto. Cuando un empaque está contaminado y no puede limpiarse ni reciclarse, debe manejarse como residuo ordinario.",
+    },
+    {
+      text: "La universidad planea comprar insumos para un evento, pero algunos proveedores entregan productos con exceso de empaques.",
+      correct: "Reducir",
+      correctFeedback:
+        "Correcto. La mejor decisión es reducir desde el origen, eligiendo productos o proveedores con menos empaque.",
+    },
+  ];
+
+  let currentIndex = 0;
+  let score = 0;
+  let hasAnswered = false;
+
+  function pulse(el, className) {
+    if (!el) return;
+    el.classList.remove(className);
+    void el.offsetWidth;
+    el.classList.add(className);
+  }
+
+  function clearSelectionStyles() {
+    actionButtons.forEach((btn) => btn.classList.remove("is-selected"));
+  }
+
+  function setButtonsEnabled(enabled) {
+    actionButtons.forEach((btn) => {
+      btn.disabled = !enabled;
+    });
+  }
+
+  function render() {
+    const total = cases.length;
+    const caseNumber = currentIndex + 1;
+
+    progressEl.textContent = `Caso ${caseNumber} de ${total}`;
+    scoreEl.textContent = `Puntaje: ${score}`;
+    caseEl.textContent = cases[currentIndex].text;
+    pulse(cardEl, "is-switching");
+    pulse(caseEl, "is-switching");
+
+    feedbackEl.classList.remove("is-correct", "is-incorrect");
+    feedbackTextEl.textContent = "Elige una acción para este caso.";
+
+    nextBtn.disabled = true;
+    hasAnswered = false;
+    clearSelectionStyles();
+    setButtonsEnabled(true);
+  }
+
+  function showFinalMessage() {
+    const total = cases.length;
+
+    progressEl.textContent = `Caso ${total} de ${total}`;
+    scoreEl.textContent = `Puntaje final: ${score}/${total}`;
+    caseEl.textContent = "Actividad finalizada.";
+
+    feedbackEl.classList.remove("is-correct", "is-incorrect");
+
+    let message =
+      "Repasa los conceptos. La opción más sostenible es evitar generar residuos desde el origen y mantener los materiales en uso el mayor tiempo posible.";
+
+    if (score >= 4) {
+      message =
+        "Excelente. Comprendiste que la gestión sostenible no consiste solo en reciclar, sino en tomar mejores decisiones desde el origen.";
+    } else if (score >= 2) {
+      message =
+        "Buen avance. Revisa la ruta circular: reducir, reutilizar, reciclar, compostar y disponer.";
+    }
+
+    feedbackTextEl.textContent = message;
+    pulse(feedbackEl, "is-pop");
+    nextBtn.disabled = true;
+    hasAnswered = true;
+    clearSelectionStyles();
+    setButtonsEnabled(false);
+  }
+
+  function handleAnswer(action, buttonEl) {
+    if (hasAnswered) return;
+
+    hasAnswered = true;
+    clearSelectionStyles();
+    buttonEl.classList.add("is-selected");
+
+    const current = cases[currentIndex];
+    const isCorrect = action === current.correct;
+
+    if (isCorrect) score += 1;
+
+    feedbackEl.classList.toggle("is-correct", isCorrect);
+    feedbackEl.classList.toggle("is-incorrect", !isCorrect);
+    feedbackTextEl.textContent = isCorrect
+      ? current.correctFeedback
+      : `Incorrecto. La mejor opción en este caso es: ${current.correct}. ${current.correctFeedback}`;
+
+    pulse(feedbackEl, "is-pop");
+    if (!isCorrect) pulse(cardEl, "is-shake");
+
+    scoreEl.textContent = `Puntaje: ${score}`;
+
+    setButtonsEnabled(false);
+    nextBtn.disabled = false;
+
+    const isLast = currentIndex === cases.length - 1;
+    nextBtn.textContent = isLast ? "Ver resultados" : "Siguiente caso";
+  }
+
+  actionButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const action = btn.dataset.action;
+      if (!action) return;
+      handleAnswer(action, btn);
+    });
+  });
+
+  nextBtn.addEventListener("click", () => {
+    const isLast = currentIndex === cases.length - 1;
+    if (isLast) {
+      showFinalMessage();
+      completeActivity(root);
+      return;
+    }
+
+    currentIndex += 1;
+    render();
+  });
+
+  resetBtn.addEventListener("click", () => {
+    currentIndex = 0;
+    score = 0;
+    nextBtn.textContent = "Siguiente caso";
+    render();
+  });
+
+  root.__odcReset = () => {
+    currentIndex = 0;
+    score = 0;
+    nextBtn.textContent = "Siguiente caso";
+    render();
+  };
+
+  render();
+}
+
+function setupActivityModals() {
+  const activities = Array.from(document.querySelectorAll(".activity"));
+  if (activities.length === 0) return;
+
+  activities.forEach((activity) => {
+    if (!(activity instanceof HTMLElement)) return;
+    if (activity.closest("dialog")) return;
+    if (activity.closest("#modulo-1")) return; // Módulo 1 se mantiene visible
+
+    const activityId = activity.dataset.activityId || "";
+    if (!activityId) return;
+    if (activityId.includes("launch")) return; // ya existe un launcher (M2, M3, entrada)
+
+    // Evita duplicar si ya fue modalizada en otra carga
+    if (activity.dataset.modalized === "true") return;
+    activity.dataset.modalized = "true";
+
+    const marker = document.createElement("div");
+    marker.setAttribute("data-activity-marker", activityId);
+    activity.insertAdjacentElement("beforebegin", marker);
+
+    const title =
+      activity.querySelector("h3")?.textContent?.trim() ||
+      activity.getAttribute("aria-label") ||
+      "Actividad";
+
+    const firstParagraph = activity.querySelector("p")?.textContent?.trim() || "";
+
+    const dialog = document.createElement("dialog");
+    dialog.className = "modal activity-dialog";
+    dialog.id = `${activityId}-dialog`;
+
+    const form = document.createElement("form");
+    form.method = "dialog";
+    form.className = "modal-card activity-modal-card";
+
+    const head = document.createElement("div");
+    head.className = "activity-modal-head";
+
+    const h = document.createElement("h3");
+    h.textContent = title;
+
+    const closeTop = document.createElement("button");
+    closeTop.className = "btn btn-ghost";
+    closeTop.type = "submit";
+    closeTop.value = "close";
+    closeTop.setAttribute("aria-label", "Cerrar actividad");
+    closeTop.textContent = "✕";
+
+    head.appendChild(h);
+    head.appendChild(closeTop);
+
+    const body = document.createElement("div");
+    body.className = "activity-modal-body";
+
+    body.appendChild(activity);
+
+    const foot = document.createElement("div");
+    foot.className = "modal-actions";
+
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "btn btn-primary";
+    closeBtn.type = "submit";
+    closeBtn.value = "close";
+    closeBtn.textContent = "Cerrar";
+
+    foot.appendChild(closeBtn);
+
+    form.appendChild(head);
+    form.appendChild(body);
+    form.appendChild(foot);
+    dialog.appendChild(form);
+    document.body.appendChild(dialog);
+
+    const launcher = document.createElement("div");
+    launcher.className = "activity-launcher";
+    launcher.dataset.activityLauncherFor = activityId;
+
+    const launcherHead = document.createElement("div");
+    launcherHead.className = "activity-launcher-head";
+
+    const launcherTitle = document.createElement("h3");
+    launcherTitle.textContent = title;
+
+    const chip = document.createElement("span");
+    chip.className = "activity-chip";
+    chip.textContent = "ACTIVIDAD";
+
+    launcherHead.appendChild(launcherTitle);
+    launcherHead.appendChild(chip);
+
+    const launcherText = document.createElement("p");
+    launcherText.className = "activity-launcher-text";
+    launcherText.textContent = firstParagraph;
+
+    const launcherActions = document.createElement("div");
+    launcherActions.className = "activity-launcher-actions";
+
+    const openBtn = document.createElement("button");
+    openBtn.className = "btn btn-primary";
+    openBtn.type = "button";
+    openBtn.textContent = "Abrir actividad";
+    openBtn.addEventListener("click", () => {
+      if (typeof dialog.showModal === "function") dialog.showModal();
+    });
+
+    launcherActions.appendChild(openBtn);
+
+    launcher.appendChild(launcherHead);
+    if (firstParagraph) launcher.appendChild(launcherText);
+    launcher.appendChild(launcherActions);
+
+    // Inserta el launcher donde estaba la actividad
+    marker.replaceWith(launcher);
+  });
 }
 
 function setFeedbackTone(feedbackEl, isCorrect) {
@@ -505,8 +1731,19 @@ function setupMultipleChoiceActivities() {
           setFeedbackTone(feedback, isCorrect);
           feedback.textContent = button.dataset.feedback || "";
         }
+
+        const isCorrect = button.dataset.correct === "true";
+        if (isCorrect) completeActivity(activity);
       });
     });
+
+    activity.__odcReset = () => {
+      buttons.forEach((btn) => btn.classList.remove("selected"));
+      if (feedback) {
+        setFeedbackTone(feedback, null);
+        feedback.textContent = "";
+      }
+    };
   });
 }
 
@@ -547,6 +1784,8 @@ function setupChecklistActivities() {
           setFeedbackTone(feedback, isCorrect);
           feedback.textContent = isCorrect ? correctMessage : incorrectMessage;
         }
+
+        if (isCorrect) completeActivity(activity);
       });
     }
 
@@ -577,6 +1816,7 @@ function setupDragDropActivities() {
     const checkBtn = activity.querySelector(".activity-check");
     const resetBtn = activity.querySelector(".activity-reset");
     const feedback = activity.querySelector(".feedback");
+    const mode = activity.dataset.dragdropMode || "pair";
 
     let selectedItem = null;
 
@@ -619,6 +1859,45 @@ function setupDragDropActivities() {
 
     if (checkBtn) {
       checkBtn.addEventListener("click", () => {
+        if (mode === "group") {
+          const allItems = Array.from(activity.querySelectorAll(".drag-item"));
+          const origin = activity.querySelector(".drag-items");
+          const placedItems = zones.flatMap((zone) =>
+            Array.from(zone.querySelectorAll(".drop-slot .drag-item"))
+          );
+          const unplacedItems = origin
+            ? Array.from(origin.querySelectorAll(".drag-item"))
+            : [];
+
+          let incorrectPlaced = 0;
+          placedItems.forEach((item) => {
+            const parentZone = item.closest(".drop-zone");
+            const expected = parentZone?.dataset?.accept;
+            const actual = item.dataset.category;
+            const ok = expected && actual && expected === actual;
+            item.classList.toggle("correct", Boolean(ok));
+            item.classList.toggle("incorrect", !ok);
+            if (!ok) incorrectPlaced += 1;
+          });
+
+          unplacedItems.forEach((item) => {
+            item.classList.remove("correct", "incorrect");
+          });
+
+          const allPlaced = placedItems.length === allItems.length;
+          const correct = allPlaced && incorrectPlaced === 0;
+
+          if (feedback) {
+            setFeedbackTone(feedback, correct);
+            feedback.textContent = correct
+              ? "Muy bien. Clasificar correctamente los residuos permite mejorar el aprovechamiento, evitar contaminación cruzada y fortalecer la cultura ambiental universitaria."
+              : "Revisa la clasificación. Algunos residuos pierden valor cuando se mezclan o se contaminan. Por ejemplo, el plástico limpio puede reciclarse, pero un empaque sucio puede convertirse en residuo ordinario.";
+          }
+
+          if (correct) completeActivity(activity);
+          return;
+        }
+
         const correct = zones.every((zone) => {
           const slotItem = zone.querySelector(".drop-slot .drag-item");
           return slotItem && slotItem.dataset.item === zone.dataset.accept;
@@ -630,6 +1909,8 @@ function setupDragDropActivities() {
             ? "Correcto. Secuencia completa: datos → tecnología → sostenibilidad → decisiones."
             : "Aún falta ordenar la secuencia. Revisa qué va primero y valida de nuevo.";
         }
+
+        if (correct) completeActivity(activity);
       });
     }
 
@@ -640,6 +1921,7 @@ function setupDragDropActivities() {
         items.forEach((item) => {
           dragItemsContainer.appendChild(item);
           item.classList.remove("selected");
+          item.classList.remove("correct", "incorrect");
         });
 
         selectedItem = null;
@@ -649,6 +1931,23 @@ function setupDragDropActivities() {
         }
       });
     }
+
+    activity.__odcReset = () => {
+      const dragItemsContainer = activity.querySelector(".drag-items");
+
+      items.forEach((item) => {
+        dragItemsContainer.appendChild(item);
+        item.classList.remove("selected");
+        item.classList.remove("correct", "incorrect");
+      });
+
+      if (feedback) {
+        setFeedbackTone(feedback, null);
+        feedback.textContent = "";
+      }
+
+      selectedItem = null;
+    };
   });
 }
 
@@ -716,6 +2015,240 @@ function setupOrderActivities() {
         }
       });
     }
+
+    activity.__odcReset = () => {
+      const items = Array.from(list.querySelectorAll(".order-item"));
+
+      items
+        .sort((a, b) => a.dataset.step.localeCompare(b.dataset.step))
+        .forEach((item) => list.appendChild(item));
+
+      if (feedback) {
+        setFeedbackTone(feedback, null);
+        feedback.textContent = "";
+      }
+    };
+  });
+}
+
+function setupPairsActivities() {
+  const activities = Array.from(
+    document.querySelectorAll('.activity[data-activity-type="pairs"]')
+  );
+
+  activities.forEach((activity) => {
+    const cards = Array.from(activity.querySelectorAll(".m3-pairs-card"));
+    const feedbackEl = activity.querySelector("[data-pairs-feedback]");
+    const progressEl = activity.querySelector("[data-pairs-progress]");
+    const resetBtn = activity.querySelector("[data-pairs-reset]");
+    const levelTabs = Array.from(activity.querySelectorAll("[data-pairs-level-tab]"));
+    const rightTitleEl = activity.querySelector("[data-pairs-right-title]");
+
+    const techCards = cards.filter((card) => card.dataset.pairsGroup === "tech");
+    const funcCards = cards.filter((card) => card.dataset.pairsGroup === "func");
+    const appCards = cards.filter((card) => card.dataset.pairsGroup === "app");
+
+    if (techCards.length === 0 || (funcCards.length === 0 && appCards.length === 0)) return;
+
+    let currentLevel = "func";
+
+    function getRightCards() {
+      return currentLevel === "app" ? appCards : funcCards;
+    }
+
+    function getTotalPairs() {
+      const rightCards = getRightCards();
+      return Math.min(techCards.length, rightCards.length);
+    }
+
+    const hints = {
+      analitica: "Piensa en interpretar registros y convertirlos en indicadores.",
+      ia: "Esta tecnologia aprende de datos y puede predecir o clasificar.",
+      iot: "Busca la opcion relacionada con sensores y captura automatica.",
+      bigdata: "Se relaciona con grandes volumenes y variedad de datos.",
+      sig: "Se relaciona con mapas, ubicacion y analisis espacial.",
+      dashboard: "Sirve para visualizar indicadores de forma grafica.",
+    };
+
+    let selectedTech = null;
+    let selectedRight = null;
+    let matchedCount = 0;
+
+    function setFeedback(message, tone) {
+      if (!feedbackEl) return;
+      feedbackEl.classList.remove("is-correct", "is-incorrect");
+      if (tone === "correct") feedbackEl.classList.add("is-correct");
+      if (tone === "incorrect") feedbackEl.classList.add("is-incorrect");
+      feedbackEl.textContent = message || "";
+    }
+
+    function updateProgress() {
+      if (!progressEl) return;
+      progressEl.textContent = `${matchedCount} de ${getTotalPairs()} parejas`;
+    }
+
+    function clearSelections() {
+      cards.forEach((card) => card.classList.remove("is-selected"));
+      selectedTech = null;
+      selectedRight = null;
+    }
+
+    function markMatched(techCard, rightCard) {
+      techCard.classList.add("is-matched");
+      rightCard.classList.add("is-matched");
+      techCard.disabled = true;
+      rightCard.disabled = true;
+      techCard.setAttribute("aria-pressed", "false");
+      rightCard.setAttribute("aria-pressed", "false");
+
+      window.setTimeout(() => {
+        techCard.classList.add("is-cleared");
+        rightCard.classList.add("is-cleared");
+        techCard.setAttribute("aria-hidden", "true");
+        rightCard.setAttribute("aria-hidden", "true");
+      }, 220);
+    }
+
+    function showFinalFeedback() {
+      const totalPairs = getTotalPairs();
+
+      if (matchedCount === totalPairs) {
+        setFeedback(
+          "Excelente. Comprendiste como cada tecnologia cumple una funcion dentro de una gestion inteligente de residuos: unas capturan datos, otras los procesan, otras los analizan y otras los visualizan para tomar decisiones.",
+          "correct"
+        );
+        return;
+      }
+
+      if (matchedCount >= 3) {
+        setFeedback(
+          "Buen avance. Recuerda la ruta: IoT captura datos, Big Data los integra, la analitica y la IA los interpretan, el SIG los ubica en mapas y el dashboard los comunica mediante indicadores.",
+          null
+        );
+        return;
+      }
+
+      setFeedback(
+        "Revisa nuevamente las tarjetas. La gestion inteligente de residuos funciona como un sistema: primero se capturan datos, luego se procesan, se analizan y finalmente se visualizan para apoyar decisiones.",
+        null
+      );
+    }
+
+    function evaluatePair() {
+      if (!selectedTech || !selectedRight) return;
+
+      const keyTech = selectedTech.dataset.pairsKey;
+      const keyRight = selectedRight.dataset.pairsKey;
+
+      if (keyTech && keyTech === keyRight) {
+        matchedCount += 1;
+        markMatched(selectedTech, selectedRight);
+        clearSelections();
+        updateProgress();
+        setFeedback("Correcto. Pareja encontrada.", "correct");
+
+        if (matchedCount === getTotalPairs()) {
+          showFinalFeedback();
+          completeActivity(activity);
+        }
+
+        return;
+      }
+
+      const hint = hints[keyTech] || "Pista: revisa la funcion principal de la tecnologia.";
+      setFeedback(`Incorrecto. ${hint}`, "incorrect");
+      clearSelections();
+    }
+
+    function handleCardClick(card) {
+      if (card.disabled) return;
+
+      const group = card.dataset.pairsGroup;
+      if (group !== "tech" && group !== "func" && group !== "app") return;
+
+      if (group === "tech") {
+        techCards.forEach((c) => c.classList.remove("is-selected"));
+        selectedTech = card;
+        card.classList.add("is-selected");
+        card.setAttribute("aria-pressed", "true");
+      } else {
+        if (group !== currentLevel) return;
+
+        const rightCards = getRightCards();
+        rightCards.forEach((c) => c.classList.remove("is-selected"));
+        selectedRight = card;
+        card.classList.add("is-selected");
+        card.setAttribute("aria-pressed", "true");
+      }
+
+      if (selectedTech && selectedRight) evaluatePair();
+    }
+
+    function reset() {
+      matchedCount = 0;
+      cards.forEach((card) => {
+        card.disabled = false;
+        card.classList.remove("is-selected", "is-matched", "is-cleared");
+        card.setAttribute("aria-pressed", "false");
+        card.removeAttribute("aria-hidden");
+      });
+      selectedTech = null;
+      selectedRight = null;
+      updateProgress();
+      setFeedback("Elige una tecnologia y luego su funcion.", null);
+    }
+
+    function syncLevelUI() {
+      const showFunc = currentLevel === "func";
+      funcCards.forEach((card) => card.classList.toggle("is-hidden", !showFunc));
+      appCards.forEach((card) => card.classList.toggle("is-hidden", showFunc));
+
+      levelTabs.forEach((tab) => {
+        const level = tab.dataset.pairsLevelTab;
+        const active = level === currentLevel;
+        tab.classList.toggle("is-active", active);
+        tab.setAttribute("aria-selected", active ? "true" : "false");
+      });
+
+      if (rightTitleEl) {
+        rightTitleEl.textContent = currentLevel === "app" ? "Aplicacion" : "Funcion";
+      }
+
+      setFeedback(
+        currentLevel === "app"
+          ? "Elige una tecnologia y luego su aplicacion institucional."
+          : "Elige una tecnologia y luego su funcion.",
+        null
+      );
+      updateProgress();
+    }
+
+    function setLevel(level) {
+      if (level !== "func" && level !== "app") return;
+      currentLevel = level;
+      clearSelections();
+      reset();
+      syncLevelUI();
+    }
+
+    cards.forEach((card) => {
+      card.setAttribute("aria-pressed", "false");
+      card.addEventListener("click", () => handleCardClick(card));
+    });
+
+    if (resetBtn) resetBtn.addEventListener("click", reset);
+
+    levelTabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const level = tab.dataset.pairsLevelTab;
+        setLevel(level);
+      });
+    });
+
+    activity.__odcReset = reset;
+
+    reset();
+    syncLevelUI();
   });
 }
 
@@ -872,8 +2405,9 @@ function setupSimulator() {
 
 function setupModals() {
   const helpDialog = document.getElementById("helpDialog");
-  const audioDialog = document.getElementById("audioDialog");
   const entryPuzzleDialog = document.getElementById("entryPuzzleDialog");
+  const m2CircularDialog = document.getElementById("m2CircularDialog");
+  const m3PairsDialog = document.getElementById("m3PairsDialog");
 
   document.addEventListener("click", (event) => {
     const target = event.target;
@@ -882,14 +2416,38 @@ function setupModals() {
       helpDialog.showModal();
     }
 
-    if (target.matches("#audioCtrlBtn") && audioDialog) {
-      audioDialog.showModal();
-    }
-
     if (target.matches("#entryPuzzleBtn") && entryPuzzleDialog) {
       entryPuzzleDialog.showModal();
     }
+
+    if (target.matches("#m2CircularOpen") && m2CircularDialog) {
+      m2CircularDialog.showModal();
+      const firstAction = m2CircularDialog.querySelector(".m2-circular-btn");
+      if (firstAction) firstAction.focus();
+    }
+
+    if (target.matches("#m3PairsOpen") && m3PairsDialog) {
+      m3PairsDialog.showModal();
+      const firstCard = m3PairsDialog.querySelector(".m3-pairs-card");
+      if (firstCard) firstCard.focus();
+    }
   });
+
+  if (m2CircularDialog) {
+    m2CircularDialog.addEventListener("click", (event) => {
+      if (event.target === m2CircularDialog && m2CircularDialog.open) {
+        m2CircularDialog.close();
+      }
+    });
+  }
+
+  if (m3PairsDialog) {
+    m3PairsDialog.addEventListener("click", (event) => {
+      if (event.target === m3PairsDialog && m3PairsDialog.open) {
+        m3PairsDialog.close();
+      }
+    });
+  }
 }
 
 /* =========================
@@ -926,17 +2484,25 @@ function init() {
     });
   }
 
-  setupAudioControls();
   setupVideoControls();
+  setupSingleVideoPlayback();
   setupInfoDialog();
+  setupCompletionDialog();
   setupInfoChips();
+  setupM3TermDialog();
+  setupM4AspectComparator();
+  setupM5IndicatorsPanel();
+  setupFlipCards();
+  setupFlowGraphics();
+  setupCircularRouteActivity();
+  setupActivityModals();
   setupActivities();
   setupQuiz();
   setupSimulator();
   setupModals();
 
   // Intenta autoplay en la sección activa (normalmente Portada)
-  autoplaySectionVideos(sections[currentSectionIndex]);
+  autoplayPrimaryVideo(sections[currentSectionIndex]);
 
   // En el primer gesto del usuario, fuerza audio activo (los navegadores suelen bloquear autoplay con sonido).
   document.addEventListener("pointerdown", enableAudioEverywhere, { once: true });
@@ -977,9 +2543,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Remove active class from all buttons
       causeButtons.forEach(btn => btn.classList.remove('active'));
+      causeButtons.forEach(btn => btn.setAttribute('aria-selected', 'false'));
       
       // Add active class to clicked button
       this.classList.add('active');
+      this.setAttribute('aria-selected', 'true');
 
       // Hide all cause contents
       causeContents.forEach(content => content.classList.add('hidden'));
@@ -1064,10 +2632,20 @@ function verifyChallenge() {
   const selectedOptions = document.querySelectorAll('.m1-option.selected');
   const feedback = document.getElementById('m1-feedback');
   const feedbackText = document.getElementById('m1-feedback-text');
+  const verifyBtn = document.getElementById('m1-verify-btn');
   
   // Correct options are 7 (data-correct="true")
   const correctOptions = document.querySelectorAll('.m1-option[data-correct="true"]');
   const incorrectOptions = document.querySelectorAll('.m1-option[data-correct="false"]');
+
+  if (!feedback || !feedbackText || !verifyBtn) return;
+
+  if (selectedOptions.length === 0) {
+    feedback.classList.add('is-incorrect');
+    feedback.classList.remove('is-correct');
+    feedbackText.textContent = 'Selecciona al menos un dato antes de validar.';
+    return;
+  }
   
   let correctCount = 0;
   let userCorrectCount = 0;
@@ -1097,6 +2675,9 @@ function verifyChallenge() {
     feedback.classList.add('is-correct');
     feedback.classList.remove('is-incorrect');
     feedbackText.textContent = `¡Excelente! Seleccionaste correctamente los ${totalCorrect} datos necesarios. (${percentage}%)`;
+
+    const activity = document.querySelector('.activity[data-activity-id="m1-datos"]');
+    if (activity) completeActivity(activity);
   } else if (userIncorrectCount === 0) {
     feedback.classList.add('is-incorrect');
     feedback.classList.remove('is-correct');
@@ -1108,7 +2689,7 @@ function verifyChallenge() {
   }
 
   // Disable verification button
-  document.getElementById('m1-verify-btn').disabled = true;
+  verifyBtn.disabled = true;
 }
 
 function resetChallenge() {
@@ -1121,10 +2702,10 @@ function resetChallenge() {
     option.classList.remove('selected', 'correct', 'incorrect');
   });
 
-  feedback.classList.remove('is-correct', 'is-incorrect');
-  feedbackText.textContent = 'Selecciona los datos que creas que son útiles para la gestión ambiental.';
+  if (feedback) feedback.classList.remove('is-correct', 'is-incorrect');
+  if (feedbackText) feedbackText.textContent = 'Selecciona los datos que creas que son útiles para la gestión ambiental.';
   
-  verifyBtn.disabled = false;
+  if (verifyBtn) verifyBtn.disabled = false;
 }
 
 // Accessibility: Ensure all interactive elements are keyboard navigable

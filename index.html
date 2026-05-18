@@ -55,39 +55,41 @@
 
         <nav class="menu-grid" aria-label="Secciones">
           <button class="nav-link active" data-section="portada">
-            01 · Portada · Inicio del ODC
+            Portada · Inicio del ODC
           </button>
           <button class="nav-link" data-section="entrada">
-            02 · REA y población objetivo
+            Entrada 1 · REA y población objetivo
           </button>
           <button class="nav-link" data-section="modulo-1">
-            03 · Módulo 1 · Problema ambiental
+            Módulo 1 · Problema ambiental y contexto local
           </button>
           <button class="nav-link" data-section="modulo-2">
-            04 · Módulo 2 · Conceptos clave
+            Módulo 2 · Conceptos clave
           </button>
           <button class="nav-link" data-section="modulo-3">
-            05 · Módulo 3 · Tecnologías digitales
+            Módulo 3 · Tecnologías digitales
           </button>
           <button class="nav-link" data-section="modulo-4">
-            06 · Módulo 4 · Esquema comparativo
+            Módulo 4 · Gestión tradicional vs. gestión inteligente
           </button>
           <button class="nav-link" data-section="modulo-5">
-            07 · Módulo 5 · Indicadores clave
+            Módulo 5 · Indicadores clave
           </button>
           <button class="nav-link" data-section="modulo-6">
-            08 · Módulo 6 · Evidencia PRISMA
+            Módulo 6 · Evidencia PRISMA
+          </button>
+          <button class="nav-link" data-section="modulo-7">
+            Módulo 7 · Funcionamiento del sistema
+          </button>
+          <button class="nav-link" data-section="modulo-8">
+            Módulo 8 · Aplicación institucional
           </button>
           <button class="nav-link" data-section="evaluacion">
-            09 · Módulo 8 · Evaluación final
+            Módulo 9 · Evaluación final
           </button>
           <button class="nav-link" data-section="conclusion">
-            10 · Módulo 9 · Conclusiones
+            Módulo 10 · Conclusiones, referencias y licencia
           </button>
-          <button class="nav-link" data-section="referencias">
-            11 · Módulo 10 · Referencias y créditos
-          </button>
-          <button class="nav-link" data-section="creditos">12 · Créditos</button>
         </nav>
       </div>
     </aside>
@@ -126,6 +128,7 @@
           <div class="hero-grid cover-grid">
             <div class="content-card cover-card">
               <div class="cover-badge">ODC · UNIVERSIDAD DE CUNDINAMARCA</div>
+              <p class="module-kicker">Portada · Inicio del ODC</p>
 
               <h1>
                 Analítica de Datos para RSU en
@@ -160,6 +163,7 @@
                     <video
                       id="portadaVideo"
                       class="cover-video"
+                      data-primary-video
                       autoplay
                       loop
                       muted
@@ -174,23 +178,34 @@
                   <div
                     class="video-overlay video-controls-below"
                     aria-label="Controles de video"
+                    data-video-controls
+                    data-video-target="portadaVideo"
                   >
                     <button
-                      id="playVideoBtn"
                       type="button"
                       class="btn video-button"
+                      data-video-action="toggle"
                       aria-label="Reproducir o pausar"
                       title="Reproducir / Pausar"
                     >
                       ▶
                     </button>
+                    <button
+                      type="button"
+                      class="btn video-button"
+                      data-video-action="replay"
+                      aria-label="Reproducir nuevamente"
+                      title="Reproducir nuevamente"
+                    >
+                      ↺
+                    </button>
                     <div class="volume-control" aria-label="Volumen">
-                      <span id="volumeIconPortada" class="volume-icon" aria-hidden="true"
+                      <span class="volume-icon" data-video-action="icon" aria-hidden="true"
                         >🔊</span
                       >
                       <input
-                        id="volumeRangePortada"
                         class="volume-range"
+                        data-video-action="volume"
                         type="range"
                         min="0"
                         max="1"
@@ -204,6 +219,11 @@
 
                 <p class="cover-video-note">
                   Conoce el propósito del ODC y cómo navegar por sus módulos.
+                </p>
+                <p class="apa-cite" role="note">
+                  González Zubieta, S., &amp; Beltrán Orozco, L. C. (2026). Video de portada del ODC “Analítica de datos
+                  para la gestión de residuos sólidos urbanos en la Universidad de Cundinamarca, Extensión Chía” [Video].
+                  Elaboración propia.
                 </p>
 
               </div>
@@ -231,7 +251,8 @@
       <!-- 02: ENTRADA -->
       <section id="entrada" class="screen">
         <header class="entry-header">
-          <h2> REA y Población objetivo</h2>
+          <p class="module-kicker">Entrada 1 · REA y población objetivo</p>
+          <h2>REA y población objetivo</h2>
           <p class="caption-box">
             Una vista rápida, aplicada y ambiental del propósito del ODC.
           </p>
@@ -279,10 +300,8 @@
               </p>
             </article>
 
-            <div
-              class="entry-activity activity"
-            >
-              <h3>Mini actividad · Rompecabezas</h3>
+            <div class="entry-activity activity" data-activity-type="dragdrop" data-activity-id="entrada-rompecabezas-launch">
+              <h3>Rompecabezas</h3>
               <p>
                 Arma la secuencia del ODC en un rompecabezas interactivo.
               </p>
@@ -303,6 +322,7 @@
                 <video
                   id="entradaVideo"
                   class="cover-video"
+                  data-primary-video
                   autoplay
                   loop
                   muted
@@ -315,17 +335,28 @@
               <div
                 class="video-overlay video-controls-below"
                 aria-label="Controles de video"
+                data-video-controls
+                data-video-target="entradaVideo"
               >
-                <button id="playEntradaBtn" type="button" class="btn video-button">
+                <button type="button" class="btn video-button" data-video-action="toggle" aria-label="Reproducir o pausar" title="Reproducir / Pausar">
                   ▶
                 </button>
+                <button
+                  type="button"
+                  class="btn video-button"
+                  data-video-action="replay"
+                  aria-label="Reproducir nuevamente"
+                  title="Reproducir nuevamente"
+                >
+                  ↺
+                </button>
                 <div class="volume-control" aria-label="Volumen">
-                  <span id="volumeIconEntrada" class="volume-icon" aria-hidden="true"
+                  <span class="volume-icon" data-video-action="icon" aria-hidden="true"
                     >🔊</span
                   >
                   <input
-                    id="volumeRangeEntrada"
                     class="volume-range"
+                    data-video-action="volume"
                     type="range"
                     min="0"
                     max="1"
@@ -336,6 +367,11 @@
                 </div>
               </div>
             </div>
+            <p class="apa-cite" role="note">
+              González Zubieta, S., &amp; Beltrán Orozco, L. C. (2026). Video 1. Introducción al ODC “Analítica de datos
+              para la gestión de residuos sólidos urbanos en la Universidad de Cundinamarca, Extensión Chía” [Video].
+              Elaboración propia.
+            </p>
 
             <div class="data-guide" aria-label="Avatar Data">
               <div class="data-avatar" aria-hidden="true">Data</div>
@@ -353,8 +389,12 @@
             <!-- 04: MÓDULO 1 -->
       <section id="modulo-1" class="screen">
         <div class="m1-header">
-          <h1>Módulo 1: Problema ambiental</h1>
-          <p class="m1-subtitle">La crisis de los residuos y la necesidad de tomar decisiones basadas en datos</p>
+          <p class="module-kicker">Módulo 1 · Problema ambiental y contexto local</p>
+          <h2>Problema ambiental y contexto local</h2>
+          <p class="m1-subtitle">
+            La crisis de los residuos y la necesidad de tomar decisiones basadas en
+            datos.
+          </p>
         </div>
 
         <div class="m1-purpose">
@@ -362,7 +402,7 @@
         </div>
 
         <section class="m1-crisis">
-          <h2>La crisis de los residuos</h2>
+          <h3>La crisis de los residuos</h3>
           <p>
             En la Universidad de Cundinamarca, Extensión Chía, se generan residuos en cafeterías, aulas, oficinas, zonas comunes y actividades institucionales. El problema ambiental no está solo en producir residuos, sino en <strong>no contar con datos suficientes para saber cuánto se genera, dónde se genera, cómo se separa y cuánto se aprovecha.</strong>
           </p>
@@ -384,72 +424,152 @@
         </section>
 
         <section class="m1-explorer">
-          <h2>Explora el problema</h2>
+          <h3>Explora el problema</h3>
           <p>Selecciona una causa para ver su descripción, consecuencia y datos necesarios.</p>
 
-          <div class="m1-cause-buttons" role="group" aria-label="Causas del problema">
-            <button class="m1-cause-btn active" type="button" data-cause="separacion">
-              Separación inadecuada
-            </button>
-            <button class="m1-cause-btn" type="button" data-cause="trazabilidad">
-              Falta de trazabilidad
-            </button>
-            <button class="m1-cause-btn" type="button" data-cause="indicadores">
-              Ausencia de indicadores
-            </button>
-            <button class="m1-cause-btn" type="button" data-cause="cultura">
-              Baja cultura ambiental
-            </button>
-          </div>
+          <div class="m1-explorer-grid" aria-label="Panel interactivo de causas">
+            <div
+              class="m1-cause-buttons"
+              role="tablist"
+              aria-label="Causas del problema"
+            >
+              <button
+                class="m1-cause-btn active"
+                type="button"
+                data-cause="separacion"
+                role="tab"
+                aria-selected="true"
+                aria-controls="m1-cause-separacion"
+              >
+                🚮 Separación inadecuada
+              </button>
+              <button
+                class="m1-cause-btn"
+                type="button"
+                data-cause="trazabilidad"
+                role="tab"
+                aria-selected="false"
+                aria-controls="m1-cause-trazabilidad"
+              >
+                🔎 Falta de trazabilidad
+              </button>
+              <button
+                class="m1-cause-btn"
+                type="button"
+                data-cause="indicadores"
+                role="tab"
+                aria-selected="false"
+                aria-controls="m1-cause-indicadores"
+              >
+                📊 Ausencia de indicadores
+              </button>
+              <button
+                class="m1-cause-btn"
+                type="button"
+                data-cause="cultura"
+                role="tab"
+                aria-selected="false"
+                aria-controls="m1-cause-cultura"
+              >
+                👥 Baja cultura ambiental
+              </button>
+            </div>
 
-          <div class="m1-cause-panel" aria-live="polite">
-            <div class="m1-cause-content" id="m1-cause-separacion">
-              <h3>Separación inadecuada</h3>
-              <p><strong>Descripción:</strong> Los residuos reciclables, orgánicos y ordinarios se mezclan, reduciendo su aprovechamiento.</p>
-              <p><strong>Consecuencia:</strong> Pérdida de materiales reciclables y aumento de residuos enviados a disposición final.</p>
-              <p><strong>Dato necesario:</strong> Porcentaje de residuos correctamente separados.</p>
-            </div>
-            <div class="m1-cause-content hidden" id="m1-cause-trazabilidad">
-              <h3>Falta de trazabilidad</h3>
-              <p><strong>Descripción:</strong> No se conoce claramente el recorrido del residuo desde su generación hasta su destino final.</p>
-              <p><strong>Consecuencia:</strong> Dificultad para saber qué residuos se aprovechan y cuáles llegan a disposición final.</p>
-              <p><strong>Dato necesario:</strong> Registro del origen, tipo, peso y destino del residuo.</p>
-            </div>
-            <div class="m1-cause-content hidden" id="m1-cause-indicadores">
-              <h3>Ausencia de indicadores</h3>
-              <p><strong>Descripción:</strong> No se mide de forma sistemática el reciclaje, los costos, la eficiencia operativa ni las emisiones evitadas.</p>
-              <p><strong>Consecuencia:</strong> Las decisiones ambientales se toman con poca evidencia.</p>
-              <p><strong>Dato necesario:</strong> Indicadores de reciclaje, aprovechamiento, costos, rutas y emisiones.</p>
-            </div>
-            <div class="m1-cause-content hidden" id="m1-cause-cultura">
-              <h3>Baja cultura ambiental</h3>
-              <p><strong>Descripción:</strong> La comunidad universitaria no siempre separa correctamente o desconoce el impacto de sus acciones.</p>
-              <p><strong>Consecuencia:</strong> Disminuye la participación y se debilitan las campañas ambientales.</p>
-              <p><strong>Dato necesario:</strong> Nivel de participación y tasa de separación en la fuente.</p>
+            <div class="m1-cause-panel" role="tabpanel" aria-live="polite">
+              <div class="m1-cause-content" id="m1-cause-separacion">
+                <h3>Separación inadecuada</h3>
+                <p><strong>Descripción:</strong> Los residuos reciclables, orgánicos y ordinarios se mezclan, reduciendo su aprovechamiento.</p>
+                <p><strong>Consecuencia:</strong> Pérdida de materiales reciclables y aumento de residuos enviados a disposición final.</p>
+                <p><strong>Dato necesario:</strong> Porcentaje de residuos correctamente separados.</p>
+              </div>
+              <div class="m1-cause-content hidden" id="m1-cause-trazabilidad">
+                <h3>Falta de trazabilidad</h3>
+                <p><strong>Descripción:</strong> No se conoce claramente el recorrido del residuo desde su generación hasta su destino final.</p>
+                <p><strong>Consecuencia:</strong> Dificultad para saber qué residuos se aprovechan y cuáles llegan a disposición final.</p>
+                <p><strong>Dato necesario:</strong> Registro del origen, tipo, peso y destino del residuo.</p>
+              </div>
+              <div class="m1-cause-content hidden" id="m1-cause-indicadores">
+                <h3>Ausencia de indicadores</h3>
+                <p><strong>Descripción:</strong> No se mide de forma sistemática el reciclaje, los costos, la eficiencia operativa ni las emisiones evitadas.</p>
+                <p><strong>Consecuencia:</strong> Las decisiones ambientales se toman con poca evidencia.</p>
+                <p><strong>Dato necesario:</strong> Indicadores de reciclaje, aprovechamiento, costos, rutas y emisiones.</p>
+              </div>
+              <div class="m1-cause-content hidden" id="m1-cause-cultura">
+                <h3>Baja cultura ambiental</h3>
+                <p><strong>Descripción:</strong> La comunidad universitaria no siempre separa correctamente o desconoce el impacto de sus acciones.</p>
+                <p><strong>Consecuencia:</strong> Disminuye la participación y se debilitan las campañas ambientales.</p>
+                <p><strong>Dato necesario:</strong> Nivel de participación y tasa de separación en la fuente.</p>
+              </div>
             </div>
           </div>
         </section>
 
-        <section class="m1-audio">
-          <h2>Escuchar explicación del módulo</h2>
-          <div class="m1-audio-controls">
-            <button class="btn btn-primary" id="m1-play-btn" type="button">
-              🎧 Reproducir audio
-            </button>
-            <button class="btn btn-secondary" id="m1-stop-btn" type="button" style="display:none;">
-              ⏹ Detener
-            </button>
-          </div>
-          <details class="m1-transcript">
-            <summary>Ver transcripción</summary>
-            <div class="transcript-body">
-              Módulo 1. La crisis de los residuos se agrava cuando no se mide. Sin datos no puedes priorizar zonas, comparar rutas ni demostrar mejoras. El primer paso es construir una línea base con indicadores simples: incidencias, tiempos de respuesta y costos operativos. Eso convierte el problema en algo gestionable.
-            </div>
-          </details>
-        </section>
+        <aside class="m1-video-panel">
+          <div class="m1-video-container">
+            <div class="cover-video-card" aria-label="Video avatar (Módulo 1)">
+              <div class="cover-video-wrapper m1-avatar-frame">
+                <video
+                  id="m1AvatarVideo"
+                  class="cover-video"
+                  data-primary-video
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="metadata"
+                >
+                  <source
+                    src="https://resource2.heygen.ai/video/transcode/defaf905f0e44216907dfc247ef818f8/ve5210bbd52124cb5858a92f2ed25cfb7/720x1280.mp4"
+                    type="video/mp4"
+                  />
+                  Tu navegador no soporta video.
+                </video>
+              </div>
 
-        <section class="m1-challenge">
-          <h2>Reto rápido: ¿qué datos necesita la universidad?</h2>
+              <div class="video-overlay video-controls-below" aria-label="Controles de video (avatar)" data-video-controls data-video-target="m1AvatarVideo">
+                <button
+                  type="button"
+                  class="btn video-button"
+                  data-video-action="toggle"
+                  aria-label="Reproducir o pausar"
+                  title="Reproducir / Pausar"
+                >
+                  ▶
+                </button>
+                <button
+                  type="button"
+                  class="btn video-button"
+                  data-video-action="replay"
+                  aria-label="Reproducir nuevamente"
+                  title="Reproducir nuevamente"
+                >
+                  ↺
+                </button>
+                <div class="volume-control" aria-label="Volumen">
+                  <span class="volume-icon" data-video-action="icon" aria-hidden="true">🔊</span>
+                  <input
+                    class="volume-range"
+                    data-video-action="volume"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value="1"
+                    aria-label="Ajustar volumen"
+                  />
+                </div>
+              </div>
+            </div>
+            <p class="apa-cite" role="note">
+              González Zubieta, S., &amp; Beltrán Orozco, L. C. (2026). Video 2. Problema ambiental (Módulo 1) [Video
+              educativo generado con avatar digital en HeyGen]. Elaboración propia para el ODC “Analítica de datos para la
+              gestión de residuos sólidos urbanos en la Universidad de Cundinamarca, Extensión Chía”.
+            </p>
+          </div>
+        </aside>
+
+        <section class="m1-challenge activity" data-activity-type="multi" data-activity-id="m1-datos">
+          <h3>¿Qué datos necesita la universidad?</h3>
           <p>Selecciona los datos que ayudarían a mejorar la gestión de residuos:</p>
 
           <div class="m1-challenge-options" role="group" aria-label="Opciones de datos útiles">
@@ -466,716 +586,1657 @@
           </div>
 
           <div class="m1-challenge-controls">
-            <button class="btn btn-primary" id="m1-verify-btn" type="button">Verificar respuestas</button>
-            <button class="btn btn-secondary" id="m1-reset-btn" type="button">Reiniciar reto</button>
+            <button class="btn btn-primary" id="m1-verify-btn" type="button">Validar</button>
+            <button class="btn btn-secondary" id="m1-reset-btn" type="button">Reiniciar actividad</button>
           </div>
 
-          <div class="m1-challenge-feedback" aria-live="polite" id="m1-feedback">
+          <div id="m1-feedback" class="feedback-box m1-challenge-feedback" aria-live="polite">
             <p id="m1-feedback-text">Selecciona los datos que creas que son útiles para la gestión ambiental.</p>
+          </div>
+
+
+          <div class="m1-next">
+            <button
+              class="btn btn-primary"
+              type="button"
+              data-section-target="modulo-2"
+            >
+              Continuar al siguiente módulo
+            </button>
           </div>
         </section>
       </section>
 
       <!-- 05: MÓDULO 2 -->
       <section id="modulo-2" class="screen">
-        <h2>Módulo 2 · Conceptos clave</h2>
+        <header class="m2-header">
+          <p class="module-kicker">Módulo 2 · Conceptos clave</p>
+          <h2>Conceptos clave</h2>
+          <p class="m2-subtitle">
+            RSU, sostenibilidad y economía circular como base para la gestión inteligente de residuos.
+          </p>
+        </header>
 
-        <div class="module-layout">
-          <div class="content-card">
-            <div class="module-purpose">
-              <strong>Propósito:</strong> definir IA, IoT y Big Data y asociar
-              cada tecnología con una función en la gestión de residuos.
+        <div class="m2-purpose">
+          <strong>Propósito:</strong> comprender los conceptos fundamentales que permiten interpretar,
+          clasificar y analizar los residuos sólidos urbanos antes de aplicar tecnologías digitales,
+          indicadores y analítica de datos.
+        </div>
+
+        <details class="m2-intro">
+          <summary>
+            <span class="m2-intro-title">Introducción investigada</span>
+            <span class="m2-intro-cta"><span aria-hidden="true">🖱️</span> Da click aquí</span>
+          </summary>
+          <div class="m2-intro-body">
+            <p>
+              Los residuos sólidos urbanos son materiales descartados como resultado de actividades
+              cotidianas, académicas, administrativas o comunitarias. En una universidad, estos residuos
+              pueden generarse en aulas, oficinas, cafeterías, laboratorios, zonas comunes y eventos
+              institucionales.
+            </p>
+            <p>
+              La gestión adecuada de residuos no se limita a la recolección. También implica separar en
+              la fuente, aprovechar materiales, reciclar, reducir impactos ambientales y disponer
+              correctamente aquello que no puede recuperarse. Por eso, antes de aplicar tecnologías
+              digitales o construir indicadores, es necesario comprender los conceptos que organizan el
+              manejo de los residuos.
+            </p>
+            <p>
+              La sostenibilidad permite orientar estas acciones hacia el uso responsable de los recursos,
+              mientras que la economía circular propone mantener los materiales en uso durante más tiempo,
+              reduciendo la generación de residuos y promoviendo su reincorporación a nuevos ciclos de
+              valor.
+            </p>
+          </div>
+        </details>
+
+        <div class="m2-grid" aria-label="Conceptos y avatar del módulo 2">
+          <section class="m2-col" aria-label="Conceptos base">
+            <h3>Conceptos base</h3>
+            <p class="m2-hint">Toca una tarjeta para ver la explicación.</p>
+
+            <div class="m2-cards" role="list" aria-label="Tarjetas de conceptos base">
+              <button class="m2-flip" type="button" aria-pressed="false" data-flip-card>
+                <span class="m2-flip-front" aria-hidden="true">
+                  <span class="m2-flip-icon" aria-hidden="true">🗑️</span>
+                  <span class="m2-flip-title">RSU</span>
+                  <span class="m2-flip-mini">Residuos sólidos urbanos</span>
+                </span>
+                <span class="m2-flip-back">
+                  Son residuos generados en actividades urbanas, institucionales o comunitarias.
+                  En la Universidad de Cundinamarca, Extensión Chía, pueden producirse en aulas,
+                  oficinas, cafeterías, zonas comunes y actividades académicas.
+                </span>
+              </button>
+
+              <button class="m2-flip" type="button" aria-pressed="false" data-flip-card>
+                <span class="m2-flip-front" aria-hidden="true">
+                  <span class="m2-flip-icon" aria-hidden="true">🧺</span>
+                  <span class="m2-flip-title">Separación en la fuente</span>
+                  <span class="m2-flip-mini">Clasificar desde el origen</span>
+                </span>
+                <span class="m2-flip-back">
+                  Consiste en separar los residuos en el lugar donde se generan. Esta práctica evita
+                  que los residuos reciclables, orgánicos, ordinarios y peligrosos se mezclen, lo que
+                  mejora el aprovechamiento y la calidad de los datos registrados.
+                </span>
+              </button>
+
+              <button class="m2-flip" type="button" aria-pressed="false" data-flip-card>
+                <span class="m2-flip-front" aria-hidden="true">
+                  <span class="m2-flip-icon" aria-hidden="true">♻️</span>
+                  <span class="m2-flip-title">Aprovechamiento</span>
+                  <span class="m2-flip-mini">Dar valor a los residuos</span>
+                </span>
+                <span class="m2-flip-back">
+                  Es el uso de residuos reciclables u orgánicos para evitar que lleguen a disposición
+                  final. Puede incluir reciclaje, compostaje, reutilización o transformación de
+                  materiales.
+                </span>
+              </button>
+
+              <button class="m2-flip" type="button" aria-pressed="false" data-flip-card>
+                <span class="m2-flip-front" aria-hidden="true">
+                  <span class="m2-flip-icon" aria-hidden="true">🔄</span>
+                  <span class="m2-flip-title">Reciclaje</span>
+                  <span class="m2-flip-mini">Transformar materiales</span>
+                </span>
+                <span class="m2-flip-back">
+                  Es el proceso mediante el cual materiales como papel, cartón, vidrio o plástico limpio
+                  son recolectados, clasificados y transformados para reincorporarse a nuevos procesos
+                  productivos.
+                </span>
+              </button>
             </div>
+          </section>
 
-            <div class="microcontent">
-              <h3>Definiciones clave</h3>
-              <p>
-                La CTI aporta herramientas para capturar datos, analizarlos y
-                convertirlos en decisiones. Explora los términos técnicos:
-                <button
-                  class="term-chip"
-                  type="button"
-                  data-info="IA: técnicas que aprenden patrones para predecir, clasificar o recomendar decisiones con datos."
+          <section class="m2-avatar" aria-label="Avatar docente">
+            <div class="m2-avatar-card">
+              <div class="m2-avatar-video">
+                <div class="cover-video-wrapper m2-avatar-video-frame">
+                  <video
+                    id="m2AvatarVideo"
+                    class="cover-video"
+                    data-primary-video
+                    autoplay
+                    loop
+                    muted
+                    playsinline
+                    preload="metadata"
+                  >
+                    <source
+                      src="https://resource2.heygen.ai/video/transcode/ac7b22a472ce42d0b0de49cdd915ba80/v4dccce6065b643f8afdf69a768331259/720x1280.mp4"
+                      type="video/mp4"
+                    />
+                    Tu navegador no soporta video.
+                  </video>
+                </div>
+
+                <div
+                  class="video-overlay video-controls-below"
+                  aria-label="Controles de video (avatar)"
+                  data-video-controls
+                  data-video-target="m2AvatarVideo"
                 >
-                  IA</button
-                >,
-                <button
-                  class="term-chip"
-                  type="button"
-                  data-info="IoT: sensores y dispositivos conectados que miden variables (p. ej., nivel de llenado) en tiempo real."
-                >
-                  IoT
-                </button>
-                y
-                <button
-                  class="term-chip"
-                  type="button"
-                  data-info="Big Data: gestión y análisis de grandes volúmenes/variedad de datos para encontrar patrones e indicadores."
-                >
-                  Big Data</button
-                >.
+                  <button
+                    type="button"
+                    class="btn video-button"
+                    data-video-action="toggle"
+                    aria-label="Reproducir o pausar"
+                    title="Reproducir / Pausar"
+                  >
+                    ▶
+                  </button>
+                  <button
+                    type="button"
+                    class="btn video-button"
+                    data-video-action="replay"
+                    aria-label="Reproducir nuevamente"
+                    title="Reproducir nuevamente"
+                  >
+                    ↺
+                  </button>
+                  <div class="volume-control" aria-label="Volumen">
+                    <span
+                      class="volume-icon"
+                      data-video-action="icon"
+                      aria-hidden="true"
+                      >🔊</span
+                    >
+                    <input
+                      class="volume-range"
+                      data-video-action="volume"
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value="1"
+                      aria-label="Ajustar volumen"
+                    />
+                  </div>
+                </div>
+              </div>
+              <p class="apa-cite" role="note">
+                González Zubieta, S., &amp; Beltrán Orozco, L. C. (2026). Video 3. Conceptos básicos para comprender la
+                gestión de residuos (Módulo 2) [Video educativo generado con avatar digital en HeyGen]. Elaboración propia
+                para el ODC “Analítica de datos para la gestión de residuos sólidos urbanos en la Universidad de
+                Cundinamarca, Extensión Chía”.
               </p>
-            </div>
+              <div class="m2-avatar-actions" aria-label="Controles del guía del módulo">
 
-            <button
-              class="info-chip"
-              type="button"
-              data-info="Ejemplo: IoT mide llenado, Big Data consolida históricos e incidencias, e IA ayuda a predecir saturación y recomendar prioridades."
-            >
-              +info
+
+              </div>
+            </div>
+          </section>
+          
+          <section class="m2-col" aria-label="Sostenibilidad y economía circular">
+            <h3>Sostenibilidad y economía circular</h3>
+            <p class="m2-hint">Toca una tarjeta para ver la explicación.</p>
+
+            <div class="m2-cards" role="list" aria-label="Tarjetas de sostenibilidad y economía circular">
+              <button class="m2-flip" type="button" aria-pressed="false" data-flip-card>
+                <span class="m2-flip-front" aria-hidden="true">
+                  <span class="m2-flip-icon" aria-hidden="true">🌱</span>
+                  <span class="m2-flip-title">Sostenibilidad</span>
+                  <span class="m2-flip-mini">Uso responsable de recursos</span>
+                </span>
+                <span class="m2-flip-back">
+                  Busca reducir impactos ambientales, conservar recursos y fortalecer prácticas responsables
+                  dentro de la comunidad universitaria.
+                </span>
+              </button>
+
+              <button class="m2-flip" type="button" aria-pressed="false" data-flip-card>
+                <span class="m2-flip-front" aria-hidden="true">
+                  <span class="m2-flip-icon" aria-hidden="true">🔁</span>
+                  <span class="m2-flip-title">Economía circular</span>
+                  <span class="m2-flip-mini">Mantener materiales en uso</span>
+                </span>
+                <span class="m2-flip-back">
+                  Propone reducir, reutilizar, reparar, reciclar y aprovechar materiales para evitar que se
+                  conviertan rápidamente en residuos.
+                </span>
+              </button>
+
+              <button class="m2-flip" type="button" aria-pressed="false" data-flip-card>
+                <span class="m2-flip-front" aria-hidden="true">
+                  <span class="m2-flip-icon" aria-hidden="true">🚮</span>
+                  <span class="m2-flip-title">Disposición final</span>
+                  <span class="m2-flip-mini">Última alternativa</span>
+                </span>
+                <span class="m2-flip-back">
+                  Es la etapa en la que los residuos no aprovechables son llevados a sitios autorizados. En
+                  una gestión sostenible, debe ser la última opción.
+                </span>
+              </button>
+            </div>
+          </section>
+
+        </div>
+
+        <section class="m2-flow" aria-label="Ruta conceptual: del residuo al ciclo circular">
+          <div class="m2-flow-head">
+            <h3>Del residuo al ciclo circular</h3>
+            <span class="m2-meta-pill" aria-hidden="true">Ruta</span>
+          </div>
+          <div class="flow-graphic" data-flow-graphic="m2" aria-label="Ruta interactiva (módulo 2)">
+            <button class="flow-node is-active" type="button" data-flow-node data-title="Generar" data-detail="El residuo se origina en actividades cotidianas. Medir y registrar desde el origen permite entender cuánto y qué se genera.">
+              <span class="flow-emoji" aria-hidden="true">🧾</span>
+              <span class="flow-label">Generar</span>
             </button>
-
-            <div
-              class="activity"
-              data-activity-type="dragdrop"
-              data-activity-id="m2-dragdrop"
-            >
-              <h3>Actividad (Arrastrar y soltar)</h3>
-              <p>
-                Asocia cada tecnología con su función principal. Luego presiona
-                “Validar”.
-              </p>
-
-              <div
-                class="dragdrop"
-                aria-label="Actividad de arrastrar y soltar: tecnología a función"
-              >
-                <div class="drag-items" aria-label="Tecnologías">
-                  <button
-                    class="drag-item"
-                    type="button"
-                    draggable="true"
-                    data-item="IA"
-                  >
-                    IA
-                  </button>
-                  <button
-                    class="drag-item"
-                    type="button"
-                    draggable="true"
-                    data-item="IoT"
-                  >
-                    IoT
-                  </button>
-                  <button
-                    class="drag-item"
-                    type="button"
-                    draggable="true"
-                    data-item="BigData"
-                  >
-                    Big Data
-                  </button>
-                </div>
-
-                <div class="drop-zones" aria-label="Funciones">
-                  <div class="drop-zone" data-accept="IoT">
-                    <div class="drop-title">Capturar datos en tiempo real</div>
-                    <div class="drop-slot" aria-label="Suelta aquí"></div>
-                  </div>
-                  <div class="drop-zone" data-accept="BigData">
-                    <div class="drop-title">
-                      Consolidar históricos e indicadores
-                    </div>
-                    <div class="drop-slot" aria-label="Suelta aquí"></div>
-                  </div>
-                  <div class="drop-zone" data-accept="IA">
-                    <div class="drop-title">
-                      Predecir y recomendar decisiones
-                    </div>
-                    <div class="drop-slot" aria-label="Suelta aquí"></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="quiz-actions">
-                <button class="btn btn-primary activity-check" type="button">
-                  Validar
-                </button>
-                <button class="btn btn-ghost activity-reset" type="button">
-                  Reiniciar
-                </button>
-              </div>
-              <div class="feedback" aria-live="polite"></div>
-            </div>
+            <div class="flow-arrow" aria-hidden="true">➜</div>
+            <button class="flow-node" type="button" data-flow-node data-title="Separar" data-detail="Separar en la fuente evita mezclas y mejora el aprovechamiento. También mejora la calidad de los datos para indicadores.">
+              <span class="flow-emoji" aria-hidden="true">🧺</span>
+              <span class="flow-label">Separar</span>
+            </button>
+            <div class="flow-arrow" aria-hidden="true">➜</div>
+            <button class="flow-node" type="button" data-flow-node data-title="Aprovechar" data-detail="Aprovechar significa dar valor a materiales reciclables u orgánicos antes de enviarlos a disposición final.">
+              <span class="flow-emoji" aria-hidden="true">♻️</span>
+              <span class="flow-label">Aprovechar</span>
+            </button>
+            <div class="flow-arrow" aria-hidden="true">➜</div>
+            <button class="flow-node" type="button" data-flow-node data-title="Reciclar / Compostar" data-detail="Cuando es posible, reciclar materiales limpios o compostar orgánicos reduce impactos y mantiene recursos en uso.">
+              <span class="flow-emoji" aria-hidden="true">🔄</span>
+              <span class="flow-label">Reciclar/Compostar</span>
+            </button>
+            <div class="flow-arrow" aria-hidden="true">➜</div>
+            <button class="flow-node" type="button" data-flow-node data-title="Disponer" data-detail="Disposición final debe ser la última alternativa: solo lo no recuperable llega a esta etapa.">
+              <span class="flow-emoji" aria-hidden="true">🚮</span>
+              <span class="flow-label">Disponer</span>
+            </button>
+          </div>
+          <div class="flow-detail" data-flow-detail aria-live="polite">
+            <strong>Generar:</strong> El residuo se origina en actividades cotidianas. Medir y registrar desde el origen permite entender cuánto y qué se genera.
           </div>
 
-          <div class="avatar-panel">
-            <div
-              class="avatar-container compact"
-              aria-label="Avatar: Módulo 2"
-            ></div>
-            <div class="audio-strip">
-              <button
-                class="btn btn-primary narration-play"
-                data-narration="Módulo 2. CTI combina tres capacidades: IoT para medir el mundo físico, Big Data para organizar datos e indicadores, e IA para aprender patrones y apoyar decisiones. El valor aparece cuando cada tecnología se traduce en una acción: priorizar, optimizar y evaluar con evidencia."
-              >
-                Escuchar avatar (60–90 s)
-              </button>
-              <button class="btn btn-ghost narration-stop" type="button">
-                Detener
-              </button>
+          <p class="m2-flow-text">
+            Esta ruta muestra que una buena gestión de residuos no empieza en la disposición final, sino en
+            la prevención, la separación adecuada y el aprovechamiento de materiales.
+          </p>
+        </section>
+
+        <section class="m2-activity-launch activity" data-activity-type="circular" data-activity-id="m2-circular-launch" aria-label="Actividad interactiva">
+          <div class="m2-activity-launch-card">
+            <div class="m2-activity-launch-head">
+              <h3>Ruta circular del residuo</h3>
+              <span class="m2-meta-pill" aria-hidden="true">Ruta circular</span>
             </div>
-            <details class="transcript">
-              <summary>Ver transcripción</summary>
-              <div class="transcript-body">
-                Módulo 2. CTI combina tres capacidades: IoT para medir el mundo
-                físico, Big Data para organizar datos e indicadores, e IA para
-                aprender patrones y apoyar decisiones. El valor aparece cuando
-                cada tecnología se traduce en una acción: priorizar, optimizar y
-                evaluar con evidencia.
-              </div>
-            </details>
+            <p class="m2-activity-preface">
+              Lee cada caso y elige la mejor acción para gestionar el residuo.
+            </p>
+            <p class="m2-hint">
+              Decide la mejor acción para gestionar un residuo siguiendo la ruta:
+              <strong>Reducir → Reutilizar → Reciclar / Compostar → Disponer</strong>.
+            </p>
+            <button id="m2CircularOpen" class="btn btn-primary" type="button">
+              Abrir actividad
+            </button>
           </div>
+        </section>
+
+        <section class="m2-analytics" aria-label="Conexión con analítica de datos">
+          <div class="m2-analytics-head">
+            <h3>¿Por qué estos conceptos importan para la analítica?</h3>
+            <span class="m2-meta-pill" aria-hidden="true">Datos</span>
+          </div>
+          <p class="m2-analytics-text">
+            La analítica de datos necesita categorías claras. Si no se comprende qué es un residuo reciclable,
+            orgánico, ordinario o peligroso, los registros pueden ser incorrectos y los indicadores no reflejarán
+            la realidad. Por eso, estos conceptos son la base para medir generación, separación, aprovechamiento,
+            reciclaje y disposición final.
+          </p>
+
+          <table class="m2-data-table" aria-label="Relación entre conceptos y datos">
+            <thead>
+              <tr>
+                <th scope="col">Concepto</th>
+                <th scope="col">Dato que puede generar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">RSU</th><td>Kilogramos totales generados.</td></tr>
+              <tr><th scope="row">Separación en la fuente</th><td>Porcentaje de residuos correctamente clasificados.</td></tr>
+              <tr><th scope="row">Aprovechamiento</th><td>Kilogramos recuperados.</td></tr>
+              <tr><th scope="row">Reciclaje</th><td>Tasa de reciclaje.</td></tr>
+              <tr><th scope="row">Economía circular</th><td>Materiales reincorporados a nuevos usos.</td></tr>
+              <tr><th scope="row">Disposición final</th><td>Kilogramos no aprovechados.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="m2-close" aria-label="Cierre del módulo">
+          <p class="m2-activity-preface">
+            Comprender los conceptos de RSU, separación en la fuente, aprovechamiento, reciclaje, sostenibilidad,
+            economía circular y disposición final permite avanzar hacia una gestión de residuos más ordenada,
+            medible y sostenible. Estos conceptos serán la base para analizar, en el siguiente módulo, cómo las
+            tecnologías digitales pueden apoyar la gestión de residuos.
+          </p>
+        </section>
+
+        <div class="m2-next">
+          <button class="btn btn-primary" type="button" data-section-target="modulo-3">
+            Continuar al Módulo 3
+          </button>
         </div>
       </section>
 
       <!-- 06: MÓDULO 3 -->
       <section id="modulo-3" class="screen">
-        <h2>Módulo 3 · Tecnologías digitales</h2>
+        <header class="m3-header">
+          <p class="module-kicker">Módulo 3 · Tecnologías digitales</p>
+          <h2>Tecnologías para una gestión inteligente de residuos</h2>
+          <p class="m3-subtitle">Tecnologías digitales aplicadas a residuos.</p>
+        </header>
 
-        <div class="module-layout">
-          <div class="content-card">
-            <div class="module-purpose">
-              <strong>Propósito:</strong> comprender el rigor científico y la
-              metodología PRISMA como guía para revisar evidencia.
+        <div class="m3-purpose">
+          <strong>Propósito:</strong> explicar cómo la analítica de datos, la inteligencia artificial, el Internet de
+          las Cosas, el Big Data, los sistemas de información geográfica y los dashboards pueden apoyar la gestión
+          de residuos sólidos urbanos mediante captura, análisis, predicción, visualización y toma de decisiones
+          basada en datos.
+        </div>
+
+        <details class="m3-intro">
+          <summary>
+            <span class="m3-intro-title">Introducción</span>
+            <span class="m2-intro-cta"><span aria-hidden="true">🖱️</span> Da click aquí</span>
+          </summary>
+          <div class="m3-intro-body">
+            <p>
+              Las tecnologías digitales permiten pasar de una gestión tradicional de residuos, basada en registros
+              manuales y decisiones reactivas, a una gestión inteligente apoyada en datos. En este enfoque, la
+              información se captura, se procesa, se analiza y se visualiza para apoyar decisiones ambientales más
+              eficientes.
+            </p>
+            <p>
+              La analítica de datos permite identificar patrones de generación de residuos, calcular indicadores y
+              evaluar tendencias. La inteligencia artificial puede apoyar la clasificación automática, la predicción
+              de volúmenes y la detección de comportamientos asociados al manejo de residuos. Estudios recientes sobre
+              aprendizaje automático y aprendizaje profundo en residuos sólidos municipales muestran que estas técnicas
+              pueden contribuir a ciudades más sostenibles mediante clasificación, predicción y análisis de patrones
+              en la gestión de residuos (Dawar et al., 2025).
+            </p>
+            <p>
+              El Internet de las Cosas permite capturar datos mediante sensores instalados en contenedores o puntos
+              críticos. Estos sensores pueden medir variables como nivel de llenado, ubicación, temperatura o estado
+              del contenedor. En soluciones de gestión inteligente de residuos, los sensores IoT se combinan con
+              analítica en tiempo real y optimización de rutas para mejorar la eficiencia operativa.
+            </p>
+          </div>
+        </details>
+
+        <section class="m3-guide" aria-label="Avatar guía del módulo 3">
+          <div class="m3-guide-card">
+            <div class="m3-guide-head">
+              <div class="m3-guide-badge" aria-hidden="true">Tu guía tecnológico</div>
+              <span class="m3-meta-pill" aria-hidden="true">Explora</span>
+            </div>
+            <p class="m3-guide-text">Haz clic en cada tecnología para ver su función y aplicación.</p>
+
+            <div class="m3-guide-layout" aria-label="Video del módulo 3">
+              <div class="m3-guide-video">
+                <div class="m3-portrait-frame" aria-label="Video guía">
+                  <iframe
+                    class="m3-portrait-embed"
+                    src="https://app.heygen.com/embeds/6372d5aed3174d45a77002f963f27530"
+                    title="Reproductor de vídeo de HeyGen"
+                    frameborder="0"
+                    allow="encrypted-media; fullscreen;"
+                    allowfullscreen
+                    loading="lazy"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                  ></iframe>
+                </div>
+                <p class="apa-cite" role="note">
+                  González Zubieta, S., &amp; Beltrán Orozco, L. C. (2026). Video 4. Tecnologías digitales aplicadas a
+                  residuos (Módulo 3) [Video educativo generado con avatar digital en HeyGen]. HeyGen. Elaboración propia
+                  para el ODC “Analítica de datos para la gestión de residuos sólidos urbanos en la Universidad de
+                  Cundinamarca, Extensión Chía”. https://app.heygen.com/embeds/6372d5aed3174d45a77002f963f27530
+                </p>
+                <p class="caption-box" style="margin:0.65rem 0 0;">
+                  Usa los controles del reproductor para pausar o ajustar el volumen.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="m3-triptych" aria-label="Módulos: capturar, analizar y decidir">
+          <div class="m3-col" data-accent="capture">
+            <div class="m3-col-head">
+              <h3><span class="m3-step" aria-hidden="true">1.</span> Capturar</h3>
+              <span class="m3-col-pill" aria-hidden="true">IoT · SIG</span>
             </div>
 
-            <figure class="media-card">
-              <img
-                src="assets/img/prisma-diagrama.svg"
-                alt="Diagrama PRISMA simplificado con etapas: identificación, cribado, elegibilidad e inclusión."
-              />
-              <figcaption class="caption-box">
-                PRISMA: flujo simplificado para revisión sistemática (esquema
-                didáctico).
-              </figcaption>
-            </figure>
+            <ul class="m3-term-cards" aria-label="Términos del módulo: Capturar">
+              <li>
+                <button class="m3-term-card" type="button" data-term-button aria-haspopup="dialog">
+                  <div class="m3-term-head">
+                    <span class="m3-term-icon" aria-hidden="true">📡</span>
+                    <span class="m3-term-title">Internet de las Cosas (IoT)</span>
+                  </div>
+                  <span class="m3-term-cta">Ver término</span>
+                </button>
+                <template data-term-template>
+                  <ul class="m3-term-list">
+                    <li><strong>Función:</strong> capturar datos mediante sensores.</li>
+                    <li><strong>Datos típicos:</strong> nivel de llenado, ubicación, temperatura y estado del contenedor.</li>
+                  </ul>
+                </template>
+              </li>
 
-            <button
-              class="info-chip"
-              type="button"
-              data-info="PRISMA (Preferred Reporting Items for Systematic Reviews and Meta-Analyses) es una guía para reportar revisiones sistemáticas con transparencia: qué se buscó, qué se excluyó y por qué."
-            >
-              +info (Definición PRISMA)
+              <li>
+                <button class="m3-term-card" type="button" data-term-button aria-haspopup="dialog">
+                  <div class="m3-term-head">
+                    <span class="m3-term-icon" aria-hidden="true">🗺️</span>
+                    <span class="m3-term-title">SIG</span>
+                  </div>
+                  <span class="m3-term-cta">Ver término</span>
+                </button>
+                <template data-term-template>
+                  <ul class="m3-term-list">
+                    <li><strong>Función:</strong> ubicar datos en mapas.</li>
+                    <li><strong>Uso:</strong> localizar contenedores, rutas internas, zonas de acumulación y puntos críticos.</li>
+                  </ul>
+                </template>
+              </li>
+            </ul>
+          </div>
+
+          <div class="m3-col" data-accent="analyze">
+            <div class="m3-col-head">
+              <h3><span class="m3-step" aria-hidden="true">2.</span> Analizar</h3>
+              <span class="m3-col-pill" aria-hidden="true">Analítica · IA · Big Data</span>
+            </div>
+
+            <ul class="m3-term-cards" aria-label="Términos del módulo: Analizar">
+              <li>
+                <button class="m3-term-card" type="button" data-term-button aria-haspopup="dialog">
+                  <div class="m3-term-head">
+                    <span class="m3-term-icon" aria-hidden="true">📊</span>
+                    <span class="m3-term-title">Analítica de datos</span>
+                  </div>
+                  <span class="m3-term-cta">Ver término</span>
+                </button>
+                <template data-term-template>
+                  <ul class="m3-term-list">
+                    <li><strong>Función:</strong> interpretar información y generar indicadores.</li>
+                    <li><strong>Aplicación:</strong> analizar volúmenes, tipos de residuos y frecuencia de recolección.</li>
+                  </ul>
+                </template>
+              </li>
+
+              <li>
+                <button class="m3-term-card" type="button" data-term-button aria-haspopup="dialog">
+                  <div class="m3-term-head">
+                    <span class="m3-term-icon" aria-hidden="true">🤖</span>
+                    <span class="m3-term-title">Inteligencia artificial</span>
+                  </div>
+                  <span class="m3-term-cta">Ver término</span>
+                </button>
+                <template data-term-template>
+                  <ul class="m3-term-list">
+                    <li><strong>Función:</strong> clasificar, predecir y detectar patrones.</li>
+                    <li><strong>Aplicación:</strong> estimar generación futura y apoyar la separación de residuos.</li>
+                  </ul>
+                </template>
+              </li>
+
+              <li>
+                <button class="m3-term-card" type="button" data-term-button aria-haspopup="dialog">
+                  <div class="m3-term-head">
+                    <span class="m3-term-icon" aria-hidden="true">🧠</span>
+                    <span class="m3-term-title">Big Data</span>
+                  </div>
+                  <span class="m3-term-cta">Ver término</span>
+                </button>
+                <template data-term-template>
+                  <ul class="m3-term-list">
+                    <li><strong>Función:</strong> procesar grandes volúmenes de información.</li>
+                    <li><strong>Aplicación:</strong> integrar registros históricos, sensores, reportes y series históricas.</li>
+                  </ul>
+                </template>
+              </li>
+            </ul>
+          </div>
+
+          <div class="m3-col" data-accent="decide">
+            <div class="m3-col-head">
+              <h3><span class="m3-step" aria-hidden="true">3.</span> Decidir</h3>
+              <span class="m3-col-pill" aria-hidden="true">Dashboard · Indicadores</span>
+            </div>
+
+            <ul class="m3-term-cards" aria-label="Términos del módulo: Decidir">
+              <li>
+                <button class="m3-term-card" type="button" data-term-button aria-haspopup="dialog">
+                  <div class="m3-term-head">
+                    <span class="m3-term-icon" aria-hidden="true">📈</span>
+                    <span class="m3-term-title">Dashboard</span>
+                  </div>
+                  <span class="m3-term-cta">Ver término</span>
+                </button>
+                <template data-term-template>
+                  <ul class="m3-term-list">
+                    <li><strong>Función:</strong> visualizar indicadores.</li>
+                    <li><strong>Ejemplos:</strong> generación por periodo, tasas de reciclaje, alertas, costos y emisiones evitadas.</li>
+                  </ul>
+                </template>
+              </li>
+
+              <li>
+                <button class="m3-term-card" type="button" data-term-button aria-haspopup="dialog">
+                  <div class="m3-term-head">
+                    <span class="m3-term-icon" aria-hidden="true">✅</span>
+                    <span class="m3-term-title">Indicadores (KPI)</span>
+                  </div>
+                  <span class="m3-term-cta">Ver término</span>
+                </button>
+                <template data-term-template>
+                  <ul class="m3-term-list">
+                    <li><strong>Propósito:</strong> medir avances y apoyar decisiones institucionales.</li>
+                    <li><strong>Ejemplos:</strong> % aprovechamiento, kg por persona, puntos críticos y cumplimiento de rutas.</li>
+                  </ul>
+                </template>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="m3-flow" aria-label="Ruta visual del módulo 3">
+          <div class="m3-flow-head">
+            <h3>Del residuo al dato</h3>
+            <span class="m3-meta-pill" aria-hidden="true">Ruta</span>
+          </div>
+          <div class="flow-graphic" data-flow-graphic="m3" aria-label="Ruta interactiva (módulo 3)">
+            <button class="flow-node is-active" type="button" data-flow-node data-title="Residuo generado" data-detail="El residuo aparece en un punto de generación. Sin registro, no hay trazabilidad ni medición.">
+              <span class="flow-emoji" aria-hidden="true">🗑️</span>
+              <span class="flow-label">Residuo</span>
             </button>
-
-            <div class="microcontent">
-              <h3>Rigor científico</h3>
-              <p>
-                Un proyecto CTI se fortalece cuando se apoya en evidencia
-                confiable. PRISMA ayuda a documentar el proceso de búsqueda y
-                selección de estudios, evitando sesgos por “escoger lo que me
-                conviene”. La idea central es la transparencia: criterios
-                claros, registro de exclusiones y síntesis de resultados. En
-                gestión de residuos, esto permite justificar decisiones
-                tecnológicas (sensores, modelos, rutas) con respaldo.
-              </p>
-            </div>
-
-            <div
-              class="activity"
-              data-activity-type="order"
-              data-activity-id="m3-order"
-            >
-              <h3>Actividad (Ordena los pasos PRISMA)</h3>
-              <p>
-                Ordena las etapas del flujo PRISMA de manera correcta y presiona
-                “Validar”.
-              </p>
-
-              <ol
-                class="order-list"
-                aria-label="Lista reordenable: pasos PRISMA"
-              >
-                <li class="order-item" data-step="Elegibilidad">
-                  <span class="order-label">Elegibilidad</span>
-                  <span class="order-actions">
-                    <button
-                      class="btn btn-ghost order-up"
-                      type="button"
-                      aria-label="Subir"
-                    >
-                      ↑
-                    </button>
-                    <button
-                      class="btn btn-ghost order-down"
-                      type="button"
-                      aria-label="Bajar"
-                    >
-                      ↓
-                    </button>
-                  </span>
-                </li>
-                <li class="order-item" data-step="Identificación">
-                  <span class="order-label">Identificación</span>
-                  <span class="order-actions">
-                    <button
-                      class="btn btn-ghost order-up"
-                      type="button"
-                      aria-label="Subir"
-                    >
-                      ↑
-                    </button>
-                    <button
-                      class="btn btn-ghost order-down"
-                      type="button"
-                      aria-label="Bajar"
-                    >
-                      ↓
-                    </button>
-                  </span>
-                </li>
-                <li class="order-item" data-step="Inclusión">
-                  <span class="order-label">Inclusión</span>
-                  <span class="order-actions">
-                    <button
-                      class="btn btn-ghost order-up"
-                      type="button"
-                      aria-label="Subir"
-                    >
-                      ↑
-                    </button>
-                    <button
-                      class="btn btn-ghost order-down"
-                      type="button"
-                      aria-label="Bajar"
-                    >
-                      ↓
-                    </button>
-                  </span>
-                </li>
-                <li class="order-item" data-step="Cribado">
-                  <span class="order-label">Cribado</span>
-                  <span class="order-actions">
-                    <button
-                      class="btn btn-ghost order-up"
-                      type="button"
-                      aria-label="Subir"
-                    >
-                      ↑
-                    </button>
-                    <button
-                      class="btn btn-ghost order-down"
-                      type="button"
-                      aria-label="Bajar"
-                    >
-                      ↓
-                    </button>
-                  </span>
-                </li>
-              </ol>
-
-              <div class="quiz-actions">
-                <button class="btn btn-primary activity-check" type="button">
-                  Validar
-                </button>
-                <button class="btn btn-ghost activity-reset" type="button">
-                  Reiniciar
-                </button>
-              </div>
-              <div class="feedback" aria-live="polite"></div>
-            </div>
+            <div class="flow-arrow" aria-hidden="true">➜</div>
+            <button class="flow-node" type="button" data-flow-node data-title="Sensor / registro digital" data-detail="Sensores IoT o registros digitales capturan datos: llenado, ubicación, tipo, fecha y volumen.">
+              <span class="flow-emoji" aria-hidden="true">📡</span>
+              <span class="flow-label">Sensor/Registro</span>
+            </button>
+            <div class="flow-arrow" aria-hidden="true">➜</div>
+            <button class="flow-node" type="button" data-flow-node data-title="Base de datos" data-detail="Los datos se almacenan (histórico) para comparar periodos, auditar cambios y consolidar información.">
+              <span class="flow-emoji" aria-hidden="true">🗄️</span>
+              <span class="flow-label">Base de datos</span>
+            </button>
+            <div class="flow-arrow" aria-hidden="true">➜</div>
+            <button class="flow-node" type="button" data-flow-node data-title="Analítica / IA / Big Data" data-detail="Se limpian, integran y analizan datos para encontrar patrones, predecir volúmenes y optimizar operación.">
+              <span class="flow-emoji" aria-hidden="true">🧠</span>
+              <span class="flow-label">Analizar</span>
+            </button>
+            <div class="flow-arrow" aria-hidden="true">➜</div>
+            <button class="flow-node" type="button" data-flow-node data-title="Dashboard" data-detail="Los tableros muestran indicadores y alertas para que la comunidad tome decisiones rápidas y claras.">
+              <span class="flow-emoji" aria-hidden="true">📈</span>
+              <span class="flow-label">Dashboard</span>
+            </button>
+            <div class="flow-arrow" aria-hidden="true">➜</div>
+            <button class="flow-node" type="button" data-flow-node data-title="Decisión institucional" data-detail="Con evidencia, se ajustan rutas, campañas, compras, puntos críticos y metas ambientales.">
+              <span class="flow-emoji" aria-hidden="true">✅</span>
+              <span class="flow-label">Decisión</span>
+            </button>
+          </div>
+          <div class="flow-detail" data-flow-detail aria-live="polite">
+            <strong>Residuo generado:</strong> El residuo aparece en un punto de generación. Sin registro, no hay trazabilidad ni medición.
           </div>
 
-          <div class="avatar-panel">
-            <div
-              class="avatar-container compact"
-              aria-label="Avatar: Módulo 3"
-            ></div>
-            <div class="audio-strip">
-              <button
-                class="btn btn-primary narration-play"
-                data-narration="Módulo 3. PRISMA es una guía de transparencia para revisiones sistemáticas. No solo importa lo que encuentras, sino cómo lo encontraste y por qué excluiste estudios. Con PRISMA puedes sustentar decisiones CTI con evidencia y reducir sesgos al documentar búsqueda, cribado, elegibilidad e inclusión."
-              >
-                Escuchar avatar (60–90 s)
-              </button>
-              <button class="btn btn-ghost narration-stop" type="button">
-                Detener
-              </button>
-            </div>
-            <details class="transcript">
-              <summary>Ver transcripción</summary>
-              <div class="transcript-body">
-                Módulo 3. PRISMA es una guía de transparencia para revisiones
-                sistemáticas. No solo importa lo que encuentras, sino cómo lo
-                encontraste y por qué excluiste estudios. Con PRISMA puedes
-                sustentar decisiones CTI con evidencia y reducir sesgos al
-                documentar búsqueda, cribado, elegibilidad e inclusión.
-              </div>
-            </details>
+          <p class="m3-flow-text">
+            Esta ruta muestra cómo un residuo puede convertirse en información útil. Primero se registra el dato en el
+            punto de generación. Luego se almacena y procesa. Después se analiza con herramientas digitales y
+            finalmente se visualiza en un tablero de control para apoyar decisiones sobre separación, recolección,
+            reciclaje, rutas o campañas ambientales.
+          </p>
+        </section>
+
+        <section class="m3-summary" aria-label="Tabla resumida">
+          <div class="m3-summary-head">
+            <h3>Resumen para el ODC</h3>
+            <span class="m3-meta-pill" aria-hidden="true">Tecnología ↔ Función ↔ Aplicación</span>
           </div>
+          <table class="m3-summary-table" aria-label="Tabla resumen de tecnologías">
+            <thead>
+              <tr>
+                <th scope="col">Tecnología</th>
+                <th scope="col">Función principal</th>
+                <th scope="col">Aplicación en la UdeC Chía</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Analítica de datos</th>
+                <td>Interpretar información y generar indicadores.</td>
+                <td>Analizar volúmenes, tipos de residuos y frecuencia de recolección.</td>
+              </tr>
+              <tr>
+                <th scope="row">Inteligencia artificial</th>
+                <td>Clasificar, predecir y detectar patrones.</td>
+                <td>Estimar generación futura y apoyar separación de residuos.</td>
+              </tr>
+              <tr>
+                <th scope="row">IoT</th>
+                <td>Capturar datos mediante sensores.</td>
+                <td>Medir nivel de llenado de contenedores y puntos críticos.</td>
+              </tr>
+              <tr>
+                <th scope="row">Big Data</th>
+                <td>Procesar grandes volúmenes de información.</td>
+                <td>Integrar registros históricos, sensores y reportes institucionales.</td>
+              </tr>
+              <tr>
+                <th scope="row">SIG</th>
+                <td>Ubicar datos en mapas.</td>
+                <td>Localizar contenedores, rutas internas y zonas críticas.</td>
+              </tr>
+              <tr>
+                <th scope="row">Dashboard</th>
+                <td>Visualizar indicadores.</td>
+                <td>Mostrar reciclaje, aprovechamiento, rutas y emisiones evitadas.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="m3-activity-launch activity" data-activity-type="pairs" data-activity-id="m3-pairs-launch" aria-label="Actividad dinámica: buscar parejas">
+          <div class="m3-activity-launch-card">
+            <div class="m3-activity-head">
+              <h3>Buscar parejas tecnológicas</h3>
+              <span class="m3-meta-pill" aria-hidden="true">🧩 Dinámica</span>
+            </div>
+            <p class="m3-activity-text">
+              Relaciona cada tecnología con su función (y su aplicación en la UdeC Chía). Abre el modal y completa las
+              parejas.
+            </p>
+            <button id="m3PairsOpen" class="btn btn-primary" type="button">Abrir actividad</button>
+          </div>
+        </section>
+
+        <section class="m3-close" aria-label="Cierre del módulo 3">
+          <h3>Cierre del módulo</h3>
+          <p class="m3-close-text">
+            Las tecnologías digitales permiten fortalecer la gestión de residuos sólidos urbanos porque convierten
+            registros dispersos en información útil. En la Universidad de Cundinamarca, Extensión Chía, estas
+            herramientas podrían apoyar la medición de volúmenes, la identificación de puntos críticos, la predicción
+            de generación de residuos, la optimización de rutas, la visualización de indicadores y la toma de
+            decisiones sostenibles.
+          </p>
+        </section>
+
+        <div class="m3-next">
+          <button class="btn btn-primary" type="button" data-section-target="modulo-4">
+            Continuar al Módulo 4
+          </button>
         </div>
       </section>
 
       <!-- 07: MÓDULO 4 -->
       <section id="modulo-4" class="screen">
-        <h2>Módulo 4 · Esquema comparativo</h2>
+        <header class="m4-header">
+          <p class="module-kicker">Módulo 4 · Gestión tradicional vs. gestión inteligente</p>
+          <h2>Gestión tradicional vs. gestión inteligente de residuos</h2>
+          <p class="m4-subtitle">
+            Comparar para comprender el valor de los datos en la sostenibilidad institucional.
+          </p>
+        </header>
 
-        <div class="module-layout">
-          <div class="content-card">
-            <div class="module-purpose">
-              <strong>Propósito:</strong> analizar el impacto de los datos en la
-              eficiencia operativa y explorar un simulador de decisiones.
-            </div>
+        <div class="m4-purpose">
+          <strong>Propósito:</strong> mostrar la diferencia entre un modelo convencional de gestión de residuos, basado en
+          registros limitados y decisiones reactivas, y un modelo apoyado en datos, indicadores, trazabilidad, tecnologías
+          digitales y toma de decisiones basada en evidencia.
+        </div>
 
-            <div class="microcontent">
-              <h3>Impacto en eficiencia</h3>
-              <p>
-                Con datos (incidencias, llenado, tiempos) se pueden comparar
-                escenarios: rutas fijas vs. rutas por umbral vs. rutas
-                dinámicas. La eficiencia se evidencia con indicadores:
-                kilómetros, combustible, tiempo y desbordes. Un simulador ayuda
-                a visualizar el “antes y después” y a justificar decisiones.
-              </p>
-            </div>
+        <details class="m4-intro">
+          <summary>
+            <span class="m4-intro-title">Introducción investigada</span>
+            <span class="m2-intro-cta"><span aria-hidden="true">🖱️</span> Da click aquí</span>
+          </summary>
+          <div class="m4-intro-body">
+            <p>
+              El corazón del ODC consiste en comparar dos formas de gestionar los residuos sólidos urbanos. La primera es
+              una gestión tradicional, caracterizada por registros manuales, seguimiento limitado, frecuencias fijas de
+              recolección y decisiones principalmente reactivas. La segunda es una gestión inteligente, apoyada en
+              analítica de datos, indicadores verificables, trazabilidad, sensores, tableros de control y toma de
+              decisiones basada en evidencia.
+            </p>
+            <p>
+              En el documento base del proyecto se plantea que la gestión de residuos sólidos urbanos en la Universidad de
+              Cundinamarca, Extensión Chía, requiere pasar de registros manuales o dispersos a un sistema verificable de
+              captura, integración, análisis y visualización de datos. Esta necesidad se relaciona con la separación en la
+              fuente, la trazabilidad, la identificación de puntos críticos, el seguimiento de rutas internas, el
+              aprovechamiento de materiales y la estimación de impactos ambientales como emisiones evitadas o reducción de
+              residuos enviados a disposición final.
+            </p>
+            <p>
+              La transformación digital de la gestión de residuos puede aportar a la eficiencia operativa, la economía
+              circular y la toma de decisiones institucional. El Banco Interamericano de Desarrollo señala que tecnologías
+              como inteligencia artificial, Internet de las Cosas, analítica de datos, inteligencia de negocios y datos
+              abiertos son parte de las tendencias de innovación para transformar la gestión de residuos sólidos hacia
+              modelos más circulares y eficientes (Rihm et al., 2024).
+            </p>
+            <p>
+              Además, los sistemas IoT pueden apoyar la recolección inteligente mediante sensores que capturan información
+              sobre el estado de los contenedores y la envían a plataformas centralizadas. Ghahramani et al. (2022)
+              explican que los sensores IoT pueden registrar condiciones físicas, como el estado de los contenedores, y
+              que los enfoques con IA e IoT pueden fortalecer la gestión de recolección de residuos en ciudades
+              inteligentes.
+            </p>
+          </div>
+        </details>
 
-            <div class="simulator">
-              <h3>Simulador (Chart.js)</h3>
-              <p>Selecciona una estrategia y ejecuta la simulación.</p>
+        <div class="m4-question" role="note" aria-label="Pregunta guía del módulo 4">
+          <strong>Pregunta guía:</strong> ¿Qué cambia cuando la gestión de residuos deja de depender solo de registros
+          manuales y empieza a apoyarse en datos, indicadores y trazabilidad?
+        </div>
 
-              <div
-                class="sim-controls"
-                role="group"
-                aria-label="Estrategias de decisión"
-              >
-                <label
-                  ><input
-                    type="radio"
-                    name="simStrategy"
-                    value="fija"
-                    checked
-                  />
-                  Ruta fija</label
-                >
-                <label
-                  ><input type="radio" name="simStrategy" value="umbral" />
-                  Umbral (80%)</label
-                >
-                <label
-                  ><input type="radio" name="simStrategy" value="dinamica" />
-                  Ruta dinámica</label
-                >
-              </div>
-
-              <div class="quiz-actions">
-                <button class="btn btn-primary" id="simulateBtn" type="button">
-                  Simular
-                </button>
-                <button class="btn btn-ghost" id="resetSimBtn" type="button">
-                  Reiniciar
-                </button>
-              </div>
-
-              <canvas
-                id="impactChart"
-                aria-label="Gráfico comparativo de indicadores"
-                role="img"
-              ></canvas>
-              <div
-                id="simulatorFeedback"
-                class="feedback-box"
-                aria-live="polite"
-              ></div>
-            </div>
-
-            <div
-              class="activity"
-              data-activity-type="mcq"
-              data-activity-id="m4-mcq"
-            >
-              <h3>Actividad (Simulador de decisiones)</h3>
-              <p>
-                Si un contenedor supera el 80% y la zona registra incidencias,
-                ¿qué decisión es más coherente con evidencia?
-              </p>
-              <button
-                type="button"
-                data-correct="true"
-                data-feedback="Correcto: usar umbral y recalcular ruta conecta señal (dato) con acción y permite medir impacto."
-              >
-                Priorizar por umbral y recalcular ruta
-              </button>
-              <button
-                type="button"
-                data-correct="false"
-                data-feedback="Incorrecto: mantener ruta fija ignora la señal del dato y puede aumentar desbordes."
-              >
-                Mantener ruta fija por calendario
-              </button>
-              <button
-                type="button"
-                data-correct="false"
-                data-feedback="Incorrecto: instalar tecnología sin regla operativa no cambia decisiones."
-              >
-                Instalar sensores sin definir acciones
-              </button>
-              <div class="feedback" aria-live="polite"></div>
-            </div>
+        <section class="m4-compare" aria-label="Comparador principal del módulo 4">
+          <div class="m4-compare-col" data-m4-col="traditional">
+            <h3>Gestión tradicional</h3>
+            <p class="m4-compare-sub">Modelo reactivo</p>
+            <p>
+              La gestión tradicional se basa en registros manuales, seguimiento limitado y decisiones tomadas después de
+              que el problema ya se hizo visible.
+            </p>
+            <ul class="m4-bullets">
+              <li>Registros incompletos, manuales o inexistentes.</li>
+              <li>Recolección con frecuencia fija.</li>
+              <li>Seguimiento limitado del residuo.</li>
+              <li>Costos difíciles de estimar.</li>
+              <li>Impacto ambiental poco cuantificado.</li>
+              <li>Trazabilidad parcial o inexistente.</li>
+              <li>Decisiones tomadas ante quejas, desbordamientos o acumulación visible.</li>
+            </ul>
           </div>
 
-          <div class="avatar-panel">
-            <div
-              class="avatar-container compact"
-              aria-label="Avatar: Módulo 4"
-            ></div>
-            <div class="audio-strip">
-              <button
-                class="btn btn-primary narration-play"
-                data-narration="Módulo 4. El análisis conecta indicadores con decisiones. Cuando eliges una estrategia, debes observar qué cambia: kilómetros, combustible, tiempo y desbordes. Usa el simulador para visualizar escenarios. Recuerda: la mejor decisión no es la más tecnológica, sino la que mejora indicadores con evidencia y puede sostenerse en operación."
-              >
-                Escuchar avatar (60–90 s)
-              </button>
-              <button class="btn btn-ghost narration-stop" type="button">
-                Detener
-              </button>
-            </div>
-            <details class="transcript">
-              <summary>Ver transcripción</summary>
-              <div class="transcript-body">
-                Módulo 4. El análisis conecta indicadores con decisiones. Cuando
-                eliges una estrategia, debes observar qué cambia: kilómetros,
-                combustible, tiempo y desbordes. Usa el simulador para
-                visualizar escenarios. Recuerda: la mejor decisión no es la más
-                tecnológica, sino la que mejora indicadores con evidencia y
-                puede sostenerse en operación.
+          <div class="m4-compare-col" data-m4-col="avatar" aria-label="Avatar guía del módulo 4">
+
+            <figure class="media-card m4-avatar-media">
+              <div class="m4-portrait-frame" aria-label="Video vertical del módulo 4">
+                <iframe
+                  class="m4-portrait-embed"
+                  src="https://app.heygen.com/embeds/590e682e0990484480042097bf486fbd"
+                  title="Reproductor de vídeo de HeyGen"
+                  frameborder="0"
+                  allow="encrypted-media; fullscreen;"
+                  allowfullscreen
+                  loading="lazy"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                ></iframe>
               </div>
-            </details>
+              <figcaption class="caption-box">
+                <p class="apa-cite" role="note" style="margin:0;">
+                  González Zubieta, S., &amp; Beltrán Orozco, L. C. (2026). Video 4. Gestión tradicional vs. gestión
+                  inteligente de residuos (Módulo 4) [Video educativo generado con avatar digital en HeyGen]. HeyGen.
+                  Elaboración propia para el ODC “Analítica de datos para la gestión de residuos sólidos urbanos en la
+                  Universidad de Cundinamarca, Extensión Chía”. https://app.heygen.com/embeds/590e682e0990484480042097bf486fbd
+                </p>
+                <p class="caption-box" style="margin:0.65rem 0 0;">
+                  Usa los controles del reproductor para pausar o ajustar el volumen.
+                </p>
+              </figcaption>
+            </figure>
           </div>
+
+          <div class="m4-compare-col" data-m4-col="smart">
+            <h3>Gestión con analítica de datos</h3>
+            <p class="m4-compare-sub">Modelo inteligente</p>
+            <p>
+              La gestión inteligente usa datos, indicadores, trazabilidad y tableros para anticipar problemas, medir
+              resultados y tomar decisiones sostenibles.
+            </p>
+            <ul class="m4-bullets">
+              <li>Registros digitales, sistemáticos y trazables.</li>
+              <li>Indicadores verificables.</li>
+              <li>Recolección ajustada según datos.</li>
+              <li>Seguimiento con tableros, reportes y alertas.</li>
+              <li>Costos medibles por kilogramo gestionado.</li>
+              <li>Impacto ambiental cuantificable.</li>
+              <li>Trazabilidad desde la generación hasta el aprovechamiento o disposición final.</li>
+              <li>Decisiones basadas en evidencia.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="m4-aspects" aria-label="Comparador por aspectos del módulo 4">
+          <div class="m4-aspects-head">
+            <h3>Compara cada aspecto</h3>
+            <p class="m4-aspects-hint">
+              Haz clic en cada aspecto para observar cómo cambia la gestión de residuos cuando se incorporan datos,
+              indicadores y trazabilidad.
+            </p>
+          </div>
+
+          <div class="m4-aspects-tabs" role="tablist" aria-label="Aspectos comparativos">
+            <button class="m4-aspect-tab is-active" type="button" data-m4-aspect="registro" role="tab" aria-selected="true">Registro</button>
+            <button class="m4-aspect-tab" type="button" data-m4-aspect="clasificacion" role="tab" aria-selected="false">Clasificación</button>
+            <button class="m4-aspect-tab" type="button" data-m4-aspect="recoleccion" role="tab" aria-selected="false">Recolección</button>
+            <button class="m4-aspect-tab" type="button" data-m4-aspect="seguimiento" role="tab" aria-selected="false">Seguimiento</button>
+            <button class="m4-aspect-tab" type="button" data-m4-aspect="decisiones" role="tab" aria-selected="false">Decisiones</button>
+            <button class="m4-aspect-tab" type="button" data-m4-aspect="costos" role="tab" aria-selected="false">Costos</button>
+            <button class="m4-aspect-tab" type="button" data-m4-aspect="impacto" role="tab" aria-selected="false">Impacto ambiental</button>
+            <button class="m4-aspect-tab" type="button" data-m4-aspect="trazabilidad" role="tab" aria-selected="false">Trazabilidad</button>
+          </div>
+
+          <div class="m4-aspect-panel" data-m4-aspect-panel aria-live="polite">
+            <h4 data-m4-aspect-title>Registro de residuos</h4>
+            <div class="m4-aspect-grid" role="group" aria-label="Panel comparativo dinámico">
+              <div class="m4-aspect-card" data-m4-aspect-left>
+                <h5>Gestión tradicional</h5>
+                <p></p>
+              </div>
+              <div class="m4-aspect-card" data-m4-aspect-right>
+                <h5>Gestión con analítica de datos</h5>
+                <p></p>
+              </div>
+              <div class="m4-aspect-value" data-m4-aspect-value>
+                <strong>Valor agregado:</strong> <span></span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="activity" data-activity-type="case-series" data-activity-id="m4-casos" data-activity-section="modulo-4" aria-label="Actividad: Caso rápido (módulo 4)">
+          <h3>Caso rápido: ¿tradicional o inteligente?</h3>
+          <p>Lee cada situación y selecciona la opción correcta:</p>
+
+          <div class="m4-case-meta" aria-label="Progreso de la actividad">
+            <span class="m3-meta-pill" data-case-progress>Caso 1 de 8</span>
+            <span class="m3-meta-pill" data-case-score>Aciertos: 0</span>
+          </div>
+
+          <div class="m4-case-card" role="group" aria-label="Caso">
+            <div class="m4-case-text" data-case-text></div>
+            <div class="m4-case-actions" role="group" aria-label="Opciones">
+              <button type="button" class="btn btn-primary" data-case-choice="tradicional">Gestión tradicional</button>
+              <button type="button" class="btn btn-secondary" data-case-choice="inteligente">Gestión con analítica de datos</button>
+            </div>
+            <div class="feedback" aria-live="polite" data-case-feedback></div>
+          </div>
+
+          <div class="quiz-actions">
+            <button class="btn btn-primary" type="button" data-case-next disabled>Siguiente caso</button>
+            <button class="btn btn-ghost" type="button" data-case-reset>Reiniciar</button>
+          </div>
+        </section>
+
+        <section class="m4-close" aria-label="Cierre del módulo 4">
+          <h3>Cierre del módulo</h3>
+          <p class="m4-close-text">
+            Comparar ambos modelos permite reconocer que la gestión inteligente no reemplaza la gestión ambiental, sino que
+            la fortalece mediante datos, indicadores y evidencia. En la Universidad de Cundinamarca, Extensión Chía, una
+            gestión inteligente de residuos puede ayudar a construir una línea base, medir indicadores, mejorar la
+            separación, optimizar la recolección, reducir costos, aumentar el aprovechamiento y tomar decisiones
+            sostenibles.
+          </p>
+          <p class="m4-close-text" style="margin-top:0.8rem;">
+            El documento del proyecto también propone una arquitectura mínima de operación técnica para capturar datos,
+            integrarlos, limpiarlos, almacenarlos, analizarlos descriptiva y predictivamente, y convertirlos en
+            recomendaciones prescriptivas para la gestión de residuos.
+          </p>
+
+        </section>
+
+        <div class="m4-next">
+          <button class="btn btn-primary" type="button" data-section-target="modulo-5">
+            Continuar al Módulo 5
+          </button>
         </div>
       </section>
 
       <!-- 08: MÓDULO 5 -->
       <section id="modulo-5" class="screen">
-        <h2>Módulo 5 · Indicadores clave</h2>
+        <header class="m5-header">
+          <p class="module-kicker">Módulo 5 · Indicadores clave</p>
+          <h2>¿Cómo medir si la gestión de residuos mejora?</h2>
+          <p class="m5-subtitle">
+            Indicadores para evaluar eficiencia operativa, sostenibilidad ambiental y viabilidad económica.
+          </p>
+        </header>
 
-        <div class="module-layout">
-          <div class="content-card">
-            <div class="module-purpose">
-              <strong>Propósito:</strong> reconocer la economía circular en la
-              práctica y analizar un caso breve con retroalimentación.
-            </div>
-
-            <div class="microcontent">
-              <h3>Economía circular</h3>
-              <p>
-                La economía circular busca mantener el valor de los materiales
-                el mayor tiempo posible: prevenir, reutilizar, reciclar y
-                aprovechar. En residuos, esto se traduce en separación en la
-                fuente, rutas diferenciadas, puntos limpios y seguimiento con
-                indicadores. Los casos reales suelen combinar educación,
-                incentivos, logística e información para demostrar resultados.
-              </p>
-            </div>
-
-            <figure class="media-card">
-              <video
-                controls
-                preload="metadata"
-                aria-label="Microvideo del módulo 5 (insertar archivo)"
-              >
-                <track kind="captions" srclang="es" label="Español" default />
-                Tu navegador no soporta video.
-              </video>
-              <figcaption class="caption-box">
-                Microvideo (1–2 min): inserta un archivo en
-                <code>assets/video/</code> y agrega el
-                <code>&lt;source&gt;</code> correspondiente.
-              </figcaption>
-            </figure>
-
-            <details class="transcript">
-              <summary>Ver transcripción</summary>
-              <div class="transcript-body">
-                (Transcripción del microvideo) Describe el caso: contexto,
-                intervención, resultados y aprendizajes. Incluye indicadores
-                antes y después. Reemplaza este texto con el guion real del
-                video.
-              </div>
-            </details>
-
-            <div
-              class="activity"
-              data-activity-type="mcq"
-              data-activity-id="m5-case"
-            >
-              <h3>Actividad (Caso breve)</h3>
-              <p>
-                Caso: en una comuna se implementa separación en la fuente y
-                recolección diferenciada. En 4 semanas, disminuyen desbordes
-                pero suben quejas por horarios. ¿Qué acción es más coherente?
-              </p>
-              <button
-                type="button"
-                data-correct="true"
-                data-feedback="Correcto: ajustar horarios con datos y comunicar mejora el servicio sin perder el avance en desbordes."
-              >
-                Ajustar horarios con datos y comunicar cambios
-              </button>
-              <button
-                type="button"
-                data-correct="false"
-                data-feedback="Incorrecto: revertir sin análisis pierde el aprendizaje; primero evalúa indicadores y ajusta la operación."
-              >
-                Eliminar la estrategia y volver al calendario anterior
-              </button>
-              <button
-                type="button"
-                data-correct="false"
-                data-feedback="Incorrecto: más contenedores no resuelve un problema de horarios y coordinación."
-              >
-                Comprar contenedores sin cambiar operación
-              </button>
-              <div class="feedback" aria-live="polite"></div>
-            </div>
-          </div>
-
-          <div class="avatar-panel">
-            <div
-              class="avatar-container compact"
-              aria-label="Avatar: Módulo 5"
-            ></div>
-            <div class="audio-strip">
-              <button
-                class="btn btn-primary narration-play"
-                data-narration="Módulo 5. En casos de economía circular, el reto no es solo técnico: también es coordinación y comportamiento. Un buen caso incluye línea base, intervención clara e indicadores antes y después. Si aparecen quejas, se ajusta la operación con datos y se comunica, sin perder el avance en reducción de desbordes."
-              >
-                Escuchar avatar (60–90 s)
-              </button>
-              <button class="btn btn-ghost narration-stop" type="button">
-                Detener
-              </button>
-            </div>
-            <details class="transcript">
-              <summary>Ver transcripción</summary>
-              <div class="transcript-body">
-                Módulo 5. En casos de economía circular, el reto no es solo
-                técnico: también es coordinación y comportamiento. Un buen caso
-                incluye línea base, intervención clara e indicadores antes y
-                después. Si aparecen quejas, se ajusta la operación con datos y
-                se comunica, sin perder el avance en reducción de desbordes.
-              </div>
-            </details>
-          </div>
+        <div class="m5-purpose">
+          <strong>Propósito:</strong> presentar indicadores verificables que permitan medir avances, comparar resultados y
+          tomar decisiones basadas en evidencia en la gestión de residuos sólidos urbanos de la Universidad de
+          Cundinamarca, Extensión Chía.
         </div>
+
+        <details class="m5-intro">
+          <summary>
+            <span class="m5-intro-title">Introducción investigada</span>
+            <span class="m2-intro-cta"><span aria-hidden="true">🖱️</span> Da click aquí</span>
+          </summary>
+          <div class="m5-intro-body">
+            <p>
+              Una gestión de residuos basada en datos requiere indicadores que permitan medir avances, comparar resultados
+              y tomar decisiones. Sin indicadores, la gestión ambiental puede quedarse en acciones aisladas, difíciles de
+              evaluar o justificar. En cambio, cuando se mide cuánto residuo se genera, cuánto se recicla, cuánto se
+              aprovecha, cuánto cuesta la operación y qué impacto ambiental se evita, la institución puede construir una
+              línea base y evaluar mejoras en el tiempo.
+            </p>
+            <p>
+              La gestión sostenible de materiales plantea que los recursos deben usarse y reutilizarse de manera más
+              productiva durante todo su ciclo de vida, reduciendo impactos ambientales y conservando recursos para el
+              presente y el futuro (United States Environmental Protection Agency [EPA], 2025). En ese sentido, los
+              indicadores no solo sirven para “contar residuos”, sino para analizar eficiencia, sostenibilidad, economía
+              circular y toma de decisiones.
+            </p>
+            <p>
+              El Global Waste Management Outlook 2024 señala que la gestión de residuos debe avanzar hacia modelos de
+              prevención, aprovechamiento y economía circular, tratando los materiales como recursos valiosos y no
+              únicamente como desechos (United Nations Environment Programme [UNEP] &amp; International Solid Waste
+              Association [ISWA], 2024). Por eso, este módulo propone indicadores aplicables a la Universidad de
+              Cundinamarca, Extensión Chía, orientados a medir aprovechamiento, reciclaje, reducción de residuos, costos,
+              eficiencia de recolección, emisiones evitadas, participación comunitaria y trazabilidad.
+            </p>
+          </div>
+        </details>
+
+        <div class="m5-question" role="note" aria-label="Pregunta guía del módulo 5">
+          <strong>Pregunta guía:</strong> ¿Cómo saber si la gestión de residuos mejora si no se mide lo que se genera, se
+          recicla, se aprovecha, cuesta y se deja de contaminar?
+        </div>
+
+        <section class="m5-avatar" aria-label="Avatar guía del módulo 5">
+          <div class="m5-avatar-card">
+            <div class="m5-avatar-head">
+              <h3>Tu guía de indicadores</h3>
+              <span class="m3-meta-pill" aria-hidden="true">🎥 HeyGen</span>
+            </div>
+            <p class="m5-avatar-text">
+              Escucha una explicación breve sobre por qué los indicadores permiten saber si la gestión de residuos
+              realmente mejora.
+            </p>
+
+            <div class="m5-video-frame m5-video-frame--portrait" aria-label="Video del módulo 5 (vertical)">
+              <iframe
+                class="m5-embed"
+                src="https://app.heygen.com/embeds/be2546cd74514c35981c8919a193036e"
+                title="Reproductor de vídeo de HeyGen"
+                frameborder="0"
+                allow="encrypted-media; fullscreen;"
+                allowfullscreen
+                loading="lazy"
+                referrerpolicy="strict-origin-when-cross-origin"
+              ></iframe>
+            </div>
+
+            <p class="caption-box" style="margin:0.65rem 0 0;">
+              Usa los controles del reproductor para pausar o ajustar el volumen.
+            </p>
+
+            <p class="apa-cite" role="note" style="margin:0.85rem 0 0;">
+              González Zubieta, S., &amp; Beltrán Orozco, L. C. (2026). Video 5. Indicadores clave para la gestión de
+              residuos sólidos urbanos (Módulo 5) [Video educativo generado con avatar digital en HeyGen]. HeyGen.
+              Elaboración propia para el ODC “Analítica de datos para la gestión de residuos sólidos urbanos en la
+              Universidad de Cundinamarca, Extensión Chía”. https://app.heygen.com/embeds/be2546cd74514c35981c8919a193036e
+            </p>
+          </div>
+        </section>
+
+        <section class="m5-indicators" aria-label="Indicadores por dimensión">
+          <div class="m5-indicators-head">
+            <h3>Indicadores por dimensión</h3>
+            <p class="m5-indicators-hint">Selecciona una dimensión para ver indicadores sugeridos y su propósito.</p>
+          </div>
+
+          <div class="m5-dim-tabs" role="tablist" aria-label="Dimensiones de indicadores">
+            <button class="m5-dim-tab is-active" type="button" data-m5-dim="ambiental" role="tab" aria-selected="true">Ambiental</button>
+            <button class="m5-dim-tab" type="button" data-m5-dim="operativa" role="tab" aria-selected="false">Operativa</button>
+            <button class="m5-dim-tab" type="button" data-m5-dim="economica" role="tab" aria-selected="false">Económica</button>
+            <button class="m5-dim-tab" type="button" data-m5-dim="comunitaria" role="tab" aria-selected="false">Participación</button>
+            <button class="m5-dim-tab" type="button" data-m5-dim="datos" role="tab" aria-selected="false">Datos</button>
+          </div>
+
+          <div class="m5-dim-panel" data-m5-dim-panel aria-live="polite">
+            <h4 data-m5-dim-title>Dimensión ambiental</h4>
+            <div class="m5-dim-grid" role="group" aria-label="Indicadores y fórmulas">
+              <div class="m5-dim-card">
+                <table class="m5-table" aria-label="Indicadores sugeridos">
+                  <thead>
+                    <tr>
+                      <th scope="col">Indicador</th>
+                      <th scope="col">Fórmula sugerida</th>
+                      <th scope="col">Qué mide</th>
+                    </tr>
+                  </thead>
+                  <tbody data-m5-dim-body></tbody>
+                </table>
+              </div>
+              <div class="m5-dim-note" role="note">
+                <strong>Detalle teórico:</strong> <span data-m5-dim-note></span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="activity" data-activity-type="calc" data-activity-id="m5-calculadora" data-activity-section="modulo-5" aria-label="Actividad: Calculadora de indicadores">
+          <h3>Calculadora de indicadores</h3>
+          <p>Aplica fórmulas básicas para interpretar el desempeño de la gestión de residuos.</p>
+
+          <div class="m5-calc-grid" aria-label="Casos de cálculo">
+            <article class="m5-calc-card" data-calc-case="reciclaje" aria-label="Caso 1: tasa de reciclaje">
+              <h4>Caso 1: tasa de reciclaje</h4>
+              <p><strong>Situación:</strong> En una semana se generan <strong>100 kg</strong> y se reciclan <strong>30 kg</strong>.</p>
+              <p class="m5-formula"><strong>Fórmula:</strong> kg reciclados / kg totales × 100</p>
+              <div class="m5-calc-inputs">
+                <label>Kg reciclados <input type="number" inputmode="decimal" min="0" step="0.01" data-calc-a value="30" /></label>
+                <label>Kg totales <input type="number" inputmode="decimal" min="0" step="0.01" data-calc-b value="100" /></label>
+              </div>
+              <button class="btn btn-primary" type="button" data-calc-run>Calcular</button>
+              <div class="feedback" aria-live="polite" data-calc-feedback></div>
+            </article>
+
+            <article class="m5-calc-card" data-calc-case="costo" aria-label="Caso 2: costo por kg gestionado">
+              <h4>Caso 2: costo por kg gestionado</h4>
+              <p><strong>Situación:</strong> Se invierten <strong>250000 COP</strong> y se gestionan <strong>500 kg</strong>.</p>
+              <p class="m5-formula"><strong>Fórmula:</strong> costo total / kg gestionados</p>
+              <div class="m5-calc-inputs">
+                <label>Costo total (COP) <input type="number" inputmode="decimal" min="0" step="1" data-calc-a value="250000" /></label>
+                <label>Kg gestionados <input type="number" inputmode="decimal" min="0" step="0.01" data-calc-b value="500" /></label>
+              </div>
+              <button class="btn btn-primary" type="button" data-calc-run>Calcular</button>
+              <div class="feedback" aria-live="polite" data-calc-feedback></div>
+            </article>
+
+            <article class="m5-calc-card" data-calc-case="trazabilidad" aria-label="Caso 3: trazabilidad del residuo">
+              <h4>Caso 3: trazabilidad del residuo</h4>
+              <p><strong>Situación:</strong> Hay <strong>80</strong> registros y <strong>60</strong> están completos.</p>
+              <p class="m5-formula"><strong>Fórmula:</strong> registros completos / registros totales × 100</p>
+              <div class="m5-calc-inputs">
+                <label>Registros completos <input type="number" inputmode="decimal" min="0" step="1" data-calc-a value="60" /></label>
+                <label>Registros totales <input type="number" inputmode="decimal" min="0" step="1" data-calc-b value="80" /></label>
+              </div>
+              <button class="btn btn-primary" type="button" data-calc-run>Calcular</button>
+              <div class="feedback" aria-live="polite" data-calc-feedback></div>
+            </article>
+          </div>
+
+          <div class="m5-calc-actions">
+            <button class="btn btn-ghost" type="button" data-calc-reset>Reiniciar cálculos</button>
+          </div>
+        </section>
+
+        <section class="m5-close" aria-label="Cierre del módulo 5">
+          <h3>Cierre del módulo</h3>
+          <p class="m5-close-text">
+            Los indicadores permiten evaluar si la gestión de residuos mejora de manera verificable. En la Universidad de
+            Cundinamarca, Extensión Chía, medir tasa de aprovechamiento, reciclaje, reducción de residuos, costo por
+            kilogramo gestionado, eficiencia de recolección, emisiones evitadas, participación comunitaria y trazabilidad
+            permite pasar de acciones aisladas a decisiones basadas en evidencia.
+          </p>
+          <p class="m5-close-text" style="margin-top:0.8rem;">
+            El documento base del proyecto también propone que el sistema de analítica opere mediante captura de datos,
+            integración y limpieza, almacenamiento, analítica descriptiva, analítica predictiva, analítica prescriptiva y
+            retroalimentación pedagógica. Este módulo prepara al estudiante para comprender cómo esos datos se convierten
+            en indicadores útiles para la gestión ambiental.
+          </p>
+
+          <div class="m5-sources" aria-label="Fuentes (APA)">
+            <h4>Fuentes (APA)</h4>
+            <ul>
+              <li>United States Environmental Protection Agency. (2025). Sustainable materials management (SMM).</li>
+              <li>United Nations Environment Programme, &amp; International Solid Waste Association. (2024). Global Waste Management Outlook 2024.</li>
+            </ul>
+          </div>
+        </section>
       </section>
 
       <!-- 09: MÓDULO 6 -->
       <section id="modulo-6" class="screen">
-        <h2>Módulo 6 · Evidencia PRISMA</h2>
+        <header class="m6-header">
+          <p class="module-kicker">Módulo 6 · Evidencia PRISMA</p>
+          <h2>¿Qué evidencia respalda la propuesta?</h2>
+          <p class="m6-subtitle">
+            Revisión documental, trazabilidad metodológica y evidencia científica para sustentar el ODC.
+          </p>
+        </header>
+
+        <div class="m6-purpose">
+          <strong>Propósito:</strong> reconocer cómo la revisión documental y el flujo PRISMA 2020 permiten justificar el
+          uso de tecnologías digitales para la gestión de residuos sólidos urbanos en la Universidad de Cundinamarca,
+          Extensión Chía.
+        </div>
+
+        <details class="m6-intro">
+          <summary>
+            <span class="m6-intro-title">Introducción investigada</span>
+            <span class="m2-intro-cta"><span aria-hidden="true">🖱️</span> Da click aquí</span>
+          </summary>
+          <div class="m6-intro-body">
+            <p>
+              La propuesta del ODC se sustenta en una revisión documental orientada a identificar estudios relacionados con
+              analítica de datos, inteligencia artificial, Internet de las Cosas, Big Data, economía circular,
+              sostenibilidad y gestión de residuos sólidos urbanos. Esta revisión permite reconocer qué tecnologías han
+              sido estudiadas, qué aplicaciones tienen en la gestión de residuos y qué evidencia respalda su posible
+              implementación en la Universidad de Cundinamarca, Extensión Chía.
+            </p>
+            <p>
+              Para organizar el proceso de búsqueda, selección e inclusión de estudios, se emplea la metodología PRISMA
+              2020. Page et al. (2021) presentan PRISMA 2020 como una actualización de la guía para reportar revisiones
+              sistemáticas, con una lista de verificación y un diagrama de flujo para mejorar la transparencia del
+              reporte.
+            </p>
+            <p>
+              En este ODC, la búsqueda se realizó en Scopus mediante una ecuación relacionada con data analytics, Big
+              Data, machine learning, artificial intelligence, Internet of Things y solid waste management. El documento
+              del proyecto reporta que la revisión inició con 162 registros y finalizó con 30 estudios incluidos.
+            </p>
+          </div>
+        </details>
+
+        <section class="m6-top" aria-label="Avatar metodológico y datos clave">
+          <div class="m6-avatar-card" aria-label="Avatar metodológico">
+            <div class="m6-avatar-head">
+              <h3>Tu guía metodológico</h3>
+              <span class="m3-meta-pill" aria-hidden="true">🎥 HeyGen</span>
+            </div>
+            <p class="m6-avatar-text">
+              Escucha una explicación breve sobre cómo PRISMA ayuda a organizar la evidencia científica que respalda el
+              ODC.
+            </p>
+            <div class="m6-video-frame" aria-label="Video del módulo 6">
+              <iframe
+                class="m6-embed"
+                src="https://app.heygen.com/embeds/5998371c65844b37806da70b67eafa80"
+                title="Reproductor de vídeo de HeyGen"
+                frameborder="0"
+                allow="encrypted-media; fullscreen;"
+                allowfullscreen
+                loading="lazy"
+                referrerpolicy="strict-origin-when-cross-origin"
+              ></iframe>
+            </div>
+            <p class="caption-box" style="margin:0.65rem 0 0;">
+              Usa los controles del reproductor para pausar o ajustar el volumen.
+            </p>
+            <p class="apa-cite" role="note" style="margin:0.85rem 0 0;">
+              González Zubieta, S., &amp; Beltrán Orozco, L. C. (2026). Video 6. Evidencia empírica y revisión PRISMA
+              (Módulo 6) [Video educativo generado con avatar digital en HeyGen]. HeyGen. Elaboración propia para el ODC
+              “Analítica de datos para la gestión de residuos sólidos urbanos en la Universidad de Cundinamarca,
+              Extensión Chía”. https://app.heygen.com/embeds/5998371c65844b37806da70b67eafa80
+            </p>
+          </div>
+
+          <div class="m6-kpi-card" aria-label="Datos principales de la revisión">
+            <h3>Datos principales de la revisión</h3>
+            <div class="m6-kpi-grid" role="list">
+              <div class="m6-kpi" role="listitem"><span>Base consultada</span><strong>Scopus</strong></div>
+              <div class="m6-kpi" role="listitem"><span>Registros identificados</span><strong>162</strong></div>
+              <div class="m6-kpi" role="listitem"><span>Registros examinados</span><strong>152</strong></div>
+              <div class="m6-kpi" role="listitem"><span>Textos completos evaluados</span><strong>47</strong></div>
+              <div class="m6-kpi" role="listitem"><span>Estudios incluidos</span><strong>30</strong></div>
+              <div class="m6-kpi" role="listitem"><span>Cuantitativos</span><strong>24</strong></div>
+              <div class="m6-kpi" role="listitem"><span>Cualitativos</span><strong>6</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="m6-prisma" aria-label="Flujo PRISMA 2020">
+          <div class="m6-prisma-head">
+            <h3>Flujo PRISMA 2020 de la revisión documental</h3>
+            <p class="m6-prisma-hint">Búsqueda, selección e inclusión de estudios en Scopus.</p>
+          </div>
+
+          <div class="m6-prisma-grid" role="list" aria-label="Fases PRISMA">
+            <article class="m6-prisma-step" role="listitem">
+              <div class="m6-prisma-top">
+                <div class="m6-prisma-num">162</div>
+                <div>
+                  <h4>Identificación</h4>
+                  <p>Registros identificados en Scopus con la ecuación de búsqueda.</p>
+                </div>
+              </div>
+              <details class="m6-prisma-detail">
+                <summary>Ver detalle</summary>
+                <ul>
+                  <li><strong>Base:</strong> Scopus.</li>
+                  <li><strong>Identificados:</strong> 162.</li>
+                  <li><strong>Duplicados eliminados:</strong> 10.</li>
+                  <li><strong>Después de duplicados:</strong> 152.</li>
+                </ul>
+              </details>
+            </article>
+
+            <article class="m6-prisma-step" role="listitem">
+              <div class="m6-prisma-top">
+                <div class="m6-prisma-num">152</div>
+                <div>
+                  <h4>Selección</h4>
+                  <p>Revisión por título y resumen para verificar pertinencia temática.</p>
+                </div>
+              </div>
+              <details class="m6-prisma-detail">
+                <summary>Ver detalle</summary>
+                <ul>
+                  <li><strong>Examinados:</strong> 152.</li>
+                  <li><strong>Excluidos por título/resumen:</strong> 95.</li>
+                  <li><strong>Para texto completo:</strong> 57.</li>
+                  <li><strong>Motivo:</strong> baja pertinencia temática.</li>
+                </ul>
+              </details>
+            </article>
+
+            <article class="m6-prisma-step" role="listitem">
+              <div class="m6-prisma-top">
+                <div class="m6-prisma-num">47</div>
+                <div>
+                  <h4>Elegibilidad</h4>
+                  <p>Evaluación en texto completo según criterios metodológicos y aplicabilidad.</p>
+                </div>
+              </div>
+              <details class="m6-prisma-detail">
+                <summary>Ver detalle</summary>
+                <ul>
+                  <li><strong>Textos completos seleccionados:</strong> 57.</li>
+                  <li><strong>No recuperados:</strong> 10.</li>
+                  <li><strong>Evaluados:</strong> 47.</li>
+                  <li><strong>Excluidos:</strong> 17 (razones metodológicas).</li>
+                </ul>
+              </details>
+            </article>
+
+            <article class="m6-prisma-step" role="listitem">
+              <div class="m6-prisma-top">
+                <div class="m6-prisma-num">30</div>
+                <div>
+                  <h4>Inclusión</h4>
+                  <p>Estudios finales que respaldan el uso de tecnologías digitales en RSU.</p>
+                </div>
+              </div>
+              <details class="m6-prisma-detail">
+                <summary>Ver detalle</summary>
+                <ul>
+                  <li><strong>Incluidos:</strong> 30.</li>
+                  <li><strong>Cuantitativos:</strong> 24.</li>
+                  <li><strong>Cualitativos:</strong> 6.</li>
+                  <li><strong>Uso en el ODC:</strong> justificar clasificación, monitoreo, optimización, trazabilidad y economía circular.</li>
+                </ul>
+              </details>
+            </article>
+          </div>
+        </section>
+
+        <section class="m6-flow" aria-label="Diagrama de flujo PRISMA (interactivo)">
+          <div class="m6-flow-head">
+            <h3>Diagrama de flujo PRISMA 2020</h3>
+            <p class="m6-flow-hint">Visualización del flujo de búsqueda, selección e inclusión de estudios.</p>
+          </div>
+
+          <!-- Diagrama SVG de flujo PRISMA -->
+          <svg class="m6-prisma-diagram" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" aria-label="Diagrama PRISMA 2020">
+            <defs>
+              <style>
+                .prisma-box { fill: rgba(16, 35, 28, 0.8); stroke: #39ff88; stroke-width: 2; }
+                .prisma-excluded { fill: rgba(255, 77, 109, 0.15); stroke: #ff4d6d; stroke-width: 2; }
+                .prisma-text { fill: #eefbf5; font-family: Poppins, sans-serif; font-weight: 700; }
+                .prisma-number { font-size: 32px; }
+                .prisma-label { font-size: 16px; font-weight: 900; }
+                .prisma-detail { font-size: 12px; font-weight: 400; }
+                .prisma-arrow { stroke: #39ff88; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+                .prisma-excluded-arrow { stroke: #ff4d6d; stroke-width: 2; fill: none; marker-end: url(#arrowhead-red); }
+              </style>
+              <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                <polygon points="0 0, 10 3, 0 6" fill="#39ff88" />
+              </marker>
+              <marker id="arrowhead-red" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                <polygon points="0 0, 10 3, 0 6" fill="#ff4d6d" />
+              </marker>
+            </defs>
+
+            <!-- Identificación -->
+            <rect class="prisma-box" x="20" y="20" width="180" height="140" rx="16" />
+            <text class="prisma-text prisma-number" x="110" y="80" text-anchor="middle">162</text>
+            <text class="prisma-text prisma-label" x="110" y="110" text-anchor="middle">Identificación</text>
+            <text class="prisma-text prisma-detail" x="110" y="135" text-anchor="middle">en Scopus</text>
+
+            <!-- Flecha 1 -->
+            <path class="prisma-arrow" d="M 200 90 L 240 90" />
+
+            <!-- Duplicados excluidos -->
+            <rect class="prisma-excluded" x="240" y="160" width="140" height="100" rx="12" />
+            <text class="prisma-text prisma-number" x="310" y="195" text-anchor="middle" fill="#ff4d6d">10</text>
+            <text class="prisma-text prisma-detail" x="310" y="220" text-anchor="middle" fill="#ff4d6d">Duplicados</text>
+            <text class="prisma-text prisma-detail" x="310" y="240" text-anchor="middle" fill="#ff4d6d">excluidos</text>
+
+            <!-- Flecha excluidos -->
+            <path class="prisma-excluded-arrow" d="M 200 100 L 240 170" stroke-dasharray="5,5" />
+
+            <!-- Selección -->
+            <rect class="prisma-box" x="240" y="20" width="180" height="140" rx="16" />
+            <text class="prisma-text prisma-number" x="330" y="80" text-anchor="middle">152</text>
+            <text class="prisma-text prisma-label" x="330" y="110" text-anchor="middle">Selección</text>
+            <text class="prisma-text prisma-detail" x="330" y="135" text-anchor="middle">por título/resumen</text>
+
+            <!-- Flecha 2 -->
+            <path class="prisma-arrow" d="M 420 90 L 460 90" />
+
+            <!-- Excluidos por título -->
+            <rect class="prisma-excluded" x="460" y="160" width="140" height="100" rx="12" />
+            <text class="prisma-text prisma-number" x="530" y="195" text-anchor="middle" fill="#ff4d6d">105</text>
+            <text class="prisma-text prisma-detail" x="530" y="220" text-anchor="middle" fill="#ff4d6d">Excluidos por</text>
+            <text class="prisma-text prisma-detail" x="530" y="240" text-anchor="middle" fill="#ff4d6d">título/resumen</text>
+
+            <!-- Flecha excluidos 2 -->
+            <path class="prisma-excluded-arrow" d="M 420 100 L 460 170" stroke-dasharray="5,5" />
+
+            <!-- Elegibilidad -->
+            <rect class="prisma-box" x="460" y="20" width="180" height="140" rx="16" />
+            <text class="prisma-text prisma-number" x="550" y="80" text-anchor="middle">47</text>
+            <text class="prisma-text prisma-label" x="550" y="110" text-anchor="middle">Elegibilidad</text>
+            <text class="prisma-text prisma-detail" x="550" y="135" text-anchor="middle">texto completo</text>
+
+            <!-- Flecha 3 -->
+            <path class="prisma-arrow" d="M 640 90 L 680 90" />
+
+            <!-- Excluidos por criterios -->
+            <rect class="prisma-excluded" x="680" y="160" width="140" height="100" rx="12" />
+            <text class="prisma-text prisma-number" x="750" y="195" text-anchor="middle" fill="#ff4d6d">17</text>
+            <text class="prisma-text prisma-detail" x="750" y="220" text-anchor="middle" fill="#ff4d6d">Excluidos por</text>
+            <text class="prisma-text prisma-detail" x="750" y="240" text-anchor="middle" fill="#ff4d6d">criterios</text>
+
+            <!-- Flecha excluidos 3 -->
+            <path class="prisma-excluded-arrow" d="M 640 100 L 680 170" stroke-dasharray="5,5" />
+
+            <!-- Inclusión -->
+            <rect class="prisma-box" x="680" y="20" width="180" height="140" rx="16" />
+            <text class="prisma-text prisma-number" x="770" y="80" text-anchor="middle">30</text>
+            <text class="prisma-text prisma-label" x="770" y="110" text-anchor="middle">Inclusión</text>
+            <text class="prisma-text prisma-detail" x="770" y="135" text-anchor="middle">Estudios finales</text>
+
+            <!-- Sección inferior: Desglose -->
+            <g transform="translate(0, 300)">
+              <text class="prisma-text prisma-label" x="50" y="30" font-size="18">Composición de los 30 estudios incluidos:</text>
+
+              <!-- Cuantitativos -->
+              <rect class="prisma-box" x="50" y="60" width="220" height="120" rx="14" />
+              <text class="prisma-text prisma-number" x="160" y="120" text-anchor="middle">24</text>
+              <text class="prisma-text prisma-label" x="160" y="150" text-anchor="middle">Cuantitativos</text>
+              <text class="prisma-text prisma-detail" x="160" y="170" text-anchor="middle">(80%)</text>
+
+              <!-- Cualitativos -->
+              <rect class="prisma-box" x="350" y="60" width="220" height="120" rx="14" />
+              <text class="prisma-text prisma-number" x="460" y="120" text-anchor="middle">6</text>
+              <text class="prisma-text prisma-label" x="460" y="150" text-anchor="middle">Cualitativos</text>
+              <text class="prisma-text prisma-detail" x="460" y="170" text-anchor="middle">(20%)</text>
+
+              <!-- Aplicación -->
+              <rect class="prisma-box" x="650" y="60" width="300" height="120" rx="14" />
+              <text class="prisma-text prisma-label" x="800" y="100" text-anchor="middle">Uso en el ODC:</text>
+              <text class="prisma-text prisma-detail" x="800" y="120" text-anchor="middle">Justifican tecnologías</text>
+              <text class="prisma-text prisma-detail" x="800" y="140" text-anchor="middle">para clasificación, monitoreo,</text>
+              <text class="prisma-text prisma-detail" x="800" y="160" text-anchor="middle">optimización y trazabilidad</text>
+            </g>
+          </svg>
+
+          <div class="flow-graphic" data-flow-graphic="m6" aria-label="Fases del flujo PRISMA">
+            <button class="flow-node is-active" type="button" data-flow-node data-title="Identificación (162)" data-detail="Búsqueda inicial en Scopus.\n\n- Identificados: 162\n- Duplicados eliminados: 10\n- Registros después de duplicados: 152">
+              <span class="flow-emoji" aria-hidden="true">🔎</span>
+              Identificación
+            </button>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <button class="flow-node" type="button" data-flow-node data-title="Selección (152)" data-detail="Revisión por título y resumen.\n\n- Examinados: 152\n- Excluidos por título/resumen: 95\n- Para texto completo: 57">
+              <span class="flow-emoji" aria-hidden="true">🗂️</span>
+              Selección
+            </button>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <button class="flow-node" type="button" data-flow-node data-title="Elegibilidad (47)" data-detail="Evaluación de texto completo.\n\n- Textos completos seleccionados: 57\n- No recuperados: 10\n- Evaluados: 47\n- Excluidos: 17 (razones metodológicas)">
+              <span class="flow-emoji" aria-hidden="true">📄</span>
+              Elegibilidad
+            </button>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <button class="flow-node" type="button" data-flow-node data-title="Inclusión (30)" data-detail="Estudios incluidos en la revisión final.\n\n- Incluidos: 30\n- Cuantitativos: 24\n- Cualitativos: 6\n- Uso en el ODC: justificar tecnologías digitales aplicadas a RSU">
+              <span class="flow-emoji" aria-hidden="true">✅</span>
+              Inclusión
+            </button>
+          </div>
+
+          <div class="flow-detail" data-flow-detail aria-live="polite"></div>
+        </section>
+
+        <details class="m6-equation">
+          <summary>Ver ecuación de búsqueda en Scopus</summary>
+          <div class="m6-equation-body">
+            <p>
+              La ecuación integra términos sobre tecnologías digitales, gestión de residuos, sostenibilidad, optimización y
+              reciclaje.
+            </p>
+            <pre class="m6-code" aria-label="Ecuación Scopus">TITLE-ABS-KEY(
+("data analytics" OR "big data" OR "machine learning" OR "artificial intelligence" OR "internet of things")
+AND
+("solid waste management" OR "municipal solid waste" OR "urban waste" OR "residuos sólidos urbanos")
+AND
+("circular economy" OR "sustainability" OR "optimiza*" OR "route optimization" OR "waste collection" OR "recycling")
+)
+AND (LIMIT-TO(SUBJAREA, "ENVI"))
+AND (LIMIT-TO(LANGUAGE, "English"))
+AND (LIMIT-TO(DOCTYPE, "ar"))</pre>
+          </div>
+        </details>
+
+        <section class="m6-criteria" aria-label="Criterios de inclusión y exclusión">
+          <div class="m6-criteria-grid">
+            <article class="m6-criteria-card">
+              <h3>Criterios de inclusión</h3>
+              <ul>
+                <li>Relación explícita entre residuos y analítica/IA/IoT/Big Data/optimización/trazabilidad/tableros.</li>
+                <li>Resultados técnicos, ambientales u operativos.</li>
+                <li>Aplicables a RSU y contextos institucionales/urbanos.</li>
+              </ul>
+            </article>
+            <article class="m6-criteria-card" data-variant="exclude">
+              <h3>Criterios de exclusión</h3>
+              <ul>
+                <li>Sin componente tecnológico o analítico.</li>
+                <li>Sin resultados cuantificables o sin claridad metodológica.</li>
+                <li>Sin relación con residuos sólidos o economía circular.</li>
+                <li>No recuperables a texto completo o baja aplicabilidad al contexto.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="m6-findings" aria-label="Hallazgos de los estudios incluidos">
+          <div class="m6-findings-head">
+            <h3>¿Qué evidencian los 30 estudios?</h3>
+            <p class="m6-findings-hint">
+              Los estudios revisados evidencian aportes de analítica e IA en patrones, predicción, clasificación, indicadores
+              y optimización de procesos en recolección, aprovechamiento y disposición final.
+            </p>
+          </div>
+
+          <div class="m6-findings-tablewrap" role="region" aria-label="Tabla de hallazgos (deslizable)">
+            <table class="m6-table">
+              <thead>
+                <tr>
+                  <th>Categoría</th>
+                  <th>Tecnologías</th>
+                  <th>Aporte al ODC</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Clasificación automatizada</td>
+                  <td>IA, visión artificial, machine learning, sensores ópticos</td>
+                  <td>Identifica fracciones aprovechables y reduce errores de separación.</td>
+                </tr>
+                <tr>
+                  <td>Optimización operativa</td>
+                  <td>IoT, sensores de nivel, analítica predictiva, optimización de rutas</td>
+                  <td>Prioriza rutas por nivel de llenado y reduce recorridos innecesarios.</td>
+                </tr>
+                <tr>
+                  <td>Trazabilidad</td>
+                  <td>QR/RFID, formularios móviles, bases de datos relacionales</td>
+                  <td>Sigue el residuo desde el punto de generación hasta su destino.</td>
+                </tr>
+                <tr>
+                  <td>Monitoreo ambiental</td>
+                  <td>IoT, SIG, tableros de control</td>
+                  <td>Ubica puntos críticos y genera alertas operativas o ambientales.</td>
+                </tr>
+                <tr>
+                  <td>Economía circular</td>
+                  <td>BI, análisis de ciclo de vida, sistemas de decisión</td>
+                  <td>Cuantifica materiales reincorporados mediante reciclaje, reúso o compostaje.</td>
+                </tr>
+                <tr>
+                  <td>Toma de decisiones</td>
+                  <td>Analítica descriptiva, predictiva y prescriptiva</td>
+                  <td>Convierte datos operativos en recomendaciones para planeación institucional.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section
+          class="activity"
+          data-activity-type="wordsearch"
+          data-activity-id="m6-sopa-prisma"
+          data-activity-section="modulo-6"
+          aria-label="Actividad: Sopa de letras PRISMA"
+        >
+          <h3>Actividad: Sopa de letras PRISMA</h3>
+          <p>Encuentra los conceptos del módulo. Cada palabra encontrada activa una breve explicación.</p>
+
+          <div class="ws-layout" aria-label="Sopa de letras">
+            <div class="ws-grid" aria-label="Cuadrícula de letras">
+              <div class="ws-row">P R I S M A S C O P U S</div>
+              <div class="ws-row">A N A L I T I C A I A X</div>
+              <div class="ws-row">B I G D A T A I O T Q</div>
+              <div class="ws-row">R E C I C L A J E R S</div>
+              <div class="ws-row">T R A Z A B I L I D A</div>
+              <div class="ws-row">S O S T E N I B I L I</div>
+              <div class="ws-row">E C O N O M I A D A S</div>
+              <div class="ws-row">D A S H B O A R D R E</div>
+              <div class="ws-row">R E S I D U O S O D C</div>
+            </div>
+
+            <div class="ws-words" aria-label="Palabras a buscar">
+              <button type="button" class="ws-word" data-word="PRISMA">PRISMA</button>
+              <button type="button" class="ws-word" data-word="SCOPUS">SCOPUS</button>
+              <button type="button" class="ws-word" data-word="ANALITICA">ANALITICA</button>
+              <button type="button" class="ws-word" data-word="BIGDATA">BIGDATA</button>
+              <button type="button" class="ws-word" data-word="IOT">IOT</button>
+              <button type="button" class="ws-word" data-word="IA">IA</button>
+              <button type="button" class="ws-word" data-word="RECICLAJE">RECICLAJE</button>
+              <button type="button" class="ws-word" data-word="TRAZABILIDAD">TRAZABILIDAD</button>
+              <button type="button" class="ws-word" data-word="SOSTENIBILIDAD">SOSTENIBILIDAD</button>
+              <button type="button" class="ws-word" data-word="ECONOMIA">ECONOMIA</button>
+              <button type="button" class="ws-word" data-word="DASHBOARD">DASHBOARD</button>
+              <button type="button" class="ws-word" data-word="RESIDUOS">RESIDUOS</button>
+            </div>
+          </div>
+
+          <div class="feedback" aria-live="polite" data-ws-feedback></div>
+
+          <div class="quiz-actions">
+            <button class="btn btn-ghost btn-sm" type="button" data-ws-reset>Reiniciar</button>
+          </div>
+        </section>
+
+        <section class="m6-close" aria-label="Cierre del módulo 6">
+          <h3>Cierre del módulo</h3>
+          <p class="m6-close-text">
+            La revisión PRISMA permite demostrar que la propuesta del ODC se fundamenta en evidencia científica. Al
+            identificar, revisar, excluir e incluir estudios de manera transparente, se fortalece la trazabilidad
+            metodológica del proyecto. En este caso, los 30 estudios incluidos respaldan el uso de tecnologías digitales
+            para mejorar clasificación, monitoreo, trazabilidad, optimización, economía circular y toma de decisiones en la
+            gestión de residuos sólidos urbanos.
+          </p>
+          <p class="m6-close-text" style="margin-top:0.8rem;">
+            En la Universidad de Cundinamarca, Extensión Chía, esta evidencia justifica la necesidad de avanzar hacia un
+            modelo de analítica de datos capaz de convertir registros operativos en información útil para la sostenibilidad
+            institucional.
+          </p>
+
+          <div class="m6-sources" aria-label="Fuentes (APA)">
+            <h4>Fuentes (APA)</h4>
+            <ul>
+              <li>Page, M. J., McKenzie, J. E., Bossuyt, P. M., Boutron, I., Hoffmann, T. C., Mulrow, C. D., et al. (2021). The PRISMA 2020 statement: An updated guideline for reporting systematic reviews. <em>BMJ</em>, 372, n71.</li>
+              <li>PRISMA. (2021). PRISMA 2020: Flow diagram and checklist.</li>
+            </ul>
+          </div>
+        </section>
+      </section>
+
+      <!-- 10: MÓDULO 7 -->
+      <section id="modulo-7" class="screen">
+        <p class="module-kicker">Módulo 7 · Funcionamiento del sistema</p>
+        <h2>Funcionamiento del sistema</h2>
+        <p class="caption-box">Sección en construcción. Próximamente.</p>
 
         <div class="module-layout">
           <div class="content-card">
             <div class="module-purpose">
-              <strong>Propósito:</strong> relacionar prácticas 3R con ODS y
-              seleccionar acciones sostenibles en la gestión de residuos.
+              <strong>Propósito:</strong> comprender cómo se integra la captura, almacenamiento, analítica y visualización
+              para apoyar decisiones en la gestión de residuos.
             </div>
-
-            <button
-              class="info-chip"
-              type="button"
-              data-info="ODS relacionados: ODS 11 (Ciudades y comunidades sostenibles), ODS 12 (Producción y consumo responsables) y ODS 13 (Acción por el clima)."
-            >
-              +info ODS
-            </button>
-
-            <div class="microcontent">
-              <h3>3R y ODS</h3>
-              <p>
-                Reducir, Reutilizar y Reciclar son prácticas concretas que se
-                conectan con metas de sostenibilidad. En residuos, la 3R se
-                fortalece con datos: medir generación por zona, identificar
-                materiales recuperables y evaluar el efecto de campañas y rutas
-                diferenciadas. Los ODS proveen un marco para reportar impacto y
-                orientar decisiones públicas.
-              </p>
-            </div>
-
-            <div
-              class="activity"
-              data-activity-type="multi"
-              data-activity-id="m6-multi"
-            >
-              <h3>Actividad (Selección múltiple)</h3>
-              <p>
-                Selecciona las acciones alineadas con 3R y ODS. Luego valida.
-              </p>
-              <ul class="checklist">
-                <li>
-                  <label
-                    ><input type="checkbox" data-correct="true" /> Separación en
-                    la fuente con seguimiento por indicadores</label
-                  >
-                </li>
-                <li>
-                  <label
-                    ><input type="checkbox" data-correct="true" /> Reutilización
-                    (p. ej., reparación y segunda vida de materiales)</label
-                  >
-                </li>
-                <li>
-                  <label
-                    ><input type="checkbox" data-correct="true" /> Rutas
-                    diferenciadas para aprovechables</label
-                  >
-                </li>
-                <li>
-                  <label
-                    ><input type="checkbox" data-correct="false" /> Mezclar
-                    todos los residuos para “simplificar”</label
-                  >
-                </li>
-                <li>
-                  <label
-                    ><input type="checkbox" data-correct="false" /> Aumentar
-                    recorridos sin medir impacto</label
-                  >
-                </li>
-              </ul>
-              <div class="quiz-actions">
-                <button class="btn btn-primary activity-check" type="button">
-                  Validar
-                </button>
-                <button class="btn btn-ghost activity-reset" type="button">
-                  Reiniciar
-                </button>
-              </div>
-              <div class="feedback" aria-live="polite"></div>
-            </div>
+            <p style="margin-top:1rem; color: var(--muted); line-height: 1.7;">
+              Aquí se presentará el flujo del sistema: captura de datos (formularios/sensores), integración y limpieza,
+              almacenamiento, analítica y dashboards, con ejemplos aplicados a la UdeC Chía.
+            </p>
           </div>
 
           <div class="avatar-panel">
-            <div
-              class="avatar-container compact"
-              aria-label="Avatar: Módulo 6"
-            ></div>
-            <div class="audio-strip">
-              <button
-                class="btn btn-primary narration-play"
-                data-narration="Módulo 6. La sostenibilidad se concreta con acciones 3R y se reporta con ODS. Si separas en la fuente, haces rutas diferenciadas y mides recuperación, puedes demostrar impacto. Evita decisiones que aumenten recorridos sin evidencia. Usa indicadores para aprender y ajustar."
-              >
-                Escuchar avatar (60–90 s)
-              </button>
-              <button class="btn btn-ghost narration-stop" type="button">
-                Detener
-              </button>
+            <div class="avatar-container compact" aria-label="Avatar: Módulo 7"></div>
+            <div class="avatar-note" role="note">
+              <strong>Guía:</strong> el sistema funciona como un ciclo: capturar → organizar → analizar → visualizar → decidir.
             </div>
-            <details class="transcript">
-              <summary>Ver transcripción</summary>
-              <div class="transcript-body">
-                Módulo 6. La sostenibilidad se concreta con acciones 3R y se
-                reporta con ODS. Si separas en la fuente, haces rutas
-                diferenciadas y mides recuperación, puedes demostrar impacto.
-                Evita decisiones que aumenten recorridos sin evidencia. Usa
-                indicadores para aprender y ajustar.
-              </div>
-            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11: MÓDULO 8 -->
+      <section id="modulo-8" class="screen">
+        <p class="module-kicker">Módulo 8 · Aplicación institucional</p>
+        <h2>Aplicación institucional</h2>
+        <p class="caption-box">Sección en construcción. Próximamente.</p>
+
+        <div class="module-layout">
+          <div class="content-card">
+            <div class="module-purpose">
+              <strong>Propósito:</strong> aplicar los conceptos del ODC en un caso institucional y proponer acciones de mejora
+              con indicadores verificables.
+            </div>
+            <p style="margin-top:1rem; color: var(--muted); line-height: 1.7;">
+              Aquí se incluirá un caso aplicado para la Extensión Chía (puntos críticos, registro, indicadores, rutas y
+              recomendaciones) con criterios de evidencia.
+            </p>
+          </div>
+
+          <div class="avatar-panel">
+            <div class="avatar-container compact" aria-label="Avatar: Módulo 8"></div>
+            <div class="avatar-note" role="note">
+              <strong>Guía:</strong> la aplicación institucional conecta indicadores con decisiones y acciones concretas.
+            </div>
           </div>
         </div>
       </section>
 
       <!-- 10: EVALUACIÓN FINAL -->
       <section id="evaluacion" class="screen">
-        <h2>Módulo 8 · Evaluación final</h2>
+        <p class="module-kicker">Módulo 9 · Evaluación final</p>
+        <h2>Evaluación final</h2>
         <p>
           Evaluación sumativa (8 ítems) alineada al REA. Retroalimentación
           inmediata y sugerencias de repaso por tema.
@@ -1358,7 +2419,8 @@
 
       <!-- 11: CONCLUSIÓN -->
       <section id="conclusion" class="screen">
-        <h2>Módulo 9 · Conclusiones</h2>
+        <p class="module-kicker">Módulo 10 · Conclusiones, referencias y licencia</p>
+        <h2>Conclusiones, referencias y licencia</h2>
 
         <div class="two-columns">
           <div class="content-card">
@@ -1399,48 +2461,38 @@
             class="avatar-container compact"
             aria-label="Avatar: Conclusión"
           ></div>
-          <div class="audio-strip">
-            <button
-              class="btn btn-primary narration-play"
-              data-narration="Conclusión. Para gestionar residuos de forma inteligente necesitas cuatro elementos: entender el problema, aplicar CTI con propósito, sustentar decisiones con evidencia y evaluar resultados. Empieza pequeño: define indicadores, prueba un umbral y compara antes y después. Lo importante es demostrar impacto y aprender con datos."
-            >
-              Escuchar cierre (avatar)
-            </button>
-            <button class="btn btn-ghost narration-stop" type="button">
-              Detener
-            </button>
+          <div class="avatar-note" role="note">
+            <strong>Cierre:</strong> gestiona residuos con evidencia: entiende el problema, aplica CTI con propósito,
+            define indicadores, prueba un umbral y compara antes/después para aprender con datos.
           </div>
-          <details class="transcript">
-            <summary>Ver transcripción</summary>
-            <div class="transcript-body">
-              Conclusión. Para gestionar residuos de forma inteligente necesitas
-              cuatro elementos: entender el problema, aplicar CTI con propósito,
-              sustentar decisiones con evidencia y evaluar resultados. Empieza
-              pequeño: define indicadores, prueba un umbral y compara antes y
-              después. Lo importante es demostrar impacto y aprender con datos.
-            </div>
-          </details>
         </div>
-      </section>
 
-      <!-- 12: REFERENCIAS -->
-      <section id="referencias" class="screen">
-        <h2>Módulo 10 · Referencias y créditos</h2>
-        <p class="caption-box">
-          Incluye mínimo 20 fuentes. Formato APA 7 con sangría francesa.
-        </p>
+        <div class="content-card" style="margin-top: 1.4rem;">
+          <h3>Referencias (APA)</h3>
+          <p class="caption-box">Formato APA 7 con sangría francesa.</p>
 
-        <ol class="references-list">
-          <li>
-            <em></em>
-            >.
-          </li>
-        </ol>
-      </section>
+          <ol class="references-list">
+            <li>
+              United States Environmental Protection Agency. (2025). <em>Sustainable materials management (SMM).</em>
+              <a
+                href="https://www.epa.gov/smm"
+                target="_blank"
+                rel="noopener noreferrer"
+              >https://www.epa.gov/smm</a>
+            </li>
+            <li>
+              United Nations Environment Programme, &amp; International Solid Waste Association. (2024). <em>Global Waste
+              Management Outlook 2024.</em>
+            </li>
+          </ol>
+        </div>
 
-      <!-- 13: CRÉDITOS Y LICENCIA -->
-      <section id="creditos" class="screen">
-        <h2>Créditos y licencia</h2>
+        <div class="content-card" style="margin-top: 1.4rem;">
+          <h3>Licencia</h3>
+          <p style="margin:0; color: var(--muted); line-height: 1.7;">
+            Sección de licencia en construcción. Aquí se incluirán los términos de uso del ODC y los créditos finales.
+          </p>
+        </div>
       </section>
 
       <!-- CONTROLES -->
@@ -1485,10 +2537,6 @@
             <strong>Actividades:</strong> cada módulo incluye una actividad
             distinta con retroalimentación.
           </li>
-          <li>
-            <strong>Transcripción:</strong> debajo de cada audio/video puedes
-            abrir “Ver transcripción”.
-          </li>
         </ul>
         <div class="modal-actions">
           <button class="btn btn-primary" value="close">Cerrar</button>
@@ -1496,39 +2544,24 @@
       </form>
     </dialog>
 
-    <!-- CONTROL DE AUDIO (MODAL) -->
-    <dialog id="audioDialog" class="modal">
-      <form method="dialog" class="modal-card">
-        <h3>Control de audio</h3>
-        <p class="caption-box">
-          Ajusta la narración por voz del navegador (si está disponible).
-        </p>
-        <div
-          class="audio-strip"
-          role="group"
-          aria-label="Controles de narración"
-        >
-          <label class="inline-control">
-            Velocidad
-            <input
-              id="ttsRate"
-              type="range"
-              min="0.8"
-              max="1.2"
-              step="0.05"
-              value="1"
-            />
-          </label>
-          <label class="inline-control">
-            Silenciar
-            <input id="ttsMute" type="checkbox" />
-          </label>
-          <button class="btn btn-ghost narration-stop" type="button">
-            Detener
-          </button>
+    <!-- ACTIVIDAD COMPLETADA (MODAL) -->
+    <dialog id="completionDialog" class="modal">
+      <form method="dialog" class="modal-card completion-card">
+        <div class="completion-head">
+          <div class="completion-icon" aria-hidden="true">✅</div>
+          <div>
+            <h3 id="completionTitle">¡Excelente!</h3>
+            <p class="caption-box completion-sub">Actividad completada</p>
+          </div>
+        </div>
+        <div id="completionMessage" class="completion-message">
+          Continúa al siguiente módulo.
         </div>
         <div class="modal-actions">
-          <button class="btn btn-primary" value="close">Cerrar</button>
+          <button class="btn btn-primary" id="completionContinue" type="button">
+            Continuar
+          </button>
+          <button class="btn btn-ghost" value="close">Cerrar</button>
         </div>
       </form>
     </dialog>
@@ -1559,8 +2592,7 @@
       <form method="dialog" class="modal-card entry-puzzle-card">
         <h3>Rompecabezas · Secuencia del ODC</h3>
         <p class="caption-box">
-          Arma la secuencia correcta: datos → tecnología → sostenibilidad →
-          decisiones.
+          Arma la secuencia correcta
         </p>
 
         <div
@@ -1619,6 +2651,193 @@
         <div class="modal-actions">
           <button class="btn btn-primary" value="close">Cerrar</button>
         </div>
+      </form>
+    </dialog>
+
+    <!-- MÓDULO 3: PAREJAS TECNOLÓGICAS (MODAL) -->
+    <dialog id="m3PairsDialog" class="modal">
+      <form method="dialog" class="modal-card m3-pairs-modal">
+        <div class="m3-modal-head">
+          <h3>🧩 Encuentra la pareja tecnológica</h3>
+          <button class="btn btn-ghost" value="close" aria-label="Cerrar modal" type="submit">
+            ✕
+          </button>
+        </div>
+
+        <section class="activity" data-activity-type="pairs" data-activity-id="m3-pairs" data-activity-section="modulo-3" aria-label="Actividad: Buscar parejas">
+          <p class="m3-activity-text" style="margin:0 0 0.9rem;">
+            Haz clic en una tarjeta de <strong>tecnología</strong> y luego selecciona la tarjeta que corresponde a su
+            <strong>función</strong> o <strong>aplicación</strong>. Si fallas, recibirás una pista.
+          </p>
+
+          <div class="m3-pairs-meta" aria-label="Progreso de la actividad">
+            <span class="m3-meta-pill" data-pairs-progress>0 de 6 parejas</span>
+          </div>
+
+          <div class="m3-pairs-levels" role="tablist" aria-label="Niveles de emparejamiento">
+            <button
+              class="m3-level-tab is-active"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              data-pairs-level-tab="func"
+            >
+              🔎 Tecnología ↔ Función
+            </button>
+            <button
+              class="m3-level-tab"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              data-pairs-level-tab="app"
+            >
+              🏫 Tecnología ↔ Aplicación
+            </button>
+          </div>
+
+          <div class="m3-pairs-grid" role="group" aria-label="Tablero de parejas">
+            <div class="m3-pairs-col" aria-label="Tarjetas de tecnología">
+              <h4>Tecnología</h4>
+              <div class="m3-pairs-cards">
+                <button class="m3-pairs-card" type="button" data-pairs-group="tech" data-pairs-key="analitica">
+                  📊 Analítica de datos
+                </button>
+                <button class="m3-pairs-card" type="button" data-pairs-group="tech" data-pairs-key="ia">
+                  🤖 Inteligencia artificial
+                </button>
+                <button class="m3-pairs-card" type="button" data-pairs-group="tech" data-pairs-key="iot">📡 IoT</button>
+                <button class="m3-pairs-card" type="button" data-pairs-group="tech" data-pairs-key="bigdata">
+                  🧠 Big Data
+                </button>
+                <button class="m3-pairs-card" type="button" data-pairs-group="tech" data-pairs-key="sig">🗺️ SIG</button>
+                <button class="m3-pairs-card" type="button" data-pairs-group="tech" data-pairs-key="dashboard">
+                  📈 Dashboard
+                </button>
+              </div>
+            </div>
+
+            <div class="m3-pairs-col" aria-label="Tarjetas de función y aplicación">
+              <h4 data-pairs-right-title>Función</h4>
+              <div class="m3-pairs-cards">
+                <button class="m3-pairs-card" type="button" data-pairs-group="func" data-pairs-key="dashboard">
+                  Visualizar indicadores
+                </button>
+                <button class="m3-pairs-card" type="button" data-pairs-group="func" data-pairs-key="sig">
+                  Ubicar datos en mapas
+                </button>
+                <button class="m3-pairs-card" type="button" data-pairs-group="func" data-pairs-key="bigdata">
+                  Procesar grandes volúmenes de información
+                </button>
+                <button class="m3-pairs-card" type="button" data-pairs-group="func" data-pairs-key="analitica">
+                  Interpretar información y generar indicadores
+                </button>
+                <button class="m3-pairs-card" type="button" data-pairs-group="func" data-pairs-key="iot">
+                  Capturar datos mediante sensores
+                </button>
+                <button class="m3-pairs-card" type="button" data-pairs-group="func" data-pairs-key="ia">
+                  Clasificar, predecir y detectar patrones
+                </button>
+
+                <button class="m3-pairs-card is-hidden" type="button" data-pairs-group="app" data-pairs-key="analitica">
+                  Analizar volúmenes, tipos de residuos y frecuencia de recolección.
+                </button>
+                <button class="m3-pairs-card is-hidden" type="button" data-pairs-group="app" data-pairs-key="ia">
+                  Estimar generación futura y apoyar separación de residuos.
+                </button>
+                <button class="m3-pairs-card is-hidden" type="button" data-pairs-group="app" data-pairs-key="iot">
+                  Medir nivel de llenado de contenedores y puntos críticos.
+                </button>
+                <button class="m3-pairs-card is-hidden" type="button" data-pairs-group="app" data-pairs-key="bigdata">
+                  Integrar registros históricos, sensores y reportes institucionales.
+                </button>
+                <button class="m3-pairs-card is-hidden" type="button" data-pairs-group="app" data-pairs-key="sig">
+                  Localizar contenedores, rutas internas y zonas críticas.
+                </button>
+                <button class="m3-pairs-card is-hidden" type="button" data-pairs-group="app" data-pairs-key="dashboard">
+                  Mostrar reciclaje, aprovechamiento, rutas y emisiones evitadas.
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="m3-pairs-feedback" aria-live="polite" data-pairs-feedback>
+            Elige una tecnología y luego su función.
+          </div>
+
+          <div class="m3-pairs-actions">
+            <button class="btn btn-ghost" type="button" data-pairs-reset>Reiniciar actividad</button>
+            <button class="btn btn-primary" value="close" type="submit">Cerrar</button>
+          </div>
+        </section>
+      </form>
+    </dialog>
+
+    <!-- MÓDULO 3: TÉRMINOS (MODAL) -->
+    <dialog id="m3TermDialog" class="modal">
+      <form method="dialog" class="modal-card m3-term-modal">
+        <div class="m3-modal-head">
+          <h3 id="m3TermTitle">Término</h3>
+          <button class="btn btn-ghost" value="close" aria-label="Cerrar modal" type="submit">
+            ✕
+          </button>
+        </div>
+        <div id="m3TermBody" class="m3-term-modal-body"></div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" value="close">Cerrar</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- MÓDULO 2: RUTA CIRCULAR (MODAL) -->
+    <dialog id="m2CircularDialog" class="modal">
+      <form method="dialog" class="modal-card m2-circular-modal">
+        <div class="m2-modal-head">
+          <h3>Ruta circular del residuo</h3>
+          <button class="btn btn-ghost" value="close" aria-label="Cerrar modal" type="submit">
+            ✕
+          </button>
+        </div>
+
+        <section class="activity m2-activity" id="m2-circular" data-activity-type="circular" data-activity-section="modulo-2" aria-label="Actividad: Ruta circular del residuo">
+          <div class="m2-activity-head">
+            <div>
+              <p class="m2-activity-hint" style="margin:0;">
+                Decide la mejor acción según la ruta:
+                <strong>Reducir → Reutilizar → Reciclar / Compostar → Disponer</strong>.
+              </p>
+            </div>
+            <div class="m2-activity-meta" aria-label="Progreso y puntaje">
+              <span id="m2CircularProgress" class="m2-meta-pill">Caso 1 de 5</span>
+              <span id="m2CircularScore" class="m2-meta-pill">Puntaje: 0</span>
+            </div>
+          </div>
+
+          <div class="m2-academic-note" role="note">
+            La jerarquía de gestión de residuos prioriza reducir y reutilizar antes
+            de reciclar, compostar o disponer.
+          </div>
+
+          <div class="m2-circular-card" aria-label="Caso interactivo">
+            <div id="m2CircularCase" class="m2-circular-case" role="status" aria-live="polite"></div>
+
+            <div class="m2-circular-actions" role="group" aria-label="Acciones de la ruta circular">
+              <button class="m2-circular-btn" type="button" data-action="Reducir">Reducir</button>
+              <button class="m2-circular-btn" type="button" data-action="Reutilizar">Reutilizar</button>
+              <button class="m2-circular-btn" type="button" data-action="Reciclar">Reciclar</button>
+              <button class="m2-circular-btn" type="button" data-action="Compostar">Compostar</button>
+              <button class="m2-circular-btn" type="button" data-action="Disponer">Disponer</button>
+            </div>
+
+            <div id="m2CircularFeedback" class="m2-circular-feedback" aria-live="polite">
+              <span id="m2CircularFeedbackText">Elige una acción para este caso.</span>
+            </div>
+
+            <div class="m2-circular-controls">
+              <button class="btn btn-ghost" id="m2CircularReset" type="button">Reiniciar actividad</button>
+              <button class="btn btn-primary" id="m2CircularNext" type="button" disabled>Siguiente caso</button>
+            </div>
+          </div>
+        </section>
       </form>
     </dialog>
 
