@@ -46,13 +46,47 @@ let activeEnterTimeMs = null;
 let activeSectionId = null;
 
 const UNDER_CONSTRUCTION_MESSAGE =
-  "Los módulos 1 al 12 se encuentran en construcción. Lo podrás ver pronto.";
+  "Los módulos 2 al 12 se encuentran en construcción. Lo podrás ver pronto.";
 
 function isUnderConstructionSectionId(id) {
-  return (
-    /^modulo-\d+$/i.test(id) ||
-    ["evaluacion", "conclusion", "referencias", "creditos"].includes(id)
-  );
+  return false;
+}
+
+function showInfoDialog(message, title = "Información") {
+  const dialog = document.getElementById("infoDialog");
+  const titleEl = document.getElementById("infoDialogTitle");
+  const messageEl = document.getElementById("infoDialogMessage");
+
+  if (titleEl) titleEl.textContent = title || "Información";
+  if (messageEl) messageEl.textContent = message || "";
+
+  if (dialog && typeof dialog.showModal === "function") {
+    if (dialog.open) dialog.close();
+    dialog.showModal();
+    return;
+  }
+
+  alert(message || "");
+}
+
+function inferInfoTitle(el) {
+  const explicit = el?.dataset?.infoTitle;
+  if (explicit) return explicit;
+
+  const ariaLabel = el?.getAttribute?.("aria-label");
+  if (ariaLabel) return ariaLabel;
+
+  const strong = el?.querySelector?.("strong");
+  if (strong?.textContent?.trim()) return strong.textContent.trim();
+
+  const raw = el?.textContent?.trim?.() || "";
+  if (!raw) return "Información";
+
+  const cleaned = raw.replace(/\s+/g, " ").trim();
+  if (cleaned === "+info" || cleaned.toLowerCase().startsWith("+info")) return "Información";
+  if (cleaned.length > 42) return "Información";
+
+  return cleaned;
 }
 
 function showConstructionNotice(message) {
@@ -66,7 +100,7 @@ function showConstructionNotice(message) {
     return;
   }
 
-  alert(message || UNDER_CONSTRUCTION_MESSAGE);
+  showInfoDialog(message || UNDER_CONSTRUCTION_MESSAGE, "Aviso");
 }
 
 function getCompletedUpTo() {
@@ -170,8 +204,9 @@ function showSection(index) {
 
     if (!hasShownLockMessage) {
       hasShownLockMessage = true;
-      alert(
-        "Este contenido está bloqueado. Para desbloquearlo, revisa el módulo anterior y llega hasta el final."
+      showInfoDialog(
+        "Este contenido está bloqueado. Para desbloquearlo, revisa el módulo anterior y llega hasta el final.",
+        "Contenido bloqueado"
       );
     }
 
@@ -415,8 +450,21 @@ function setupInfoChips() {
   chips.forEach((chip) => {
     chip.addEventListener("click", () => {
       const message = chip.dataset.info;
-      if (message) alert(message);
+      if (!message) return;
+      const title = inferInfoTitle(chip);
+      showInfoDialog(message, title);
     });
+  });
+}
+
+function setupInfoDialog() {
+  const dialog = document.getElementById("infoDialog");
+  if (!dialog) return;
+
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog && dialog.open) {
+      dialog.close();
+    }
   });
 }
 
@@ -429,6 +477,13 @@ function setupActivities() {
   setupChecklistActivities();
   setupDragDropActivities();
   setupOrderActivities();
+}
+
+function setFeedbackTone(feedbackEl, isCorrect) {
+  if (!feedbackEl) return;
+  feedbackEl.classList.remove("is-correct", "is-incorrect");
+  if (isCorrect === true) feedbackEl.classList.add("is-correct");
+  if (isCorrect === false) feedbackEl.classList.add("is-incorrect");
 }
 
 function setupMultipleChoiceActivities() {
@@ -446,6 +501,8 @@ function setupMultipleChoiceActivities() {
         button.classList.add("selected");
 
         if (feedback) {
+          const isCorrect = button.dataset.correct === "true";
+          setFeedbackTone(feedback, isCorrect);
           feedback.textContent = button.dataset.feedback || "";
         }
       });
@@ -464,6 +521,11 @@ function setupChecklistActivities() {
     const checkBtn = activity.querySelector(".activity-check");
     const resetBtn = activity.querySelector(".activity-reset");
     const feedback = activity.querySelector(".feedback");
+    const correctMessage =
+      activity.dataset.feedbackCorrect ||
+      "Correcto. Tus respuestas están alineadas con el objetivo.";
+    const incorrectMessage =
+      activity.dataset.feedbackIncorrect || "Revisa tus selecciones e inténtalo nuevamente.";
 
     if (checkBtn) {
       checkBtn.addEventListener("click", () => {
@@ -482,9 +544,8 @@ function setupChecklistActivities() {
         });
 
         if (feedback) {
-          feedback.textContent = isCorrect
-            ? "Correcto. Tus respuestas están alineadas con el objetivo."
-            : "Revisa tus selecciones e inténtalo nuevamente.";
+          setFeedbackTone(feedback, isCorrect);
+          feedback.textContent = isCorrect ? correctMessage : incorrectMessage;
         }
       });
     }
@@ -496,7 +557,10 @@ function setupChecklistActivities() {
           checkbox.checked = false;
         });
 
-        if (feedback) feedback.textContent = "";
+        if (feedback) {
+          setFeedbackTone(feedback, null);
+          feedback.textContent = "";
+        }
       });
     }
   });
@@ -561,6 +625,7 @@ function setupDragDropActivities() {
         });
 
         if (feedback) {
+          setFeedbackTone(feedback, correct);
           feedback.textContent = correct
             ? "Correcto. Secuencia completa: datos → tecnología → sostenibilidad → decisiones."
             : "Aún falta ordenar la secuencia. Revisa qué va primero y valida de nuevo.";
@@ -578,7 +643,10 @@ function setupDragDropActivities() {
         });
 
         selectedItem = null;
-        if (feedback) feedback.textContent = "";
+        if (feedback) {
+          setFeedbackTone(feedback, null);
+          feedback.textContent = "";
+        }
       });
     }
   });
@@ -626,6 +694,7 @@ function setupOrderActivities() {
         const correct = currentOrder.every((step, index) => step === correctOrder[index]);
 
         if (feedback) {
+          setFeedbackTone(feedback, correct);
           feedback.textContent = correct
             ? "Correcto. El orden PRISMA es adecuado."
             : "Revisa el orden: identificación, cribado, elegibilidad e inclusión.";
@@ -641,7 +710,10 @@ function setupOrderActivities() {
           .sort((a, b) => a.dataset.step.localeCompare(b.dataset.step))
           .forEach((item) => list.appendChild(item));
 
-        if (feedback) feedback.textContent = "";
+        if (feedback) {
+          setFeedbackTone(feedback, null);
+          feedback.textContent = "";
+        }
       });
     }
   });
@@ -672,6 +744,7 @@ function setupQuiz() {
 
     if (quizResult) {
       quizResult.textContent = `Obtuviste ${score} de 8 respuestas correctas.`;
+      setFeedbackTone(quizResult, score === 8);
     }
 
     if (quizReview) {
@@ -679,6 +752,7 @@ function setupQuiz() {
         score === 8
           ? "Muy bien: todas las respuestas son correctas."
           : "Revisa los módulos sugeridos para mejorar tu puntaje.";
+      setFeedbackTone(quizReview, score === 8);
     }
   });
 
@@ -689,8 +763,14 @@ function setupQuiz() {
       const quizResult = document.getElementById("quizResult");
       const quizReview = document.getElementById("quizReview");
 
-      if (quizResult) quizResult.textContent = "";
-      if (quizReview) quizReview.textContent = "";
+      if (quizResult) {
+        setFeedbackTone(quizResult, null);
+        quizResult.textContent = "";
+      }
+      if (quizReview) {
+        setFeedbackTone(quizReview, null);
+        quizReview.textContent = "";
+      }
     });
   }
 }
@@ -848,6 +928,7 @@ function init() {
 
   setupAudioControls();
   setupVideoControls();
+  setupInfoDialog();
   setupInfoChips();
   setupActivities();
   setupQuiz();
@@ -882,3 +963,195 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+// ========== MODULE 1: PROBLEMA AMBIENTAL ==========
+
+// Cause Explorer Interaction
+document.addEventListener('DOMContentLoaded', function() {
+  // Cause buttons
+  const causeButtons = document.querySelectorAll('.m1-cause-btn');
+  const causeContents = document.querySelectorAll('.m1-cause-content');
+
+  causeButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const causeName = this.getAttribute('data-cause');
+
+      // Remove active class from all buttons
+      causeButtons.forEach(btn => btn.classList.remove('active'));
+      
+      // Add active class to clicked button
+      this.classList.add('active');
+
+      // Hide all cause contents
+      causeContents.forEach(content => content.classList.add('hidden'));
+
+      // Show the selected cause content
+      const selectedContent = document.getElementById(`m1-cause-${causeName}`);
+      if (selectedContent) {
+        selectedContent.classList.remove('hidden');
+      }
+    });
+  });
+
+  // Challenge options
+  const options = document.querySelectorAll('.m1-option');
+  options.forEach(option => {
+    option.addEventListener('click', function() {
+      this.classList.toggle('selected');
+    });
+
+    // Keyboard accessibility
+    option.setAttribute('role', 'button');
+    option.setAttribute('tabindex', '0');
+    option.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.click();
+      }
+    });
+  });
+
+  // Verify button
+  const verifyBtn = document.getElementById('m1-verify-btn');
+  if (verifyBtn) {
+    verifyBtn.addEventListener('click', function() {
+      verifyChallenge();
+    });
+  }
+
+  // Reset button
+  const resetBtn = document.getElementById('m1-reset-btn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', function() {
+      resetChallenge();
+    });
+  }
+
+  // Audio controls
+  const playBtn = document.getElementById('m1-play-btn');
+  const stopBtn = document.getElementById('m1-stop-btn');
+  
+  if (playBtn && stopBtn) {
+    // Create audio element dynamically
+    let audioElement = document.getElementById('m1-audio-element');
+    if (!audioElement) {
+      audioElement = document.createElement('audio');
+      audioElement.id = 'm1-audio-element';
+      audioElement.src = 'assets/audio/modulo-1.mp3'; // Adjust path as needed
+      document.body.appendChild(audioElement);
+    }
+
+    playBtn.addEventListener('click', function() {
+      audioElement.play();
+      playBtn.style.display = 'none';
+      stopBtn.style.display = 'inline-flex';
+    });
+
+    stopBtn.addEventListener('click', function() {
+      audioElement.pause();
+      audioElement.currentTime = 0;
+      stopBtn.style.display = 'none';
+      playBtn.style.display = 'inline-flex';
+    });
+
+    audioElement.addEventListener('ended', function() {
+      stopBtn.style.display = 'none';
+      playBtn.style.display = 'inline-flex';
+    });
+  }
+});
+
+function verifyChallenge() {
+  const selectedOptions = document.querySelectorAll('.m1-option.selected');
+  const feedback = document.getElementById('m1-feedback');
+  const feedbackText = document.getElementById('m1-feedback-text');
+  
+  // Correct options are 7 (data-correct="true")
+  const correctOptions = document.querySelectorAll('.m1-option[data-correct="true"]');
+  const incorrectOptions = document.querySelectorAll('.m1-option[data-correct="false"]');
+  
+  let correctCount = 0;
+  let userCorrectCount = 0;
+  let userIncorrectCount = 0;
+
+  selectedOptions.forEach(option => {
+    if (option.getAttribute('data-correct') === 'true') {
+      userCorrectCount++;
+      option.classList.add('correct');
+      option.classList.remove('selected');
+    } else {
+      userIncorrectCount++;
+      option.classList.add('incorrect');
+      option.classList.remove('selected');
+    }
+  });
+
+  correctCount = correctOptions.length;
+
+  // Calculate score
+  const totalCorrect = correctOptions.length;
+  const score = userCorrectCount;
+  const percentage = totalCorrect > 0 ? Math.round((score / totalCorrect) * 100) : 0;
+
+  // Provide feedback
+  if (userIncorrectCount === 0 && userCorrectCount === totalCorrect) {
+    feedback.classList.add('is-correct');
+    feedback.classList.remove('is-incorrect');
+    feedbackText.textContent = `¡Excelente! Seleccionaste correctamente los ${totalCorrect} datos necesarios. (${percentage}%)`;
+  } else if (userIncorrectCount === 0) {
+    feedback.classList.add('is-incorrect');
+    feedback.classList.remove('is-correct');
+    feedbackText.textContent = `Casi! Seleccionaste ${userCorrectCount} de ${totalCorrect} datos correctos. (${percentage}%) Falta seleccionar ${totalCorrect - userCorrectCount} dato(s) más.`;
+  } else {
+    feedback.classList.add('is-incorrect');
+    feedback.classList.remove('is-correct');
+    feedbackText.textContent = `Necesitas revisar. Seleccionaste ${userIncorrectCount} dato(s) incorrecto(s). Intenta de nuevo.`;
+  }
+
+  // Disable verification button
+  document.getElementById('m1-verify-btn').disabled = true;
+}
+
+function resetChallenge() {
+  const options = document.querySelectorAll('.m1-option');
+  const feedback = document.getElementById('m1-feedback');
+  const feedbackText = document.getElementById('m1-feedback-text');
+  const verifyBtn = document.getElementById('m1-verify-btn');
+
+  options.forEach(option => {
+    option.classList.remove('selected', 'correct', 'incorrect');
+  });
+
+  feedback.classList.remove('is-correct', 'is-incorrect');
+  feedbackText.textContent = 'Selecciona los datos que creas que son útiles para la gestión ambiental.';
+  
+  verifyBtn.disabled = false;
+}
+
+// Accessibility: Ensure all interactive elements are keyboard navigable
+document.addEventListener('DOMContentLoaded', function() {
+  const interactiveElements = document.querySelectorAll('.m1-cause-btn, .m1-option, .btn');
+  
+  interactiveElements.forEach(element => {
+    if (!element.hasAttribute('tabindex')) {
+      element.setAttribute('tabindex', '0');
+    }
+
+    // Focus visible indicator
+    element.addEventListener('focus', function() {
+      this.style.outline = '2px solid var(--primary)';
+      this.style.outlineOffset = '2px';
+    });
+
+    element.addEventListener('blur', function() {
+      this.style.outline = 'none';
+    });
+
+    // Keyboard interaction
+    element.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.click();
+      }
+    });
+  });
+});
