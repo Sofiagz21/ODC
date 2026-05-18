@@ -382,6 +382,7 @@ function animateSectionEntrance(section) {
   const animated = Array.from(
     section.querySelectorAll(
       [
+        ".caption-box",
         ".content-card",
         ".avatar-panel",
         ".microcontent",
@@ -389,6 +390,8 @@ function animateSectionEntrance(section) {
         ".simulator",
         ".media-card",
         ".activity",
+        ".quiz-item",
+        "table",
         ".m1-zone",
         ".m2-col",
         ".m3-col",
@@ -533,9 +536,10 @@ function setupVideoPlayer(videoId, playBtnId, volumeRangeId, volumeIconId, repla
 function getVideoControlsParts(overlay) {
   const playBtn = overlay.querySelector('[data-video-action="toggle"]');
   const replayBtn = overlay.querySelector('[data-video-action="replay"]');
+  const stopBtn = overlay.querySelector('[data-video-action="stop"]');
   const volumeRange = overlay.querySelector('[data-video-action="volume"]');
   const volumeIcon = overlay.querySelector('[data-video-action="icon"]');
-  return { playBtn, replayBtn, volumeRange, volumeIcon };
+  return { playBtn, replayBtn, stopBtn, volumeRange, volumeIcon };
 }
 
 function resolveTargetVideo(overlay) {
@@ -552,12 +556,19 @@ function resolveTargetVideo(overlay) {
 
 function setupVideoOverlayControls(overlay) {
   const video = resolveTargetVideo(overlay);
-  const { playBtn, replayBtn, volumeRange, volumeIcon } = getVideoControlsParts(overlay);
+  const { playBtn, replayBtn, stopBtn, volumeRange, volumeIcon } = getVideoControlsParts(overlay);
 
   if (!video || !playBtn || !volumeRange) return;
 
+  function syncPlayButton() {
+    const iconEl = playBtn.querySelector("[data-video-state-icon]");
+    const symbol = video.paused ? "▶" : "⏸";
+    if (iconEl) iconEl.textContent = symbol;
+    else playBtn.textContent = symbol;
+  }
+
   function sync() {
-    playBtn.textContent = video.paused ? "▶" : "⏸";
+    syncPlayButton();
 
     const currentVolume = Number.isFinite(video.volume) ? video.volume : 1;
     volumeRange.value = String(video.muted ? 0 : currentVolume);
@@ -589,6 +600,13 @@ function setupVideoOverlayControls(overlay) {
       } catch (error) {
         console.warn("No se pudo reiniciar el video:", error);
       }
+    });
+  }
+
+  if (stopBtn) {
+    stopBtn.addEventListener("click", () => {
+      resetVideo(video);
+      sync();
     });
   }
 
@@ -1338,6 +1356,77 @@ function setupActivities() {
   setupCaseSeriesActivities();
   setupCalcActivities();
   setupWordSearchActivities();
+  setupModule7Quiz();
+  setupModule7Hub();
+  setupModule8Hub();
+}
+
+function setupModule8Hub() {
+  const hubs = Array.from(
+    document.querySelectorAll('.activity[data-activity-type="module8-hub"]')
+  );
+
+  hubs.forEach((hub) => {
+    const tabs = Array.from(hub.querySelectorAll("[data-m8-tab]"));
+    const panels = Array.from(hub.querySelectorAll("[data-m8-panel]"));
+    if (tabs.length === 0 || panels.length === 0) return;
+
+    function setActive(key) {
+      tabs.forEach((tab) => {
+        const isActive = tab.dataset.m8Tab === key;
+        tab.classList.toggle("is-active", isActive);
+        tab.setAttribute("aria-selected", String(isActive));
+      });
+
+      panels.forEach((panel) => {
+        const isActive = panel.dataset.m8Panel === key;
+        panel.hidden = !isActive;
+      });
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => setActive(tab.dataset.m8Tab));
+    });
+
+    const initial =
+      tabs.find((t) => t.classList.contains("is-active"))?.dataset?.m8Tab ||
+      tabs[0].dataset.m8Tab;
+    setActive(initial);
+  });
+}
+
+function setupModule7Hub() {
+  const hubs = Array.from(
+    document.querySelectorAll('.activity[data-activity-type="module7-hub"]')
+  );
+
+  hubs.forEach((hub) => {
+    const tabs = Array.from(hub.querySelectorAll("[data-m7-tab]"));
+    const panels = Array.from(hub.querySelectorAll("[data-m7-panel]"));
+    if (tabs.length === 0 || panels.length === 0) return;
+
+    function setActive(key) {
+      tabs.forEach((tab) => {
+        const isActive = tab.dataset.m7Tab === key;
+        tab.classList.toggle("is-active", isActive);
+        tab.setAttribute("aria-selected", String(isActive));
+      });
+
+      panels.forEach((panel) => {
+        const isActive = panel.dataset.m7Panel === key;
+        panel.hidden = !isActive;
+      });
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => setActive(tab.dataset.m7Tab));
+    });
+
+    const initial =
+      tabs.find((t) => t.classList.contains("is-active"))?.dataset?.m7Tab ||
+      tabs[0].dataset.m7Tab;
+    setActive(initial);
+  });
 }
 
 function setupFlipCards() {
@@ -1596,6 +1685,7 @@ function setupActivityModals() {
     if (!(activity instanceof HTMLElement)) return;
     if (activity.closest("dialog")) return;
     if (activity.closest("#modulo-1")) return; // Módulo 1 se mantiene visible
+    if (activity.dataset.modalSkip === "true") return;
 
     const activityId = activity.dataset.activityId || "";
     if (!activityId) return;
@@ -1962,7 +2052,24 @@ function setupOrderActivities() {
     const resetBtn = activity.querySelector(".activity-reset");
     const feedback = activity.querySelector(".feedback");
 
-    const correctOrder = ["Identificación", "Cribado", "Elegibilidad", "Inclusión"];
+    const fallbackOrder = ["Identificación", "Cribado", "Elegibilidad", "Inclusión"];
+    const expectedOrder = (activity.dataset.orderCorrect || "")
+      .split("|")
+      .map((v) => v.trim())
+      .filter(Boolean);
+    const correctOrder = expectedOrder.length ? expectedOrder : fallbackOrder;
+
+    const correctMessage =
+      activity.dataset.feedbackCorrect ||
+      (expectedOrder.length
+        ? "Excelente. Comprendiste que el sistema no comienza con un dashboard, sino con datos bien capturados."
+        : "Correcto. El orden PRISMA es adecuado.");
+
+    const incorrectMessage =
+      activity.dataset.feedbackIncorrect ||
+      (expectedOrder.length
+        ? "Revisa el flujo. Antes de analizar o visualizar información, es necesario capturar, almacenar y procesar los datos."
+        : "Revisa el orden: identificación, cribado, elegibilidad e inclusión.");
 
     if (!list) return;
 
@@ -1994,10 +2101,10 @@ function setupOrderActivities() {
 
         if (feedback) {
           setFeedbackTone(feedback, correct);
-          feedback.textContent = correct
-            ? "Correcto. El orden PRISMA es adecuado."
-            : "Revisa el orden: identificación, cribado, elegibilidad e inclusión.";
+          feedback.textContent = correct ? correctMessage : incorrectMessage;
         }
+
+        if (correct) completeActivity(activity);
       });
     }
 
@@ -2028,6 +2135,73 @@ function setupOrderActivities() {
         feedback.textContent = "";
       }
     };
+  });
+}
+
+function setupModule7Quiz() {
+  const activities = Array.from(
+    document.querySelectorAll('.activity[data-activity-type="module7-quiz"]')
+  );
+
+  activities.forEach((activity) => {
+    const form = activity.querySelector(".module7-quiz-form");
+    const checkBtn = activity.querySelector(".activity-check");
+    const resetBtn = activity.querySelector(".activity-reset");
+    const feedback = activity.querySelector(".feedback");
+
+    if (!form || !checkBtn || !feedback) return;
+
+    const answers = {
+      q1: "b",
+      q2: "a",
+      q3: "a",
+      q4: "a",
+    };
+
+    function validate() {
+      const data = new FormData(form);
+      let allAnswered = true;
+      let allCorrect = true;
+
+      Object.entries(answers).forEach(([question, correct]) => {
+        const value = data.get(question);
+        if (!value) {
+          allAnswered = false;
+          allCorrect = false;
+        }
+
+        if (value && value !== correct) {
+          allCorrect = false;
+        }
+      });
+
+      if (!allAnswered) {
+        setFeedbackTone(feedback, false);
+        feedback.textContent = "Responde todas las preguntas antes de verificar.";
+        return;
+      }
+
+      setFeedbackTone(feedback, allCorrect);
+      feedback.textContent = allCorrect
+        ? "Muy bien. Todas las respuestas son correctas."
+        : "Revisa tus respuestas y corrige las opciones incorrectas.";
+
+      if (allCorrect) {
+        completeActivity(activity, "¡Bien! El dato está listo para convertirse en decisión institucional.");
+      }
+    }
+
+    function reset() {
+      form.reset();
+      setFeedbackTone(feedback, null);
+      feedback.textContent = "";
+    }
+
+    checkBtn.addEventListener("click", validate);
+    if (resetBtn) resetBtn.addEventListener("click", reset);
+
+    activity.__odcReset = reset;
+    reset();
   });
 }
 
@@ -2506,36 +2680,125 @@ function setupQuiz() {
 
   if (!finalQuiz) return;
 
-  finalQuiz.addEventListener("submit", (event) => {
-    event.preventDefault();
+  const items = Array.from(finalQuiz.querySelectorAll(".quiz-item"));
 
+  function getCorrectLabelText(fieldset) {
+    if (!fieldset) return "";
+    const correctValue = fieldset.dataset.correct;
+    if (!correctValue) return "";
+
+    const correctInput = fieldset.querySelector(
+      `input[type="radio"][value="${correctValue}"]`
+    );
+    if (!correctInput) return "";
+
+    const label = correctInput.closest("label");
+    if (!label) return "";
+
+    return (label.textContent || "").replace(/\s+/g, " ").trim();
+  }
+
+  function showItemFeedback(fieldset) {
+    const correctValue = fieldset.dataset.correct;
+    const explanation = (fieldset.dataset.feedback || "").trim();
+    const feedbackEl = fieldset.querySelector(".item-feedback");
+
+    if (!feedbackEl || !correctValue) return;
+
+    const selected = fieldset.querySelector('input[type="radio"]:checked');
+    if (!selected) {
+      feedbackEl.textContent = "";
+      setFeedbackTone(feedbackEl, null);
+      return;
+    }
+
+    const isCorrect = selected.value === correctValue;
+    const correctText = getCorrectLabelText(fieldset);
+
+    if (isCorrect) {
+      setFeedbackTone(feedbackEl, true);
+      feedbackEl.textContent = explanation
+        ? `Correcto. ${explanation}`
+        : "Correcto.";
+      return;
+    }
+
+    setFeedbackTone(feedbackEl, false);
+    feedbackEl.textContent = explanation
+      ? `Incorrecto. Respuesta correcta: ${correctText} ${explanation}`
+      : `Incorrecto. Respuesta correcta: ${correctText}`;
+  }
+
+  items.forEach((fieldset) => {
+    fieldset.addEventListener("change", () => showItemFeedback(fieldset));
+  });
+
+  function computeScore() {
     const formData = new FormData(finalQuiz);
     let score = 0;
 
     for (let i = 1; i <= 8; i += 1) {
-      if (formData.get(`q${i}`) === "a") score += 1;
+      const answer = formData.get(`q${i}`);
+      const fieldset = finalQuiz
+        .querySelector(`input[name="q${i}"]`)
+        ?.closest?.(".quiz-item");
+      const correct = fieldset?.dataset?.correct;
+      if (correct && answer === correct) score += 1;
     }
 
+    return score;
+  }
+
+  function renderFinalFeedback(score) {
     const quizResult = document.getElementById("quizResult");
     const quizReview = document.getElementById("quizReview");
 
+    const passed = score >= 6;
+
     if (quizResult) {
       quizResult.textContent = `Obtuviste ${score} de 8 respuestas correctas.`;
-      setFeedbackTone(quizResult, score === 8);
+      setFeedbackTone(quizResult, passed);
     }
 
     if (quizReview) {
-      quizReview.textContent =
-        score === 8
-          ? "Muy bien: todas las respuestas son correctas."
-          : "Revisa los módulos sugeridos para mejorar tu puntaje.";
-      setFeedbackTone(quizReview, score === 8);
+      let message = "";
+
+      if (score === 8) {
+        message =
+          "Excelente desempeño. Comprendiste los conceptos, tecnologías, indicadores y fundamentos metodológicos del ODC. Puedes explicar cómo la analítica de datos contribuye a una gestión de residuos más sostenible y basada en evidencia.";
+      } else if (score >= 6) {
+        message =
+          "Buen desempeño. Alcanzaste el resultado de aprendizaje. Se recomienda repasar los módulos sobre indicadores, PRISMA y funcionamiento del sistema para fortalecer la comprensión.";
+      } else if (score >= 4) {
+        message =
+          "Desempeño básico. Reconoces algunos conceptos importantes, pero necesitas revisar nuevamente los módulos centrales sobre tecnologías, indicadores y gestión inteligente.";
+      } else {
+        message =
+          "Requiere refuerzo. Es recomendable volver a estudiar los módulos del ODC antes de repetir la evaluación, especialmente los conceptos de RSU, tecnologías digitales, indicadores y aplicación institucional.";
+      }
+
+      quizReview.textContent = message;
+      setFeedbackTone(quizReview, passed);
     }
+  }
+
+  finalQuiz.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    items.forEach((fieldset) => showItemFeedback(fieldset));
+    renderFinalFeedback(computeScore());
   });
 
   if (resetQuizBtn) {
     resetQuizBtn.addEventListener("click", () => {
       finalQuiz.reset();
+
+      items.forEach((fieldset) => {
+        const feedbackEl = fieldset.querySelector(".item-feedback");
+        if (!feedbackEl) return;
+        setFeedbackTone(feedbackEl, null);
+        feedbackEl.textContent = "";
+      });
 
       const quizResult = document.getElementById("quizResult");
       const quizReview = document.getElementById("quizReview");
@@ -2738,6 +3001,7 @@ function init() {
   setupM5IndicatorsPanel();
   setupFlipCards();
   setupFlowGraphics();
+  decorateSectionTargetButtons();
   setupCircularRouteActivity();
   setupActivityModals();
   setupActivities();
@@ -2770,6 +3034,57 @@ function init() {
   }
 
   updateProgress();
+}
+
+function decorateSectionTargetButtons() {
+  const buttons = Array.from(
+    document.querySelectorAll('button.btn.btn-primary[data-section-target]')
+  );
+
+  const emojiByTarget = {
+    entrada: "🚀",
+    "modulo-1": "🧭",
+    "modulo-2": "🗑️",
+    "modulo-3": "💻",
+    "modulo-4": "⚖️",
+    "modulo-5": "📏",
+    "modulo-6": "📚",
+    "modulo-7": "🧠",
+    "modulo-8": "🏛️",
+    evaluacion: "✅",
+    conclusion: "🎓",
+  };
+
+  buttons.forEach((button) => {
+    if (!button || button.dataset.decorated === "true") return;
+    button.dataset.decorated = "true";
+
+    const target = button.dataset.sectionTarget;
+    const emoji = emojiByTarget[target] || "➡️";
+
+    button.classList.add("btn-module-next");
+
+    const originalText = button.textContent || "";
+    button.textContent = "";
+
+    const emojiSpan = document.createElement("span");
+    emojiSpan.className = "btn-emoji";
+    emojiSpan.setAttribute("aria-hidden", "true");
+    emojiSpan.textContent = `${emoji} `;
+
+    const textSpan = document.createElement("span");
+    textSpan.className = "btn-text";
+    textSpan.textContent = originalText.trim();
+
+    const arrowSpan = document.createElement("span");
+    arrowSpan.className = "btn-arrow";
+    arrowSpan.setAttribute("aria-hidden", "true");
+    arrowSpan.textContent = " →";
+
+    button.appendChild(emojiSpan);
+    button.appendChild(textSpan);
+    button.appendChild(arrowSpan);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);
