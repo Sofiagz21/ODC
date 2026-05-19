@@ -245,14 +245,17 @@ function setCompletedUpTo(value) {
 }
 
 function canAccessSectionId(id) {
-  const targetIndex = indexById.get(id);
-  if (targetIndex === undefined) return true;
-
-  const completedUpTo = getCompletedUpTo();
-  return targetIndex <= completedUpTo + 1;
+  return true;
 }
 
 function applyModuleLockState() {
+  navLinks.forEach((link) => {
+    link.disabled = false;
+    link.setAttribute("aria-disabled", "false");
+    link.title = "";
+  });
+  updateNextButtonLock();
+
   navLinks.forEach((link) => {
     const targetId = link.dataset.section;
     const isLocked = !canAccessSectionId(targetId);
@@ -276,6 +279,9 @@ function updateNextButtonLock() {
     nextBtn.disabled = true;
     return;
   }
+
+  nextBtn.disabled = false;
+  return;
 
   nextBtn.disabled = !canAccessSectionId(nextSection.id);
 }
@@ -321,7 +327,7 @@ function showSection(index) {
     return;
   }
 
-  if (!canAccessSectionId(targetId)) {
+  if (false && !canAccessSectionId(targetId)) {
     const completedUpTo = getCompletedUpTo();
     const requiredId = orderedSectionIds[completedUpTo + 1] || "entrada";
     const requiredIndex = sections.findIndex((section) => section.id === requiredId);
@@ -343,6 +349,7 @@ function showSection(index) {
 
   pauseAllVideos();
   resetSectionVideos(previousSection);
+  stopSectionIframes(previousSection);
 
   sections.forEach((section, sectionIndex) => {
     section.classList.toggle("active", sectionIndex === index);
@@ -357,7 +364,6 @@ function showSection(index) {
   updateNextButtonLock();
   maybeCompleteActiveSection();
   window.setTimeout(maybeCompleteActiveSection, 6200);
-  autoplayPrimaryVideo(sections[index]);
   animateSectionEntrance(sections[index]);
 
   if (audioUnlocked) {
@@ -658,6 +664,26 @@ function pauseAllVideos() {
 
   videos.forEach((video) => {
     if (!video.paused) video.pause();
+  });
+}
+
+function stopSectionIframes(section) {
+  if (!section) return;
+
+  const iframes = Array.from(section.querySelectorAll("iframe"));
+
+  iframes.forEach((iframe) => {
+    const src = iframe.getAttribute("src");
+    if (!src) return;
+
+    // Forzar la detención de audio/video en embeds (HeyGen/otros) al navegar entre módulos.
+    try {
+      iframe.setAttribute("src", "about:blank");
+      // Restaura la URL original en el siguiente ciclo para detener reproducción en curso.
+      window.setTimeout(() => iframe.setAttribute("src", src), 0);
+    } catch {
+      // ignore
+    }
   });
 }
 
@@ -3174,7 +3200,7 @@ function init() {
   setupModals();
 
   // Intenta autoplay en la sección activa (normalmente Portada)
-  autoplayPrimaryVideo(sections[currentSectionIndex]);
+  // Autoplay desactivado para evitar audio duplicado al navegar entre módulos.
 
   // En el primer gesto del usuario, fuerza audio activo (los navegadores suelen bloquear autoplay con sonido).
   document.addEventListener("pointerdown", enableAudioEverywhere, { once: true });

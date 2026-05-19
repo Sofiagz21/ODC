@@ -142,6 +142,12 @@ a:hover {
   color: #7eff9e;
 }
 
+/* Evita desbordes por URLs largas (referencias) */
+.references-list a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 a,
 button,
 .btn,
@@ -387,6 +393,7 @@ textarea {
 }
 
 .m5-intro {
+  width: 100%;
   max-width: 1000px;
   margin: 0 auto 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -3805,7 +3812,8 @@ button:disabled,
 
   .m5-table,
   .m2-data-table,
-  .m3-summary-table {
+  .m3-summary-table,
+  .m6-table {
     display: block;
     width: 100%;
     overflow-x: auto;
@@ -3901,15 +3909,25 @@ button:disabled,
     padding: 1rem;
   }
 
-  .module7-avatar-frame,
-  .module8-avatar-frame {
+  .m3-portrait-frame,
+  .m4-portrait-frame {
     min-height: 320px;
-    max-height: 520px;
+    max-height: 56vh;
+  }
+
+  .module7-avatar-frame {
+    min-height: 240px;
+    max-height: 360px;
+  }
+
+  .module8-avatar-frame {
+    min-height: 220px;
+    max-height: 56vh;
   }
 
   #modulo-8 .module8-video-top .cover-video-wrapper {
-    min-height: 320px;
-    max-height: 460px;
+    min-height: 220px;
+    max-height: 56vh;
   }
 
   /* Portada: mobile */
@@ -3959,6 +3977,24 @@ button:disabled,
 
   #portada .cover-video-wrapper {
     min-height: 340px;
+  }
+}
+
+@media (max-width: 420px) {
+  .m3-portrait-frame,
+  .m4-portrait-frame {
+    min-height: 300px;
+    max-height: 54vh;
+  }
+
+  .module8-avatar-frame {
+    min-height: 200px;
+    max-height: 52vh;
+  }
+
+  #modulo-8 .module8-video-top .cover-video-wrapper {
+    min-height: 200px;
+    max-height: 52vh;
   }
 }
 /* ========== MODULE 1: PROBLEMA AMBIENTAL ========== */
@@ -4554,6 +4590,7 @@ button:disabled,
 }
 
 .m2-intro {
+  width: 100%;
   max-width: 1000px;
   margin: 0 auto 1.6rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -4607,6 +4644,45 @@ button:disabled,
 
 .m2-intro-body p {
   margin: 0.85rem 0 0;
+}
+
+/* INTRO GENÉRICA (TODOS LOS MÓDULOS) */
+
+.module-intro {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto 1.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+}
+
+.module-intro summary {
+  cursor: pointer;
+  padding: 1rem 1.1rem;
+  font-weight: 900;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.module-intro-body {
+  padding: 0.1rem 1.1rem 1rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.module-intro-body p {
+  margin: 0.85rem 0 0;
+}
+
+/* Cuando la introducción vive dentro de una tarjeta, evita márgenes y límites de ancho. */
+.content-card .module-intro {
+  max-width: none;
+  margin: 0;
 }
 
 .m2-theory {
@@ -5444,6 +5520,7 @@ button:disabled,
 }
 
 .m3-intro {
+  width: 100%;
   max-width: 1000px;
   margin: 0 auto 1.6rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -6458,6 +6535,7 @@ button:disabled,
 }
 
 .m4-intro {
+  width: 100%;
   max-width: 1000px;
   margin: 0 auto 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -6912,6 +6990,7 @@ button:disabled,
 }
 
 .m6-intro {
+  width: 100%;
   max-width: 1100px;
   margin: 0 auto 1.1rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -7546,5 +7625,13 @@ button:disabled,
 
   .ws-words {
     grid-column: 1;
+  }
+}
+
+@media (max-width: 420px) {
+  .ws-grid td {
+    width: 28px;
+    height: 28px;
+    font-size: 0.82rem;
   }
 }
