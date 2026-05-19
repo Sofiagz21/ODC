@@ -40,7 +40,6 @@ const orderedSectionIds = [
 
 const indexById = new Map(orderedSectionIds.map((id, index) => [id, index]));
 
-let hasShownLockMessage = false;
 let activeEnterTimeMs = null;
 let activeSectionId = null;
 
@@ -331,14 +330,6 @@ function showSection(index) {
     const completedUpTo = getCompletedUpTo();
     const requiredId = orderedSectionIds[completedUpTo + 1] || "entrada";
     const requiredIndex = sections.findIndex((section) => section.id === requiredId);
-
-    if (!hasShownLockMessage) {
-      hasShownLockMessage = true;
-      showInfoDialog(
-        "Este contenido está bloqueado. Para desbloquearlo, revisa el módulo anterior y llega hasta el final.",
-        "Contenido bloqueado"
-      );
-    }
 
     if (requiredIndex !== -1) {
       index = requiredIndex;

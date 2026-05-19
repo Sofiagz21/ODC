@@ -33,6 +33,10 @@ video {
   height: auto;
 }
 
+iframe {
+  max-width: 100%;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -1184,6 +1188,12 @@ p {
   align-items: start;
 }
 
+.hero-grid > *,
+.two-columns > *,
+.module-layout > * {
+  min-width: 0;
+}
+
 .module-layout.module-layout-single {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -1226,6 +1236,8 @@ p {
   font-size: 0.52rem;
   line-height: 1.55;
   font-style: italic;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .avatar-note strong {
@@ -3264,6 +3276,7 @@ button:disabled,
   padding: 0.35rem 0.45rem;
   overflow: visible;
   margin-top: 0.75rem;
+  max-width: 100%;
 }
 
 .module7-table-wrapper table {
@@ -3307,6 +3320,10 @@ button:disabled,
   margin-top: 1rem;
 }
 
+.module7-example-grid > * {
+  min-width: 0;
+}
+
 .module7-image-placeholder {
   min-height: 220px;
   padding: 1.35rem;
@@ -3332,6 +3349,7 @@ button:disabled,
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.03);
   animation: odcPopIn 0.55s ease both;
+  max-width: 100%;
 }
 
 .module7-example-image {
@@ -3802,32 +3820,20 @@ button:disabled,
 }
 
 @media (max-width: 980px) {
-  /* Tablas: permitir scroll horizontal en pantallas pequeñas */
+  /* Tablas: scroll horizontal en pantallas pequeñas (el scroll va en el wrapper) */
   .m6-findings-tablewrap,
   .module7-table-wrapper,
-  .module8-table-wrapper {
+  .module8-table-wrapper,
+  .table-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
   }
 
-  .m5-table,
-  .m2-data-table,
-  .m3-summary-table,
-  .m6-table {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .m5-table,
-  .m2-data-table,
-  .m3-summary-table,
-  .m6-table,
-  .module7-table,
-  .module7-detail-table,
-  .module7-cafe-table,
-  .module8-table {
+  .m6-findings-tablewrap > table,
+  .module7-table-wrapper > table,
+  .module8-table-wrapper > table,
+  .table-scroll > table {
     min-width: 720px;
   }
 }
@@ -7633,5 +7639,76 @@ button:disabled,
     width: 28px;
     height: 28px;
     font-size: 0.82rem;
+  }
+}
+
+/* =========================
+   MOBILE: TABLE SCROLL
+   (placed at the end to override later table-specific rules)
+========================= */
+
+.table-scroll {
+  width: 100%;
+  max-width: 100%;
+}
+
+.media-scroll {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 980px) {
+  .table-scroll,
+  .m6-findings-tablewrap,
+  .module7-table-wrapper,
+  .module8-table-wrapper {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  .table-scroll > table,
+  .m6-findings-tablewrap > table,
+  .module7-table-wrapper > table,
+  .module8-table-wrapper > table {
+    min-width: 720px;
+  }
+
+  /* Ajustes por tipo de tabla (mejor lectura antes de envolver texto) */
+  .table-scroll > .m2-data-table {
+    min-width: 520px;
+  }
+
+  .table-scroll > .m6-table {
+    min-width: 620px;
+  }
+
+  .table-scroll > .m3-summary-table,
+  .table-scroll > .m5-table,
+  .m6-findings-tablewrap > .m6-table,
+  .module8-table-wrapper > .module8-table {
+    min-width: 860px;
+  }
+
+  .module7-table-wrapper > .module7-table {
+    min-width: 980px;
+  }
+
+  .module7-table-wrapper > .module7-detail-table,
+  .module7-table-wrapper > .module7-cafe-table {
+    min-width: 1100px;
+  }
+
+  .media-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  .media-scroll > .m6-prisma-diagram {
+    width: 1000px;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
