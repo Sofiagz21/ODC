@@ -2444,10 +2444,138 @@ function initializeWordSearch() {
 
     if (!grid || wordButtons.length === 0) return;
 
-    // Get cells from table
+    const words = Array.from(wordButtons)
+      .map((btn) => (btn.dataset.word || "").trim().toUpperCase())
+      .filter(Boolean);
+
+    const maxWordLen = words.reduce((max, w) => Math.max(max, w.length), 0);
+
+    function createSeededRandom(seedString) {
+      // FNV-1a hash -> 32-bit seed
+      let hash = 2166136261;
+      for (let i = 0; i < seedString.length; i++) {
+        hash ^= seedString.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+      // Mulberry32
+      return function random() {
+        hash |= 0;
+        hash = (hash + 0x6d2b79f5) | 0;
+        let t = Math.imul(hash ^ (hash >>> 15), 1 | hash);
+        t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function buildWordSearchGrid(tableEl, size, wordList) {
+      const random = createSeededRandom(
+        `${activity.dataset.activityId || ""}-${activity.dataset.activitySection || ""}-${size}`
+      );
+
+      const gridMatrix = Array.from({ length: size }, () =>
+        Array.from({ length: size }, () => "")
+      );
+
+      const directions = [
+        { dx: 1, dy: 0 },
+        { dx: 0, dy: 1 },
+        { dx: 1, dy: 1 },
+        { dx: -1, dy: 0 },
+        { dx: 0, dy: -1 },
+        { dx: -1, dy: -1 },
+        { dx: 1, dy: -1 },
+        { dx: -1, dy: 1 },
+      ];
+
+      const sortedWords = [...wordList].sort((a, b) => b.length - a.length);
+
+      function canPlace(word, row, col, dir) {
+        for (let i = 0; i < word.length; i++) {
+          const r = row + dir.dy * i;
+          const c = col + dir.dx * i;
+          const existing = gridMatrix[r][c];
+          if (existing && existing !== word[i]) return false;
+        }
+        return true;
+      }
+
+      function placeWord(word) {
+        const maxAttempts = 600;
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+          const dir = directions[Math.floor(random() * directions.length)];
+          const rowMin = dir.dy === -1 ? word.length - 1 : 0;
+          const rowMax = dir.dy === 1 ? size - word.length : size - 1;
+          const colMin = dir.dx === -1 ? word.length - 1 : 0;
+          const colMax = dir.dx === 1 ? size - word.length : size - 1;
+
+          const row = rowMin + Math.floor(random() * (rowMax - rowMin + 1));
+          const col = colMin + Math.floor(random() * (colMax - colMin + 1));
+
+          if (!canPlace(word, row, col, dir)) continue;
+
+          for (let i = 0; i < word.length; i++) {
+            const r = row + dir.dy * i;
+            const c = col + dir.dx * i;
+            gridMatrix[r][c] = word[i];
+          }
+          return true;
+        }
+        return false;
+      }
+
+      // Place all words; if any fail, fall back to a larger grid
+      for (const word of sortedWords) {
+        const ok = placeWord(word);
+        if (!ok) return false;
+      }
+
+      // Fill the rest with random letters
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (!gridMatrix[r][c]) {
+            gridMatrix[r][c] = alphabet[Math.floor(random() * alphabet.length)];
+          }
+        }
+      }
+
+      // Render table
+      tableEl.innerHTML = "";
+      const tbody = document.createElement("tbody");
+      for (let r = 0; r < size; r++) {
+        const tr = document.createElement("tr");
+        for (let c = 0; c < size; c++) {
+          const td = document.createElement("td");
+          td.textContent = gridMatrix[r][c];
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      }
+      tableEl.appendChild(tbody);
+
+      return true;
+    }
+
+    // Ensure the grid can actually contain the longest word (e.g., SOSTENIBILIDAD)
+    let rows = grid.querySelectorAll("tr").length;
+    let cols =
+      grid.querySelector("tr")?.querySelectorAll("td")?.length || 0;
+
+    const targetSize = Math.max(14, maxWordLen);
+    if (rows < targetSize || cols < targetSize) {
+      // Try build with target size; if placement fails (rare), grow and retry
+      let size = targetSize;
+      while (size <= targetSize + 4) {
+        const built = buildWordSearchGrid(grid, size, words);
+        if (built) break;
+        size += 1;
+      }
+      rows = grid.querySelectorAll("tr").length;
+      cols = grid.querySelector("tr")?.querySelectorAll("td")?.length || 0;
+    }
+
+    // Get cells from table (after potential rebuild)
     const cells = Array.from(grid.querySelectorAll("td"));
-    const rows = grid.querySelectorAll("tr").length;
-    const cols = grid.querySelector("tr").querySelectorAll("td").length;
 
     // Track found words
     const foundWords = new Set();
@@ -2459,8 +2587,6 @@ function initializeWordSearch() {
 
     function findWords(cells, rows, cols) {
       const positions = {};
-      const words = Array.from(wordButtons).map((btn) => btn.dataset.word);
-
       words.forEach((word) => {
         // Check all directions: right, down, diagonal-right, diagonal-left
         const directions = [
@@ -2511,28 +2637,58 @@ function initializeWordSearch() {
       return positions;
     }
 
-    // Mouse events for grid selection
-    cells.forEach((cell, index) => {
-      cell.addEventListener("mousedown", () => {
-        selectionStartCell = index;
-        selectedCells = [index];
-        updateSelection();
-      });
+    // Pointer events for grid selection (mouse + touch + pen)
+    let activePointerId = null;
 
-      cell.addEventListener("mouseenter", () => {
-        if (selectionStartCell === null) return;
+    function getCellIndexFromEvent(evt) {
+      const target = evt.target instanceof Element ? evt.target : null;
+      const td = target?.closest?.("td") || null;
+      if (!td || !grid.contains(td)) return null;
+      const idx = cells.indexOf(td);
+      return idx >= 0 ? idx : null;
+    }
 
-        // Get line between start and current cell
-        selectedCells = getLineCells(selectionStartCell, index, rows, cols);
-        updateSelection();
-      });
+    function finishSelection() {
+      checkSelection();
+      selectionStartCell = null;
+      selectedCells = [];
+      updateSelection();
+      activePointerId = null;
+    }
 
-      cell.addEventListener("mouseup", () => {
-        checkSelection();
-        selectionStartCell = null;
-        selectedCells = [];
-        updateSelection();
-      });
+    grid.addEventListener("pointerdown", (evt) => {
+      const index = getCellIndexFromEvent(evt);
+      if (index === null) return;
+
+      activePointerId = evt.pointerId;
+      grid.setPointerCapture(activePointerId);
+
+      selectionStartCell = index;
+      selectedCells = [index];
+      updateSelection();
+
+      evt.preventDefault();
+    });
+
+    grid.addEventListener("pointermove", (evt) => {
+      if (activePointerId === null || evt.pointerId !== activePointerId) return;
+      if (selectionStartCell === null) return;
+
+      const index = getCellIndexFromEvent(evt);
+      if (index === null) return;
+
+      selectedCells = getLineCells(selectionStartCell, index, rows, cols);
+      updateSelection();
+    });
+
+    grid.addEventListener("pointerup", (evt) => {
+      if (activePointerId === null || evt.pointerId !== activePointerId) return;
+      finishSelection();
+    });
+
+    grid.addEventListener("pointercancel", (evt) => {
+      if (activePointerId === null || evt.pointerId !== activePointerId) return;
+      finishSelection();
     });
 
     // Helper to get cells in a line
@@ -2572,14 +2728,14 @@ function initializeWordSearch() {
         .map((i) => cells[i].textContent?.trim() || "")
         .join("");
 
-      const selectedTextReverse = selectedCells
+      const selectedTextReverse = [...selectedCells]
         .reverse()
         .map((i) => cells[i].textContent?.trim() || "")
         .join("");
 
       let foundWord = null;
 
-      for (const word of Array.from(wordButtons).map((btn) => btn.dataset.word)) {
+      for (const word of words) {
         if (
           selectedText === word ||
           selectedTextReverse === word ||
@@ -2593,7 +2749,7 @@ function initializeWordSearch() {
       if (foundWord && !foundWords.has(foundWord)) {
         foundWords.add(foundWord);
         markWordAsFound(foundWord);
-        updateFeedback();
+        updateFeedback(foundWord);
 
         if (foundWords.size === wordButtons.length) {
           showCompletionMessage();
@@ -2618,11 +2774,19 @@ function initializeWordSearch() {
       }
     }
 
-    function updateFeedback() {
+    function updateFeedback(foundWord) {
       const remaining = wordButtons.length - foundWords.size;
       if (remaining === 0) return;
 
-      feedbackEl.textContent = `¡Bien! Te quedan ${remaining} palabr${remaining === 1 ? "a" : "as"}.`;
+      const btn = Array.from(wordButtons).find(
+        (b) => (b.dataset.word || "").trim().toUpperCase() === foundWord
+      );
+      const label = (btn?.textContent || foundWord).replace(/\s+/g, " ").trim();
+      const hint = (btn?.dataset.hint || "").trim();
+
+      feedbackEl.textContent = hint
+        ? `¡Bien! Encontraste "${label}". ${hint} Te quedan ${remaining} palabra${remaining === 1 ? "" : "s"}.`
+        : `¡Bien! Encontraste "${label}". Te quedan ${remaining} palabra${remaining === 1 ? "" : "s"}.`;
       feedbackEl.classList.add("success");
       setTimeout(() => feedbackEl.classList.remove("success"), 2000);
     }
